@@ -628,19 +628,19 @@ class `DoFileWriter' {
 				put()
 
 	private:
-		`RS' fh
 		// If 1, add debugging information to the do-file as comments; 0
 		// otherwise.
 		`RS' debug
 		// If 1, use naive rules (sufficient for -odkmeta-) to determine the
 		// indent setting; 0 otherwise.
 		`RS' autotab
+		`RS' fh
 		// The indent setting of the current line
 		`RS' tab
 		// Indicates whether the current line is a comment:
 		// 0 - not a comment
 		// 1 - one-line comment
-		// 2 - multi-line comment: start or middle (not end) of /* */ block
+		// 2 - multiline comment: start or middle (not end) of /* */ block
 		`RS' comment
 		/* joinline indicates the line number within a line-join block.
 		Lines not in a line-join block have linejoin = 1. For example:
@@ -653,17 +653,18 @@ class `DoFileWriter' {
 
 		*/
 		`RS' joinline
-		// lastjoin indicates whether the previous line had joinline > 1, i.e.,
-		// whether it should be an indented line within a line-join block.
+		// lastjoin is 1 if the previous line had joinline > 1, i.e., if the
+		// previous line should have been an indented line within a line-join
+		// block; otherwise it is 0.
 		`RS' lastjoin
-		// The delimiter in effect for the current line
+		// The delimiter for the current line
 		`SS' delim
 		// The start of the current line
 		`SS' linestart
 		void new(), new_do_file()
 
 		// Line parsing functions
-		// These take the current line as an argument and assume that it is
+		// These take the current line as an argument, assuming that it is
 		// trimmed of leading and trailing white space.
 		`RS' open_block(), close_block()
 		`SS'			command()
