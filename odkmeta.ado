@@ -2403,10 +2403,6 @@ void _get_fields(pointer(`FieldS') rowvector fields,
 		return
 	}
 
-	// survey is "begin group/repeat" by itself, not followed by a field.
-	if (rows == 1)
-		return
-
 	row = 1::rows
 	firstbeginrow = min(select(row, begin))
 	// The first row is not "begin group/repeat".
