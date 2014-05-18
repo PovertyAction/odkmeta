@@ -243,7 +243,7 @@ pr parse_survey, sclass
 	loc listvars listvars(`all')
 
 	tempvar nonmiss
-	egen `nonmiss' = rownonmiss(_all), strok
+	egen `nonmiss' = rownonmiss(_all), str
 	tempvar stdtype
 	loc matastd stdtype(st_sdata(., "`typevar'"))
 	mata: st_sstore(., st_addvar(smallest_vartype(`matastd'), "`stdtype'"), ///
@@ -311,7 +311,7 @@ pr parse_choices, sclass
 	unab all : _all
 	loc listvars listvars(`all')
 	tempvar nonmiss
-	egen `nonmiss' = rownonmiss(_all), strok
+	egen `nonmiss' = rownonmiss(_all), str
 
 	check_col `listname' ///
 		if (strtrim(`listname') != strtoname(strtrim(`listname')) | ///
