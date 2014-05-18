@@ -175,6 +175,7 @@ pr check_col
 	gen `touse' = `if'
 	qui cou if `touse'
 	if r(N) {
+		* Determine the first problematic row.
 		tempvar order
 		gen `order' = _n
 		* Add an extra observation so the row number is correct.
@@ -184,12 +185,15 @@ pr check_col
 		sort `order'
 		qui replace `order' = _n
 		qui su `order' if `touse'
+		loc first = r(min)
+
 		if "`listvars'" != "" ///
-			li `listvars' if `order' == `r(min)', ab(32)
+			li `listvars' in `first', ab(32)
+
 		* [ID 61], [ID 62], [ID 63], [ID 64], [ID 65], [ID 66], [ID 67], [ID 68]
 		mata: errprintf("invalid %s attribute '%s'\n", ///
 			st_global("`varlist'[Column_header]"), ///
-			st_sdata(`r(min)', "`varlist'"))
+			st_sdata(`first', "`varlist'"))
 		error_parsing 198, ///
 			`opt' `=cond("`subopt'" != "", "sub(`subopt'())", "")'
 		/*NOTREACHED*/
