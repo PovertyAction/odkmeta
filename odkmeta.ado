@@ -256,17 +256,20 @@ pr parse_survey, sclass
 	* Check the word count of `typevar'.
 	tempvar select
 	gen `select' = inlist(word(`stdtype', 1), "select_one", "select_multiple")
+	* [ID 65]
 	check_col `typevar' if `select' & wordcount(`stdtype') != ///
 		2 + (word(`stdtype', wordcount(`stdtype')) == "or_other"), ///
 		`opt' sub(type) `listvars'
 
 	* Check that the list names specified to select variables are Stata names.
+	* [ID 66], [ID 67], [ID 68]
 	check_col `typevar' if `select' & ///
 		(word(`stdtype', 2) != strtoname(word(`stdtype', 2)) | ///
 		strpos(word(`stdtype', 2), "`")), ///
 		`opt' sub(type) `listvars'
 
 	* Check the word count of `namevar'.
+	* [ID 200]
 	check_col `namevar' if wordcount(`namevar') != 1 & ///
 		!regexm(`stdtype', "^end (group|repeat)$") & `nonmiss', ///
 		`opt' sub(name) `listvars'
@@ -318,14 +321,17 @@ pr parse_choices, sclass
 	tempvar nonmiss
 	egen `nonmiss' = rownonmiss(_all), str
 
+	* [ID 61], [ID 62], [ID 63], [ID 64]
 	check_col `listnamevar' ///
 		if (strtrim(`listnamevar') != strtoname(strtrim(`listnamevar')) | ///
 		strpos(`listnamevar', "`")) & `nonmiss', ///
 		`opt' sub(listname) `listvars'
 
+	* [ID 201]
 	check_col `namevar' if mi(strtrim(`namevar')) & `nonmiss', ///
 		`opt' sub(name) `listvars'
 
+	* [ID 202]
 	check_col `labelvar' if mi(`labelvar') & `nonmiss', ///
 		`opt' sub(label) `listvars'
 
