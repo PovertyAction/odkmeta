@@ -1523,7 +1523,7 @@ field's variables' long names. Return codes:
 		return(0)
 
 	last = repeat->last_field()
-	if (last== NULL)
+	if (last == NULL)
 		return(0)
 	return(order == last->order())
 }
