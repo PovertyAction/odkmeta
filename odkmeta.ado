@@ -582,19 +582,20 @@ It is assumed that s can be enclosed in double quotes. See -help specialexp-. */
 
 /* Returns the Stata name that -insheet- would choose for s: all characters
 other than a-z, A-Z, 0-9, and _ are removed, then leading digits of the
-resulting string are removed, then the resulting string is truncated at 32
+resulting string are removed, then the resulting string is truncated to 32
 characters. If a digit follows a character other than a-z, A-Z, 0-9, or _ before
 any a-z, A-Z, or _ is encountered, -insheet- would not convert s to a Stata
 name, and -insheet_name()- returns "". */
 `SS' insheet_name(`SS' s)
 {
 	// "c" suffix for "character": "badc" for "bad character."
-	`RS' nondigit, badc, i
+	`RS' nondigit, badc, n, i
 	`SS' name, c
 
 	name = ""
 	nondigit = badc = 0
-	for (i = 1; i <= strlen(s); i++) {
+	n = strlen(s)
+	for (i = 1; i <= n; i++) {
 		c = substr(s, i, 1)
 		if (c >= "A" & c <= "Z" | c >= "a" & c <= "z" | c == "_") {
 			nondigit = 1
