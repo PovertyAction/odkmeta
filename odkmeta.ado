@@ -1038,11 +1038,13 @@ void `Collection'::new()
 	order = ++ctr
 }
 
-// Returns a pointer to the parent collection stored in the child class.
+// Returns a pointer to the parent collection stored in the child class
+// definition.
 pointer(`TS') scalar `Collection'::trans_parent()
 	_error("`Collection'.trans_parent() invoked")
 
-// Returns pointers to the children collections stored in the child class.
+// Returns pointers to the children collections stored in the child class
+// definition.
 pointer(`TS') rowvector `Collection'::trans_children()
 	_error("`Collection'.trans_children() invoked")
 
@@ -1067,8 +1069,8 @@ pointer(`FieldS') scalar `Collection'::field(`RS' i)
 void `Collection'::add_field(pointer(`FieldS') scalar newfield)
 	fields = fields, newfield
 
-// Returns 1 if the `Collection' represents the main fields, not a group or
-// repeat group; returns 0 otherwise.
+// Returns 1 if the collection represents the main fields, not a group or repeat
+// group; returns 0 otherwise.
 `RS' `Collection'::main()
 	return(trans_parent() == NULL)
 
@@ -1078,9 +1080,8 @@ void `Collection'::add_field(pointer(`FieldS') scalar newfield)
 	return(trans_parent() != NULL)
 
 // Returns the level of a collection within its family tree: for the main
-// fields, -_level()- returns 0; for collections among the main fields,
-// -_level()- returns 1; for collections within those collections, -_level()-
-// returns 2; and so on.
+// fields, -_level()- returns 0; for collections among the main fields, it
+// returns 1; for collections within those collections, it returns 2; and so on.
 `RS' `Collection'::_level(pointer(`CollectionS') scalar collec)
 {
 	if (collec->main())
@@ -1174,7 +1175,6 @@ class `Group' extends `Collection' {
 	private:
 		pointer(`GroupS') scalar		parent
 		pointer(`GroupS') rowvector		children
-
 }
 
 pointer(`TS') scalar `Group'::trans_parent()
@@ -1235,11 +1235,16 @@ void `Group'::add_child(pointer(`GroupS') scalar newchild)
 // Represents repeat groups.
 class `Repeat' extends `Collection' {
 	public:
+		/* getters and setters */
 		pointer(`RepeatS') scalar		parent(), child()
 		pointer(`RepeatS') rowvector	children()
+		pointer(`GroupS') scalar		parent_group()
 		pointer(`FieldS') scalar		parent_set_of(), child_set_of()
 		void							set_parent(), add_child(),
-										set_parent_set_of(), set_child_set_of()
+										set_parent_group(), set_parent_set_of(),
+										set_child_set_of()
+
+		`SS'							long_name()
 
 	protected:
 		virtual pointer(`TS') scalar		trans_parent()
@@ -1247,8 +1252,9 @@ class `Repeat' extends `Collection' {
 
 	private:
 		pointer(`RepeatS') scalar		parent
-		pointer(`FieldS') scalar		parentsetof, childsetof
 		pointer(`RepeatS') rowvector	children
+		pointer(`GroupS') scalar		parentgroup
+		pointer(`FieldS') scalar		parentsetof, childsetof
 }
 
 pointer(`TS') scalar `Repeat'::trans_parent()
@@ -1273,6 +1279,12 @@ pointer(`RepeatS') scalar `Repeat'::child(`RS' i)
 void `Repeat'::add_child(pointer(`RepeatS') scalar newchild)
 	children = children, newchild
 
+pointer(`GroupS') scalar `Repeat'::parent_group()
+	return(parentgroup)
+
+void `Repeat'::set_parent_group(newgroup)
+	parentgroup = newgroup
+
 // Every repeat group is associated with two SET-OF fields, one in the repeat
 // group and one in its parent.
 // -parent_set_of()- returns a pointer to the parent's SET-OF field.
@@ -1284,13 +1296,24 @@ void `Repeat'::set_parent_set_of(pointer(`FieldS') scalar newsetof)
 
 // Every repeat group is associated with two SET-OF fields, one in the repeat
 // group and one in its parent.
-// -child_set_of()- returns a pointer to this repeat's SET-OF field (the child
-// SET-OF).
+// -child_set_of()- returns a pointer to this repeat group's SET-OF field (the
+// child SET-OF).
 pointer(`FieldS') scalar `Repeat'::child_set_of()
 	return(childsetof)
 
 void `Repeat'::set_child_set_of(pointer(`FieldS') scalar newsetof)
 	childsetof = newsetof
+
+// Returns the repeat group's long name.
+`SS' `Repeat'::long_name()
+{
+	// The main fields, represented as a repeat group, have parentgroup == NULL.
+	if (parentgroup == NULL)
+		return(name())
+	else
+		return(parentgroup->long_name() + name())
+	/*NOTREACHED*/
+}
 
 					/* repeat class			*/
 /* -------------------------------------------------------------------------- */
@@ -1310,7 +1333,8 @@ class `Field' {
 		pointer(`RepeatS') scalar		repeat()
 		void							set_name(), set_type(), set_label(),
 										set_attribs(), set_group(),
-										set_repeat(), set_dup(), set_dup_var()
+										set_repeat(), set_dup_var(),
+										set_other_dup_name()
 
 		`RS'							begin_repeat(), end_repeat()
 		`SS'							long_name(), st_long()
@@ -1383,38 +1407,6 @@ void `Field'::set_label(`SS' newlabel)
 void `Field'::set_attribs(`SR' newattribs)
 	attribs = newattribs
 
-// Returns 1 if the Stata name of the field is the same as a previous field's;
-// otherwise it returns 0.
-`RS' `Field'::is_dup()
-	return(otherdup != "")
-
-/* If -is_dup()- == 1 and the field is associated with multiple variables,
-returns the ODK long name of the first variable of the field with a duplicate
-Stata name. For example, if mygeo is a geopoint field, then field.name() ==
-"mygeo", and field.dup_var() could be "mygeo-Latitude". If -is_dup()- == 0 or
-the field is associated with a single variable, -dup_var()- returns "". */
-`SS' `Field'::dup_var()
-	return(dupvar)
-
-// If -is_dup()- == 1, returns the ODK long name of the other field with the
-// same Stata name. Otherwise, it returns "".
-`SS' `Field'::other_dup_name()
-	return(otherdup)
-
-// Sets the name of the other field with the same Stata name and, for fields
-// associated with multiple variables, the name of the first variable with a
-// duplicate Stata name.
-void `Field'::set_dup(`SS' newotherdup, |`SS' newdupvar)
-{
-	otherdup = newotherdup
-	dupvar   = newdupvar
-}
-
-// For fields associated with multiple variables, sets the name of the first
-// variable with a duplicate Stata name.
-void `Field'::set_dup_var(`SS' newdupvar)
-	dupvar = newdupvar
-
 // Returns a pointer to the group in which the field is nested.
 // If the field is not in a group, it returns NULL.
 pointer(`GroupS') scalar `Field'::group()
@@ -1433,6 +1425,33 @@ pointer(`RepeatS') scalar `Field'::repeat()
 void `Field'::set_repeat(pointer(`RepeatS') scalar newrepeat)
 	repeat = newrepeat
 
+// Returns 1 if the Stata name of the field is the same as a previous field's;
+// otherwise it returns 0.
+`RS' `Field'::is_dup()
+	return(otherdup != "")
+
+/* If is_dup() == 1 and the field is associated with multiple variables, returns
+the ODK long name of the first variable of the field with a duplicate Stata
+name. For example, if mygeo is a geopoint field, then name() == "mygeo", and
+dup_var() could be "mygeo-Latitude". If is_dup() == 0 or the field is associated
+with a single variable, -dup_var()- returns "". */
+`SS' `Field'::dup_var()
+	return(dupvar)
+
+// For fields associated with multiple variables, sets the name of the first
+// variable with a duplicate Stata name.
+void `Field'::set_dup_var(`SS' newdupvar)
+	dupvar = newdupvar
+
+// If is_dup() == 1, returns the ODK long name of the other field with the same
+// Stata name. Otherwise, it returns "".
+`SS' `Field'::other_dup_name()
+	return(otherdup)
+
+// Sets the ODK long name of the other field with the same Stata name.
+void `Field'::set_other_dup_name(`SS' newotherdup)
+	otherdup = newotherdup
+
 // Returns the long name of the field.
 `SS' `Field'::long_name()
 	return((type != "begin repeat") * group->long_name() + name)
@@ -1446,11 +1465,12 @@ field's variables' long names. Return codes:
 `InsheetOK'		All the variables' names are OK.
 `InsheetBad'	-insheet- will not convert at least one of the variables' names
 				to a Stata name.
-`InsheetDup' 	At least one of the variables' names is duplicate, either with
-				another variable of the same field or with a variable of another
-				field.
-`InsheetV'		At least one of the variables' names is a v# name and another
-				field in the same repeat group is `InsheetBad' or `InsheetDup'.
+`InsheetDup' 	At least one of the variables' Stata name is duplicate, either
+				with another variable of the same field or with a variable of
+				another field in the same repeat group.
+`InsheetV'		At least one of the variables' Stata name is a v# name, and
+				another field in the same repeat group is `InsheetBad' or
+				`InsheetDup'.
 */
 `InsheetCodeS' `Field'::insheet()
 {
@@ -1463,13 +1483,12 @@ field's variables' long names. Return codes:
 
 	// geopoint variables (not fields) have a nonnumeric suffix, so they never
 	// match the pattern v#.
-	if (regexm(st_long(), "^v[1-9][0-9]*$") & type != "geopoint" &
-		group->main()) {
+	if (regexm(st_long(), "^v[1-9][0-9]*$") & type != "geopoint") {
 		n = length(repeat->fields())
 		for (i = 1; i <= n; i++) {
 			if (repeat->field(i)->order != order &
 				(repeat->field(i)->st_long() == "" |
-				repeat->field(i)->is_dup() != "")) {
+				repeat->field(i)->is_dup())) {
 				return(`InsheetV')
 			}
 		}
@@ -1484,7 +1503,7 @@ field's variables' long names. Return codes:
 {
 	pointer(`FieldS') scalar first
 
-	if (!repeat->inside())
+	if (repeat->main())
 		return(0)
 
 	first = repeat->first_field()
@@ -1499,16 +1518,19 @@ field's variables' long names. Return codes:
 {
 	pointer(`FieldS') scalar last
 
-	if (!repeat->inside())
+	if (repeat->main())
 		return(0)
 
 	last = repeat->last_field()
-	if (last== NULL)
+	if (last == NULL)
 		return(0)
 	return(order == last->order())
 }
 
 // Returns pointers to the groups for which the field is the first field.
+pointer(`GroupS') rowvector `Field'::begin_groups()
+	return(_begin_groups(group))
+
 pointer(`GroupS') rowvector `Field'::_begin_groups(pointer(`GroupS') scalar g)
 {
 	pointer(`FieldS') scalar groupfirst
@@ -1529,10 +1551,10 @@ pointer(`GroupS') rowvector `Field'::_begin_groups(pointer(`GroupS') scalar g)
 	/*NOTREACHED*/
 }
 
-pointer(`GroupS') rowvector `Field'::begin_groups()
-	return(_begin_groups(group))
-
 // Returns pointers to the groups for which the field is the last field.
+pointer(`GroupS') rowvector `Field'::end_groups()
+	return(_end_groups(group))
+
 pointer(`GroupS') rowvector `Field'::_end_groups(pointer(`GroupS') scalar g)
 {
 	pointer(`FieldS') scalar grouplast
@@ -1552,9 +1574,6 @@ pointer(`GroupS') rowvector `Field'::_end_groups(pointer(`GroupS') scalar g)
 		return(J(1, 0, NULL))
 	/*NOTREACHED*/
 }
-
-pointer(`GroupS') rowvector `Field'::end_groups()
-	return(_end_groups(group))
 
 					/* field and collection classes		*/
 /* -------------------------------------------------------------------------- */
