@@ -1528,6 +1528,9 @@ field's variables' long names. Return codes:
 }
 
 // Returns pointers to the groups for which the field is the first field.
+pointer(`GroupS') rowvector `Field'::begin_groups()
+	return(_begin_groups(group))
+
 pointer(`GroupS') rowvector `Field'::_begin_groups(pointer(`GroupS') scalar g)
 {
 	pointer(`FieldS') scalar groupfirst
@@ -1548,10 +1551,10 @@ pointer(`GroupS') rowvector `Field'::_begin_groups(pointer(`GroupS') scalar g)
 	/*NOTREACHED*/
 }
 
-pointer(`GroupS') rowvector `Field'::begin_groups()
-	return(_begin_groups(group))
-
 // Returns pointers to the groups for which the field is the last field.
+pointer(`GroupS') rowvector `Field'::end_groups()
+	return(_end_groups(group))
+
 pointer(`GroupS') rowvector `Field'::_end_groups(pointer(`GroupS') scalar g)
 {
 	pointer(`FieldS') scalar grouplast
@@ -1571,9 +1574,6 @@ pointer(`GroupS') rowvector `Field'::_end_groups(pointer(`GroupS') scalar g)
 		return(J(1, 0, NULL))
 	/*NOTREACHED*/
 }
-
-pointer(`GroupS') rowvector `Field'::end_groups()
-	return(_end_groups(group))
 
 					/* field and collection classes		*/
 /* -------------------------------------------------------------------------- */
