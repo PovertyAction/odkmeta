@@ -3263,7 +3263,7 @@ void write_repeat_locals(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat,
 {
 	// Define `repeats'.
 	df.put("local repeats " +
-		adorn_quotes("\`repeats' " + adorn_quotes(repeat), "list"))
+		adorn_quotes("\`repeats' " + adorn_quotes(repeat)))
 	// Define `childfiles.
 	if (anyrepeat) {
 		df.put("tempfile child")
@@ -3378,7 +3378,8 @@ void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 	// Variable order
 	df.put("unab before : _all")
 	// Check that there is no unexpected variable list overlap.
-	df.put(sprintf(`"local pos : list posof "%s" in repeats"', loopname))
+	df.put(sprintf(`"local pos : list posof %s in repeats"',
+		adorn_quotes(loopname)))
 	df.put("local child : word \`pos' of \`childfiles'")
 	df.put("describe using \`child', varlist")
 	df.put("local childvars \`r(varlist)'")
