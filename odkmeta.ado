@@ -1999,13 +1999,9 @@ void write_survey(
 	pointer(`RepeatS') rowvector repeats
 	pointer(`FieldS') rowvector fields
 
-	// Set default values for the output locals.
-	st_local(_anyrepeat,  "0")
-	st_local(_otherlists, "")
-
 	survey = read_csv(_survey)
 	if (rows(survey) < 2)
-		return
+		_error("no fields in survey sheet")
 
 	charpre = "Odk_"
 	attr = get_attribs(survey, _type, _name, _label, _disabled,
