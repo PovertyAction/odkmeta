@@ -103,7 +103,7 @@ pr odkmeta
 		encodetab fulldo
 
 	* Do-file start and end
-	mata: write_do_start(st_local("0"), "`startdo'")
+	mata: write_do_start("`startdo'", st_local("0"))
 	mata: write_do_end("`enddo'", "`relax'" != "")
 
 	* -survey()-
@@ -1819,7 +1819,7 @@ void append_files(`SR' _infiles, `SS' _outfile)
 /* -------------------------------------------------------------------------- */
 					/* do-file start/end	*/
 
-void write_do_start(`SS' _0, `SS' _outfile)
+void write_do_start(`SS' _outfile, `SS' _0)
 {
 	`DoFileWriterS' df
 
