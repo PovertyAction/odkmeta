@@ -513,7 +513,7 @@ It is assumed that s can be enclosed in double quotes. See -help specialexp-. */
 	else if (style == "label") {
 		// The list of characters allowed in a Stata name
 		namechars = tokens(c("ALPHA")), tokens(c("alpha")), strofreal(0..9), "_"
-		// s with namechars removed
+		// badchars is s with namechars removed
 		badchars = s
 		n = length(namechars)
 		for (i = 1; i <= n; i++) {
@@ -529,6 +529,7 @@ It is assumed that s can be enclosed in double quotes. See -help specialexp-. */
 		q = first :== " " :| first :== tab() :| first :== `"""' :|
 			first2 :== "`" + `"""' :| last :== " " :| last :== tab()
 
+		// Implement -loop-.
 		if (args() >= 3 & loop) {
 			q = q :| strpos(s, "  ") :| strpos(s, tab(2)) :|
 				strpos(s, " " + tab()) :| strpos(s, tab() + " ")
