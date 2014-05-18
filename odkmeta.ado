@@ -1729,16 +1729,16 @@ void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
 	if (cols)
 		col = 1..cols(csv)
 
-	// Check that required column headers exist.
-	optindex = J(1, 0, .)
-	nopts = cols(_opts)
+	// Check that the required column headers exist.
+	nopts = length(_opts)
+	optindex = J(1, nopts, .)
 	for (i = 1; i <= nopts; i++) {
 		if (rows)
 			min = min(select(col, csv[1,] :== st_local(_opts[i])))
 		else
 			min = .
 		if (min != .)
-			optindex = optindex, min
+			optindex[i] = min
 		else {
 			// [ID 35], [ID 37], [ID 39], [ID 40], [ID 53], [ID 188]
 			errprintf("column header %s not found\n", st_local(_opts[i]))
