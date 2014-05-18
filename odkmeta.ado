@@ -346,11 +346,6 @@ loc TR	transmorphic rowvector
 loc TC	transmorphic colvector
 loc TM	transmorphic matrix
 
-// "ocq" for "open compound quote"
-loc ocq		("`" + `"""')
-// "ccq" for "close compound quote"
-loc ccq		(`"""' + "'")
-
 * Convert real x to string using -strofreal(x, `RealFormat')-.
 loc RealFormat	""%24.0g""
 
