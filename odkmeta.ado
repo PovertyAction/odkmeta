@@ -1334,6 +1334,7 @@ class `Field' {
 		void							set_name(), set_type(), set_label(),
 										set_attribs(), set_group(),
 										set_repeat(), set_dup_var(),
+										set_other_dup_name()
 
 		`RS'							begin_repeat(), end_repeat()
 		`SS'							long_name(), st_long()
@@ -1446,6 +1447,10 @@ void `Field'::set_dup_var(`SS' newdupvar)
 // Stata name. Otherwise, it returns "".
 `SS' `Field'::other_dup_name()
 	return(otherdup)
+
+// Sets the ODK long name of the other field with the same Stata name.
+void `Field'::set_other_dup_name(`SS' newotherdup)
+	otherdup = newotherdup
 
 // Returns the long name of the field.
 `SS' `Field'::long_name()
