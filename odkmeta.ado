@@ -757,7 +757,7 @@ void `DoFileWriter'::change_delim(`SS' line)
 		if (anyof((" ", tab(), ";"), substr(regexs(2), 1, 1))) {
 			newdelim = strtrim(subinstr(regexs(2), tab(), " ", .))
 			if (newdelim != "cr" & newdelim != ";")
-				_error("invalid #delimit command\n")
+				_error("invalid #delimit command")
 			delim = newdelim
 		}
 	}
@@ -921,7 +921,7 @@ pointer(`AttribPropsS') scalar `AttribSet'::add(`SS' name)
 	n = n()
 	for (i = 1; i <= n; i++) {
 		if (attribs[i].name == name)
-			_error("duplicate attribute name\n")
+			_error("duplicate attribute name")
 	}
 
 	attrib.name = name
@@ -940,7 +940,7 @@ pointer(`AttribPropsS') scalar `AttribSet'::get(`SS' name)
 			return(&attribs[i].props)
 	}
 
-	_error(sprintf("attribute '%s' not found\n", name))
+	_error(sprintf("attribute '%s' not found", name))
 }
 
 // Takes an attribute and a property name and returns the value of the specified
@@ -962,7 +962,7 @@ pointer(`AttribPropsS') scalar `AttribSet'::get(`SS' name)
 	else if (val == "keep")
 		return(attrib.props.keep)
 
-	_error(sprintf("unknown attribute property '%s'\n", val))
+	_error(sprintf("unknown attribute property '%s'", val))
 }
 
 // Returns a single property for all attributes as a rowvector. The sort order
