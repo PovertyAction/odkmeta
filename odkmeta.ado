@@ -1333,7 +1333,7 @@ class `Field' {
 		pointer(`RepeatS') scalar		repeat()
 		void							set_name(), set_type(), set_label(),
 										set_attribs(), set_group(),
-										set_repeat(), set_dup(), set_dup_var()
+										set_repeat(), set_dup_var(),
 
 		`RS'							begin_repeat(), end_repeat()
 		`SS'							long_name(), st_long()
@@ -1405,15 +1405,6 @@ void `Field'::set_label(`SS' newlabel)
 
 void `Field'::set_attribs(`SR' newattribs)
 	attribs = newattribs
-
-// Sets the name of the other field with the same Stata name and, for fields
-// associated with multiple variables, the name of the first variable with a
-// duplicate Stata name.
-void `Field'::set_dup(`SS' newotherdup, |`SS' newdupvar)
-{
-	otherdup = newotherdup
-	dupvar   = newdupvar
-}
 
 // Returns a pointer to the group in which the field is nested.
 // If the field is not in a group, it returns NULL.
