@@ -263,8 +263,8 @@ pr parse_survey, sclass
 		`opt' sub(type) `listvars'
 
 	* Check the word count of `namevar'.
-	check_col `namevar' if wordcount(`namevar') != 1 & `nonmiss' & ///
-		!regexm(`stdtype', "^end (group|repeat)$"), ///
+	check_col `namevar' if wordcount(`namevar') != 1 & ///
+		!regexm(`stdtype', "^end (group|repeat)$") & `nonmiss', ///
 		`opt' sub(name) `listvars'
 
 	sret loc fn       "`fn'"
