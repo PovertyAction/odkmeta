@@ -1038,11 +1038,13 @@ void `Collection'::new()
 	order = ++ctr
 }
 
-// Returns a pointer to the parent collection stored in the child class.
+// Returns a pointer to the parent collection stored in the child class
+// definition.
 pointer(`TS') scalar `Collection'::trans_parent()
 	_error("`Collection'.trans_parent() invoked")
 
-// Returns pointers to the children collections stored in the child class.
+// Returns pointers to the children collections stored in the child class
+// definition.
 pointer(`TS') rowvector `Collection'::trans_children()
 	_error("`Collection'.trans_children() invoked")
 
@@ -1067,8 +1069,8 @@ pointer(`FieldS') scalar `Collection'::field(`RS' i)
 void `Collection'::add_field(pointer(`FieldS') scalar newfield)
 	fields = fields, newfield
 
-// Returns 1 if the `Collection' represents the main fields, not a group or
-// repeat group; returns 0 otherwise.
+// Returns 1 if the collection represents the main fields, not a group or repeat
+// group; returns 0 otherwise.
 `RS' `Collection'::main()
 	return(trans_parent() == NULL)
 
@@ -1078,9 +1080,8 @@ void `Collection'::add_field(pointer(`FieldS') scalar newfield)
 	return(trans_parent() != NULL)
 
 // Returns the level of a collection within its family tree: for the main
-// fields, -_level()- returns 0; for collections among the main fields,
-// -_level()- returns 1; for collections within those collections, -_level()-
-// returns 2; and so on.
+// fields, -_level()- returns 0; for collections among the main fields, it
+// returns 1; for collections within those collections, it returns 2; and so on.
 `RS' `Collection'::_level(pointer(`CollectionS') scalar collec)
 {
 	if (collec->main())
@@ -1174,7 +1175,6 @@ class `Group' extends `Collection' {
 	private:
 		pointer(`GroupS') scalar		parent
 		pointer(`GroupS') rowvector		children
-
 }
 
 pointer(`TS') scalar `Group'::trans_parent()
@@ -1296,8 +1296,8 @@ void `Repeat'::set_parent_set_of(pointer(`FieldS') scalar newsetof)
 
 // Every repeat group is associated with two SET-OF fields, one in the repeat
 // group and one in its parent.
-// -child_set_of()- returns a pointer to this repeat's SET-OF field (the child
-// SET-OF).
+// -child_set_of()- returns a pointer to this repeat group's SET-OF field (the
+// child SET-OF).
 pointer(`FieldS') scalar `Repeat'::child_set_of()
 	return(childsetof)
 
