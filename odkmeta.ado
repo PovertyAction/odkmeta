@@ -2280,16 +2280,15 @@ void _get_fields_base(pointer(`FieldS') rowvector fields, `RS' fpos,
 				("SET-OF-" + parentgroup->long_name()) +
 				survey[i, attr.get("name")->col])
 			// The -odkmeta- do-file assumes that KEY and PARENT_KEY do not have
-			// duplicate Stata variable names.
-			if (anyof(("KEY", "PARENT_KEY"),
-				insheet_name(fields[fpos]->long_name()))) {
+			// duplicate Stata variable names with other fields.
+			if (anyof(("KEY", "PARENT_KEY"), fields[fpos]->st_long())) {
 				// [ID 160], [ID 161]
 				errprintf("the Stata variable name of field %s%s is %s; " +
 					"not allowed\n",
 					fields[fpos]->long_name(),
 					fields[fpos]->repeat()->inside() *
 					(" in repeat group " + fields[fpos]->repeat()->name()),
-					insheet_name(fields[fpos]->long_name()))
+					fields[fpos]->st_long())
 				error_parsing(198, "survey")
 				/*NOTREACHED*/
 			}
