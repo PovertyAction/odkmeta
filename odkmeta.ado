@@ -1710,7 +1710,8 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 }
 
 /* Load the .csv file _fn into memory, clearing the dataset currently in memory.
--load_csv()- checks that the column headers specified to _opts exist.
+-load_csv()- checks that the column headers specified to _opts exist:
+_opts is a vector of names of locals that contain column headers.
 _opt is the name of the -odkmeta- option associated with the .csv file.
 _optvars is the name of a local in which -load_csv()- will save the
 corresponding variable names of the column headers specified to _opts. */
