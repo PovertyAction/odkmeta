@@ -741,9 +741,7 @@ void `DoFileWriter'::indent(|`RS' tabchange)
 // Returns 1 if a line opens a block and 0 otherwise.
 // Specifically, it returns whether line is an open brace or -program-.
 `RS' `DoFileWriter'::open_block(`SS' line)
-{
 	return(regexm(line, "{$") | regexm(command(line), "^pr(o(g(r(am?)?)?)?)?$"))
-}
 
 // Returns 1 if a line closes a block and 0 otherwise.
 // Specifically, it returns whether line is a close brace or -end-.
@@ -779,10 +777,8 @@ void `DoFileWriter'::change_comment(`SS' line)
 		else {
 			if (substr(line, 1, 2) == "/*")
 				comment = substr(line, -2, .) == "*/" ? 1 : 2
-			else if (substr(line, 1, 1) == "*" |
-				substr(line, 1, 2) == "//") {
+			else if (substr(line, 1, 1) == "*" | substr(line, 1, 2) == "//")
 				comment = 1
-			}
 			else
 				comment = 0
 		}
