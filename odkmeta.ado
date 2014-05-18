@@ -904,7 +904,7 @@ class `AttribSet' {
 
 	private:
 		`AttribR' attribs
-		`TS' val()
+		static `TS'		val()
 }
 
 `RS' `AttribSet'::n()
