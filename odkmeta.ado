@@ -306,6 +306,7 @@ pr parse_choices, sclass
 		"choices")
 	gettoken listnamevar optvars : optvars
 	gettoken namevar     optvars : optvars
+	gettoken labelvar    optvars : optvars
 
 	unab all : _all
 	loc listvars listvars(`all')
@@ -319,6 +320,9 @@ pr parse_choices, sclass
 
 	check_col `namevar' if mi(strtrim(`namevar')) & `nonmiss', ///
 		`opt' sub(name) `listvars'
+
+	check_col `labelvar' if mi(`labelvar') & `nonmiss', ///
+		`opt' sub(label) `listvars'
 
 	sret loc fn			"`fn'"
 	sret loc listname	"`listname'"
