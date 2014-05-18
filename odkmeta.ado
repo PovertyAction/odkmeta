@@ -1776,7 +1776,7 @@ void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
 	st_local(_optvars, optvars)
 }
 
-// Add a tab at the start of each nonblank line of _infile, saving the result to
+// Add a tab to the start of each nonblank line of _infile, saving the result to
 // _outfile.
 void tab_file(`SS' _infile, `SS' _outfile)
 {
