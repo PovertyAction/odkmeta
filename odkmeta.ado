@@ -818,10 +818,11 @@ void `DoFileWriter'::put(`SS' line)
 	// leave it to the user.
 	if (autotab & delim == "cr") {
 		if (joinline == 1) {
-			tab = tab - lastjoin
+			if (lastjoin)
+				tab--
 
-			if (!comment)
-				tab = tab - close_block(trim)
+			if (!comment & close_block(trim))
+				tab--
 		}
 		else if (joinline == 2)
 			tab++
@@ -845,8 +846,8 @@ void `DoFileWriter'::put(`SS' line)
 
 	fput(fh, tab(trim != "" ? tab : 0) + trim)
 
-	if (autotab & delim == "cr" & !comment)
-		tab = tab + open_block(trim)
+	if (autotab & delim == "cr" & !comment & open_block(trim))
+		tab++
 
 	if (joinline == 1 & !comment)
 		change_delim(trim)
