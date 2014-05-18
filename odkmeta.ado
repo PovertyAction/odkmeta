@@ -2180,7 +2180,8 @@ void write_survey(
 	// disabled
 	attrib = attr.add("disabled")
 	attrib->header = _disabled
-	attrib->form = attrib->special = 1
+	attrib->form = 1
+	attrib->special = 0
 	// Other (not special) attributes
 	cols = cols(survey)
 	for (i = 1; i <= cols; i++) {
