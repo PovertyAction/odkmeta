@@ -72,6 +72,7 @@ pr odkmeta
 		("`replace'" != "" & !inlist(_rc, 0, 602)) {
 		* [ID 187]
 		conf new f `"`using'"'
+		/*NOTREACHED*/
 	}
 
 	preserve
@@ -1131,6 +1132,7 @@ pointer(`FieldS') scalar `Collection'::first_field(|`RS' include_children)
 		orders = field_orders(f)
 		return(select(f, orders :== min(orders)))
 	}
+	/*NOTREACHED*/
 }
 
 // Returns a pointer to the last field by field order within the collection.
@@ -1150,6 +1152,7 @@ pointer(`FieldS') scalar `Collection'::last_field(|`RS' include_children)
 		orders = field_orders(f)
 		return(select(f, orders :== max(orders)))
 	}
+	/*NOTREACHED*/
 }
 
 					/* collection class		*/
