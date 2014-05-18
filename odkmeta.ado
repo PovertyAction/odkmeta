@@ -1634,7 +1634,7 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 	transmorphic t
 
 	// Read fn, storing it in csv.
-	// The use of -st_fopen()- means that fn doesn't need the .csv extension.
+	// The use of -st_fopen()- means that fn does not need the .csv extension.
 	fh = st_fopen(fn, ".csv", "r")
 	fseek(fh, 0, 1)
 	pos = ftell(fh)
@@ -1646,12 +1646,12 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 		return(J(0, 0, ""))
 
 	// Tokenize csv, storing the result in tokens.
-	t = tokeninit("", (",", char(13) + char(10), char(10), char(13)), (`""""'))
+	t = tokeninit("", (",", char(13) + char(10), char(10), char(13)), `""""')
 	tokenset(t, csv)
 	tokens = tokengetall(t)
 	eol = tokens :== char(13) + char(10) :| tokens :== char(10) :|
 		tokens :== char(13)
-	if (!eol[cols(eol)]) {
+	if (!eol[length(eol)]) {
 		tokens = tokens, char(10)
 		eol    = eol,    1
 	}
@@ -1688,9 +1688,8 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 		preveol = pos
 	}
 
-	// Implement -dropmiss-.
+	// Implement -dropmiss-: drop missing rows.
 	if (dropmiss) {
-		// Drop missing rows.
 		nonmiss = J(rows(res), 1, 0)
 		for (i = 1; i <= cols; i++) {
 			nonmiss = nonmiss :| res[,i] :!= ""
