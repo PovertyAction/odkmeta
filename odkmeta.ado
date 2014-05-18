@@ -1988,7 +1988,7 @@ void write_survey(
 	/* column headers */ `SS' _type, `SS' _name, `SS' _label, `SS' _disabled,
 	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax)
 {
-	`RS' anyrepeat, nfields, anyselect, anymultiple, anynote, isselect, i
+	`RS' anyselect, anymultiple, anynote, nfields, isselect, anyrepeat, i
 	`RR' col
 	`SS' charpre, list
 	`SR' otherlists
@@ -2031,8 +2031,8 @@ void write_survey(
 
 	survey[,attr.get("type")->col] = stdtype(survey[,attr.get("type")->col])
 
-	pragma unset groups
 	pragma unset fields
+	pragma unset groups
 	pragma unset repeats
 	get_fields(fields, groups, repeats, survey, attr)
 
