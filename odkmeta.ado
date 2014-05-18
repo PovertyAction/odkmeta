@@ -3551,12 +3551,10 @@ void write_merge_repeats(`DoFileWriterS' df,
 		df.put(sprintf("use %s, clear", dtaq))
 		df.put("")
 
-		if (repeats[i]->inside()) {
-			df.put("* Rename any variable names that " +
-				"are difficult for -merge- or -reshape-.")
-			df.put("// rename ...")
-			df.put("")
-		}
+		df.put("* Rename any variable names that " +
+			"are difficult for -merge- or -reshape-.")
+		df.put("// rename ...")
+		df.put("")
 
 		if (length(repeats[i]->children()))
 			write_merge_repeat(df, repeats[i], attr, repeats[i]->main())
