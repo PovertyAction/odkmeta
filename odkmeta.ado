@@ -215,7 +215,7 @@ pr parse_survey, sclass
 		gettoken opt1 opts : opts
 
 		if `"``opt1''"' == "" ///
-			loc `opt1' "`opt1'"
+			loc `opt1' `opt1'
 
 		foreach opt2 of loc opts {
 			if `"``opt1''"' == `"``opt2''"' {
@@ -291,7 +291,7 @@ pr parse_choices, sclass
 		gettoken opt1 opts : opts
 
 		if `"``opt1''"' == "" ///
-			loc `opt1' "`opt1'"
+			loc `opt1' `opt1'
 
 		foreach opt2 of loc opts {
 			if `"``opt1''"' == `"``opt2''"' {
