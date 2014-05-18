@@ -2723,8 +2723,8 @@ void write_save_dta(`DoFileWriterS' df, `SS' _csv, `SS' repeat, `RS' anyrepeat,
 void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 	`AttribSetS' attr, `SS' _csv, `RS' _relax)
 {
-	`RS' relax, nfields, nattribs, firstrepeat, insheetmain, ngroups, geopoint,
-		other, loop, pctr, i, j
+	`RS' relax, nfields, firstrepeat, insheetmain, nattribs, ngroups, other,
+		geopoint, loop, pctr, i, j
 	`RC' p
 	`RM' order
 	`SS' var, badname, list, space
