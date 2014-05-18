@@ -843,7 +843,7 @@ void `DoFileWriter'::put(`SS' line)
 		fput(fh, " */")
 	}
 
-	fput(fh, (trim != "") * tab(tab) + trim)
+	fput(fh, tab(trim != "" ? tab : 0) + trim)
 
 	if (autotab & delim == "cr" & !comment)
 		tab = tab + open_block(trim)
