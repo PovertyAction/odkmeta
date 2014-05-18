@@ -1717,7 +1717,7 @@ corresponding variable names of the column headers specified to _opts. */
 void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
 {
 	// "nopts" for "number of options"
-	`RS' rows, cols, nopts, min, len, i
+	`RS' rows, cols, nopts, min, v, i
 	`RR' col, optindex
 	`SS' var, type
 	`SR' vars
@@ -1750,12 +1750,15 @@ void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
 	st_dropvar(.)
 	st_addobs(rows(csv) - 1)
 
-	vars = J(1, 0, "")
+	vars = J(1, cols, "")
 	for (i = 1; i <= cols; i++) {
 		var = insheet_name(csv[1, i])
-		if (var == "" | anyof(vars, var))
-			var = sprintf("v%f", i)
-		vars = vars, var
+		v = i
+		while (var == "" | anyof(vars, var)) {
+			var = sprintf("v%f", v++)
+		}
+		vars[i] = var
+
 		if (rows == 1)
 			type = "str1"
 		else
