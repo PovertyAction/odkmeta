@@ -2216,9 +2216,6 @@ void write_survey(
 	for (i = 1; i <= n; i++) {
 		attrib = attr.get(formattribs[i])
 
-		// .col
-		attrib->col = min(select(col, survey[1,] :== attrib->header))
-
 		// .char
 		base = strlower(subinstr(strtoname(attrib->header), "`", "_", .))
 		while (strpos(base, "__"))
@@ -2235,6 +2232,9 @@ void write_survey(
 			j++
 		}
 		attrib->char = char
+
+		// .col
+		attrib->col = min(select(col, survey[1,] :== attrib->header))
 
 		// .keep
 		if (length(dropattrib) | dropall)
