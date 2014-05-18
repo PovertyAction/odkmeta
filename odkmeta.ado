@@ -2313,35 +2313,36 @@ void _get_fields_base(pointer(`FieldS') rowvector fields, `RS' fpos,
 			other = regexm(fields[fpos]->type(),
 				"^select_(one|multiple) .* or_other$")
 			if (fields[fpos]->st_long() != "") {
+				// Fields associated with a single variable with no suffix
 				if (!geopoint & !other) {
 					dupname = select(odknames,
 						stnames :== fields[fpos]->st_long())
 					if (!length(dupname)) {
 						odknames = odknames, fields[fpos]->long_name()
-						stnames = stnames, fields[fpos]->st_long()
+						stnames  = stnames,  fields[fpos]->st_long()
 					}
 				}
+				// Fields associated with multiple variables with different
+				// suffixes
 				else {
 					dupname = J(1, 0, "")
+					j = 0
 					suffix = geopoint ? "-" :+ ("Latitude", "Longitude",
 						"Altitude", "Accuracy") : ("", "_other")
-					j = 0
 					while (++j <= length(suffix) & !length(dupname)) {
 						odkname = fields[fpos]->long_name() + suffix[j]
 						dupname = select(odknames,
 							stnames :== insheet_name(odkname))
-						if (length(dupname)) {
-							fields[fpos]->set_dup_var(
-								fields[fpos]->long_name() + suffix[j])
-						}
+						if (length(dupname))
+							fields[fpos]->set_dup_var(odkname)
 						else {
 							odknames = odknames, odkname
-							stnames = stnames, insheet_name(odkname)
+							stnames  = stnames,  insheet_name(odkname)
 						}
 					}
 				}
 				if (length(dupname))
-					fields[fpos]->set_dup(dupname[1])
+					fields[fpos]->set_other_dup_name(dupname[1])
 			}
 
 			// .label
