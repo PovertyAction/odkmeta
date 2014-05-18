@@ -2019,6 +2019,8 @@ void write_survey(
 	// Exclude disabled fields.
 	if (attr.get("disabled")->col != .)
 		survey = select(survey, survey[,attr.get("disabled")->col] :!= "yes")
+	else
+		attr.drop("disabled")
 
 	if (!rows(survey)) {
 		// [ID 156], [ID 189]
