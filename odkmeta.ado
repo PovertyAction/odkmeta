@@ -22,7 +22,7 @@ pr odkmeta
 	#d cr
 	/* Abbreviations:
 	-csv-: no known -CSV*- option.
-	-Survey()- from -streg-'s -predict, Surv-.
+	-Survey()- from -streg-'s -predict, Surv-; multiple -S*- options.
 	-survey(, Type())- from -ds, has(Type)-.
 	-survey(, Disabled())- from -cluster subcommand, Dissimilarity-; multiple
 		-D*- options.
@@ -272,7 +272,7 @@ end
 
 pr parse_choices, sclass
 	cap noi syntax anything(name=fn id=filename equalok everything), ///
-		[Listname(str) name(str) LAbel(str)]
+		[LIstname(str) name(str) LAbel(str)]
 	loc opt opt(choices)
 	if _rc {
 		error_parsing `=_rc', `opt'
