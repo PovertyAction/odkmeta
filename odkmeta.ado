@@ -1768,11 +1768,7 @@ void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
 	if (rows > 1)
 		st_sstore(., ., csv[|2, . \ ., .|])
 
-	optvars = ""
-	for (i = 1; i <= nopts; i++) {
-		optvars = optvars + (optvars != "") * " " + vars[optindex[i]]
-	}
-	st_local(_optvars, optvars)
+	st_local(_optvars, invtokens(vars[optindex]))
 }
 
 // Add a tab to the start of each nonblank line of _infile, saving the result to
