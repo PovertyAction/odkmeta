@@ -3849,29 +3849,27 @@ void write_sysmiss_labs(`DoFileWriterS' df, `ListR' lists)
 	}
 }
 
-void write_other_labs(`DoFileWriterS' df, `SR' otherlists, `SS' other)
+void write_other_labs(`DoFileWriterS' df, `SR' otherlists, `SS' _other)
 {
 	`SS' otherval
 
-	if (length(otherlists)) {
-		df.put(`"* Add "other" values to value labels that need them."')
-		df.put("local otherlabs " + invtokens(otherlists))
-		df.put("foreach lab of local otherlabs {")
-		df.put(`"mata: st_vlload("\`lab'", \`values' = ., \`text' = "")"')
-		if (other == "min" | other == "max") {
-			df.put(sprintf(`"mata: st_local("otherval", "' +
-				`"strofreal(%s, "%s"))"',
-				(other == "max" ? "max(\`values') + 1" : "min(\`values') - 1"),
-				`RealFormat'))
-			otherval = "\`otherval'"
-		}
-		else
-			otherval = other
-		df.put("local othervals \`othervals' " + otherval)
-		df.put(sprintf("label define \`lab' %s other, add", otherval))
-		df.put("}")
-		df.put("")
+	df.put(`"* Add "other" values to value labels that need them."')
+	df.put("local otherlabs " + invtokens(otherlists))
+	df.put("foreach lab of local otherlabs {")
+	df.put(`"mata: st_vlload("\`lab'", \`values' = ., \`text' = "")"')
+	if (_other == "max" | _other == "min") {
+		df.put(sprintf(`"mata: st_local("otherval", "' +
+			`"strofreal(%s, "%s"))"',
+			(_other == "max" ? "max(\`values') + 1" : "min(\`values') - 1"),
+			`RealFormat'))
+		otherval = "\`otherval'"
 	}
+	else
+		otherval = _other
+	df.put("local othervals \`othervals' " + otherval)
+	df.put(sprintf("label define \`lab' %s other, add", otherval))
+	df.put("}")
+	df.put("")
 }
 
 void write_save_label_info(`DoFileWriterS' df)
