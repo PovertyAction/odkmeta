@@ -677,6 +677,7 @@ void `DoFileWriter'::new_do_file()
 	tab = comment = lastjoin = 0
 	joinline = 1
 	delim = "cr"
+	linestart = ""
 }
 
 void `DoFileWriter'::new()
