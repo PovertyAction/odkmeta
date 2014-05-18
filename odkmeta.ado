@@ -666,7 +666,8 @@ class `DoFileWriter' {
 		// Line parsing functions
 		// These take the current line as an argument, assuming that it is
 		// trimmed of leading and trailing white space.
-		`RS' open_block(), close_block()
+		`RS'			open_block()
+		static `RS'		close_block()
 		`SS'			command()
 		void			change_delim(), change_comment()
 }
