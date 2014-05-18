@@ -312,11 +312,13 @@ pr parse_choices, sclass
 	tempvar nonmiss
 	egen `nonmiss' = rownonmiss(_all), str
 
-	check_col `listname' ///
-		if (strtrim(`listname') != strtoname(strtrim(`listname')) | ///
-		strpos(`listname', "`")) & `nonmiss', ///
+	check_col `listnamevar' ///
+		if (strtrim(`listnamevar') != strtoname(strtrim(`listnamevar')) | ///
+		strpos(`listnamevar', "`")) & `nonmiss', ///
 		`opt' sub(listname) `listvars'
-	check_col `name' if mi(`name') & `nonmiss', `opt' sub(name) `listvars'
+
+	check_col `namevar' if mi(strtrim(`namevar')) & `nonmiss', ///
+		`opt' sub(name) `listvars'
 
 	sret loc fn			"`fn'"
 	sret loc listname	"`listname'"
