@@ -1627,8 +1627,7 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 {
 	`RS' fh, numeol, cols, last, rows, pos, linecol, i, j
 	`RR' eol, eolpos
-	// "nonmi" for "nonmissing"
-	`RC' nonmi
+	`RC' nonmiss
 	`SS' csv
 	`SR' tokens, line
 	`SM' res
@@ -1693,11 +1692,11 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 	// Implement -dropmiss-.
 	if (dropmiss) {
 		// Drop missing rows.
-		nonmi = J(rows(res), 1, 0)
+		nonmiss = J(rows(res), 1, 0)
 		for (i = 1; i <= cols; i++) {
-			nonmi = nonmi :| res[,i] :!= ""
+			nonmiss = nonmiss :| res[,i] :!= ""
 		}
-		res = select(res, nonmi)
+		res = select(res, nonmiss)
 	}
 
 	// Clean up strings.
