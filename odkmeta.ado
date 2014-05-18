@@ -2082,7 +2082,6 @@ void write_survey(
 	if (anynote)
 		write_drop_note_vars(df, attr)
 	write_dates_times(df, attr)
-	write_field_labels(df, attr)
 
 	df.close()
 
@@ -2095,6 +2094,7 @@ void write_survey(
 	if (length(otherlists))
 		write_recode_or_other(df)
 
+	write_field_labels(df, attr)
 	write_compress(df)
 	write_repeat_locals(df, attr, (anyrepeat ? "\`repeat'" : ""), anyrepeat)
 

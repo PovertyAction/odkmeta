@@ -117,9 +117,9 @@ completes the following tasks in order:
 {phang2}o  Drop {cmd:note} variables{p_end}
 {phang2}o  {help format:Format} {cmd:date}, {cmd:time}, and
 {cmd:datetime} variables{p_end}
+{phang2}o  Attach value labels{p_end}
 {phang2}o  Attach field labels as
 {help label:variable labels} and {help notes}{p_end}
-{phang2}o  Attach value labels{p_end}
 {phang2}o  {help merge:Merge} repeat groups{p_end}
 
 {pstd}
