@@ -619,28 +619,28 @@ name, and -insheet_name()- returns "". */
 
 
 /* -------------------------------------------------------------------------- */
-					/* do-file writer class	*/
+					/* do-file writer class		*/
 
 class `DoFileWriter' {
 	public:
-		`RS' debug(), autotab()
-		void set_debug(), set_autotab(), open(), close(), indent(), write(),
-			put()
+		`RS'	debug(), autotab()
+		void	set_debug(), set_autotab(), open(), close(), indent(), write(),
+				put()
 
 	private:
-		`RS' fh
 		// If 1, add debugging information to the do-file as comments; 0
 		// otherwise.
 		`RS' debug
 		// If 1, use naive rules (sufficient for -odkmeta-) to determine the
 		// indent setting; 0 otherwise.
 		`RS' autotab
+		`RS' fh
 		// The indent setting of the current line
 		`RS' tab
 		// Indicates whether the current line is a comment:
 		// 0 - not a comment
 		// 1 - one-line comment
-		// 2 - multi-line comment: start or middle (not end) of /* */ block
+		// 2 - multiline comment: start or middle (not end) of /* */ block
 		`RS' comment
 		/* joinline indicates the line number within a line-join block.
 		Lines not in a line-join block have linejoin = 1. For example:
@@ -653,21 +653,23 @@ class `DoFileWriter' {
 
 		*/
 		`RS' joinline
-		// lastjoin indicates whether the previous line had joinline > 1, i.e.,
-		// whether it should be an indented line within a line-join block.
+		// lastjoin is 1 if the previous line had joinline > 1, i.e., if the
+		// previous line should have been an indented line within a line-join
+		// block; otherwise it is 0.
 		`RS' lastjoin
-		// The delimiter in effect for the current line
+		// The delimiter for the current line
 		`SS' delim
 		// The start of the current line
 		`SS' linestart
 		void new(), new_do_file()
 
 		// Line parsing functions
-		// These take the current line as an argument and assume that it is
+		// These take the current line as an argument, assuming that it is
 		// trimmed of leading and trailing white space.
-		`RS' open_block(), close_block()
-		`SS' command()
-		void change_delim(), change_comment()
+		`RS'			open_block()
+		static `RS'		close_block()
+		`SS'			command()
+		void			change_delim(), change_comment()
 }
 
 void `DoFileWriter'::new_do_file()
@@ -675,6 +677,7 @@ void `DoFileWriter'::new_do_file()
 	tab = comment = lastjoin = 0
 	joinline = 1
 	delim = "cr"
+	linestart = ""
 }
 
 void `DoFileWriter'::new()
@@ -698,7 +701,12 @@ void `DoFileWriter'::set_autotab(`RS' setting)
 
 void `DoFileWriter'::open(`SS' fn, |`SS' mode, `RS' new_do)
 {
-	fh = fopen(fn, (args() == 2 ? mode : "w"))
+	if (args() < 2)
+		mode = "w"
+	else if (mode != "w" & mode != "a")
+		_error("invalid mode")
+
+	fh = fopen(fn, mode)
 
 	if (new_do)
 		new_do_file()
@@ -712,7 +720,7 @@ void `DoFileWriter'::indent(|`RS' tabchange)
 	if (args())
 		tab = tab + (nonmissing(tabchange) ? tabchange : 0)
 	else
-		tab = tab + 1
+		tab++
 }
 
 // Returns the command (the first word) of a line.
@@ -733,9 +741,7 @@ void `DoFileWriter'::indent(|`RS' tabchange)
 // Returns 1 if a line opens a block and 0 otherwise.
 // Specifically, it returns whether line is an open brace or -program-.
 `RS' `DoFileWriter'::open_block(`SS' line)
-{
 	return(regexm(line, "{$") | regexm(command(line), "^pr(o(g(r(am?)?)?)?)?$"))
-}
 
 // Returns 1 if a line closes a block and 0 otherwise.
 // Specifically, it returns whether line is a close brace or -end-.
@@ -752,7 +758,7 @@ void `DoFileWriter'::change_delim(`SS' line)
 		if (anyof((" ", tab(), ";"), substr(regexs(2), 1, 1))) {
 			newdelim = strtrim(subinstr(regexs(2), tab(), " ", .))
 			if (newdelim != "cr" & newdelim != ";")
-				_error("invalid #delimit command\n")
+				_error("invalid #delimit command")
 			delim = newdelim
 		}
 	}
@@ -771,18 +777,16 @@ void `DoFileWriter'::change_comment(`SS' line)
 		else {
 			if (substr(line, 1, 2) == "/*")
 				comment = substr(line, -2, .) == "*/" ? 1 : 2
-			else if (substr(line, 1, 1) == "*" |
-				substr(line, 1, 2) == "//") {
+			else if (substr(line, 1, 1) == "*" | substr(line, 1, 2) == "//")
 				comment = 1
-			}
 			else
 				comment = 0
 		}
 	}
 }
 
-void `DoFileWriter'::write(`SS' linestub)
-	linestart = linestart + linestub
+void `DoFileWriter'::write(`SS' s)
+	linestart = linestart + s
 
 void `DoFileWriter'::put(`SS' line)
 {
@@ -810,36 +814,36 @@ void `DoFileWriter'::put(`SS' line)
 	// leave it to the user.
 	if (autotab & delim == "cr") {
 		if (joinline == 1) {
-			tab = tab - lastjoin
+			if (lastjoin)
+				tab--
 
-			if (!comment)
-				tab = tab - close_block(trim)
+			if (!comment & close_block(trim))
+				tab--
 		}
 		else if (joinline == 2)
-			tab = tab + 1
+			tab++
 	}
 
 	if (debug) {
-		fwrite(fh, (trim != "") * tab(tab))
-		if (comment != 2)
-			fwrite(fh, "* ")
-		fwrite(fh, sprintf("fh = %f; ", fh))
-		fwrite(fh, sprintf("autotab = %f; ", autotab))
-		fwrite(fh, sprintf("tab = %f; ", tab))
-		fwrite(fh, sprintf("comment = %f; ", comment))
-		fwrite(fh, sprintf("joinline = %f; ", joinline))
-		fwrite(fh, sprintf("lastjoin = %f; ", lastjoin))
-		fwrite(fh, sprintf("delim = %s; ", adorn_quotes(delim)))
-		fwrite(fh, sprintf("linestart = %s; ", adorn_quotes(linestart)))
-		fwrite(fh, sprintf("open_block() = %f; ", open_block(trim)))
+		fwrite(fh, tab(trim != "" ? tab : 0))
+		fwrite(fh, "/* ")
+		fwrite(fh, sprintf("autotab = %f, ", autotab))
+		fwrite(fh, sprintf("fh = %f, ", fh))
+		fwrite(fh, sprintf("tab = %f, ", tab))
+		fwrite(fh, sprintf("comment = %f, ", comment))
+		fwrite(fh, sprintf("joinline = %f, ", joinline))
+		fwrite(fh, sprintf("lastjoin = %f, ", lastjoin))
+		fwrite(fh, sprintf("delim = %s, ", adorn_quotes(delim)))
+		fwrite(fh, sprintf("linestart = %s, ", adorn_quotes(linestart)))
+		fwrite(fh, sprintf("open_block() = %f, ", open_block(trim)))
 		fwrite(fh, sprintf("close_block() = %f", close_block(trim)))
-		fput(fh, "")
+		fput(fh, " */")
 	}
 
-	fput(fh, (trim != "") * tab(tab) + trim)
+	fput(fh, tab(trim != "" ? tab : 0) + trim)
 
-	if (autotab & delim == "cr" & !comment)
-		tab = tab + open_block(trim)
+	if (autotab & delim == "cr" & !comment & open_block(trim))
+		tab++
 
 	if (joinline == 1 & !comment)
 		change_delim(trim)
@@ -847,14 +851,14 @@ void `DoFileWriter'::put(`SS' line)
 	// Track our place in the line-join block.
 	lastjoin = joinline > 1
 	if (delim == "cr" & !comment & regexm(trim, sprintf("[ %s]///$", tab())))
-		joinline = joinline + 1
+		joinline++
 	else
 		joinline = 1
 
 	linestart = ""
 }
 
-					/* do-file writer class	*/
+					/* do-file writer class		*/
 /* -------------------------------------------------------------------------- */
 
 
@@ -916,7 +920,7 @@ pointer(`AttribPropsS') scalar `AttribSet'::add(`SS' name)
 	n = n()
 	for (i = 1; i <= n; i++) {
 		if (attribs[i].name == name)
-			_error("duplicate attribute name\n")
+			_error("duplicate attribute name")
 	}
 
 	attrib.name = name
@@ -935,7 +939,7 @@ pointer(`AttribPropsS') scalar `AttribSet'::get(`SS' name)
 			return(&attribs[i].props)
 	}
 
-	_error(sprintf("attribute '%s' not found\n", name))
+	_error(sprintf("attribute '%s' not found", name))
 }
 
 // Takes an attribute and a property name and returns the value of the specified
@@ -957,7 +961,7 @@ pointer(`AttribPropsS') scalar `AttribSet'::get(`SS' name)
 	else if (val == "keep")
 		return(attrib.props.keep)
 
-	_error(sprintf("unknown attribute property '%s'\n", val))
+	_error(sprintf("unknown attribute property '%s'", val))
 }
 
 // Returns a single property for all attributes as a rowvector. The sort order
