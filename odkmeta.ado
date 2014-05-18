@@ -1625,7 +1625,7 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 // are all blank will be dropped.
 `SM' read_csv(`SS' fn, |`RS' dropmiss)
 {
-	`RS' fh, numeol, cols, last, rows, pos, linecol, i, j
+	`RS' fh, pos, rows, cols, preveol, linecol, i, j
 	`RR' eol, eolpos
 	`RC' nonmiss
 	`SS' csv
@@ -1657,16 +1657,17 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 	}
 
 	// Parse tokens.
-	numeol = sum(eol)
-	res = J(numeol, cols = 1, "")
+	rows = sum(eol)
+	res = J(rows, cols = 1, "")
 	eolpos = select(1..cols(tokens), eol)
-	last = rows = 0
-	for (i = 1; i <= numeol; i++) {
+	// preveol is the position in tokens of the previous EOL character.
+	preveol = 0
+	for (i = 1; i <= rows; i++) {
 		pos = eolpos[i]
 
 		line = J(1, cols, "")
 		linecol = 1
-		for (j = last + 1; j < pos; j++) {
+		for (j = preveol + 1; j < pos; j++) {
 			if (tokens[j] != ",")
 				line[linecol] = line[linecol] + tokens[j]
 			else {
@@ -1682,12 +1683,10 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 			res = res, J(rows(res), linecol - cols, "")
 			cols = linecol
 		}
-		res[++rows,] = line
+		res[i,] = line
 
-		last = pos
+		preveol = pos
 	}
-	// Adjust the number of rows of res.
-	res = res[|1, . \ rows, .|]
 
 	// Implement -dropmiss-.
 	if (dropmiss) {
