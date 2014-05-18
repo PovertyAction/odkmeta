@@ -110,7 +110,8 @@ pr odkmeta
 	#d ;
 	mata: write_survey(
 		/* output do-files */ "`chardo'", "`cleando1'", "`cleando2'",
-		/* output locals */ "anyrepeat", "otherlists",
+		/* output locals */ "anyrepeat", "otherlists", "listnamechar",
+			"isotherchar",
 		`"`sfn'"', st_local("csv"),
 		/* column headers */ st_local("type"), st_local("sname"),
 			st_local("slabel"), st_local("disabled"),
@@ -120,10 +121,13 @@ pr odkmeta
 
 	* -choices()-
 	#d ;
-	mata: write_choices("`vallabdo'", "`encodedo'",
+	mata: write_choices(
+		/* output do-files */ "`vallabdo'", "`encodedo'",
 		`"`cfn'"',
-		st_local("listname"), st_local("cname"), st_local("clabel"),
-		"`otherlists'", "`other'",
+		/* column headers */ st_local("listname"), st_local("cname"),
+			st_local("clabel"),
+		/* characteristic names */ "`listnamechar'", "`isotherchar'",
+		/* other values */ "`otherlists'", "`other'",
 		"`oneline'" != "")
 	;
 	#d cr
@@ -357,9 +361,6 @@ loc TM	transmorphic matrix
 
 * Convert real x to string using -strofreal(x, `RealFormat')-.
 loc RealFormat	""%24.0g""
-
-* The prefix of characteristic names
-loc CharPre		""Odk_""
 
 * Names of locals specified by the user at the start of the do-file
 loc DateMask		""datemask""
@@ -1972,14 +1973,15 @@ void write_final_warnings(`DoFileWriterS' df, `RS' _relax)
 
 void write_survey(
 	/* output do-files */ `SS' _chardo, `SS' _cleando1, `SS' _cleando2,
-	/* output locals */ `SS' _anyrepeat, `SS' _otherlists,
+	/* output locals */ `SS' _anyrepeat, `SS' _otherlists, `SS' _listnamechar,
+		`SS' _isotherchar,
 	`SS' _survey, `SS' _csv,
 	/* column headers */ `SS' _type, `SS' _name, `SS' _label, `SS' _disabled,
 	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax)
 {
 	`RS' anyrepeat, nfields, anyselect, anymultiple, anynote, isselect, i
 	`RR' col
-	`SS' list
+	`SS' charpre, list
 	`SR' otherlists
 	`SM' survey
 	`DoFileWriterS' df
@@ -1996,8 +1998,9 @@ void write_survey(
 	if (rows(survey) < 2)
 		return
 
+	charpre = "Odk_"
 	attr = get_attribs(survey, _type, _name, _label, _disabled,
-		_dropattrib, _keepattrib)
+		_dropattrib, _keepattrib, charpre)
 
 	// Drop the column headers.
 	survey = survey[|2, . \ ., .|]
@@ -2054,7 +2057,7 @@ void write_survey(
 	// -insheet-s the .csv files and imports the characteristics.
 	df.open(_chardo)
 
-	write_survey_start(df, attr)
+	write_survey_start(df, attr, charpre)
 	write_fields(df, fields, attr, _csv, _relax)
 
 	df.close()
@@ -2066,7 +2069,7 @@ void write_survey(
 
 	anyrepeat = length(repeats) > 1
 	if (anyrepeat)
-		write_dta_loop_start(df)
+		write_dta_loop_start(df, attr)
 	if (anymultiple) {
 		write_rename_for_split(df, repeats)
 		write_split_select_multiple(df, attr)
@@ -2101,16 +2104,18 @@ void write_survey(
 
 	df.close()
 
-	// Store values in output locals.
-	st_local(_anyrepeat,   strofreal(anyrepeat))
-	st_local(_otherlists,  invtokens(otherlists))
+	// Store values in the output locals.
+	st_local(_anyrepeat,    strofreal(anyrepeat))
+	st_local(_otherlists,   invtokens(otherlists))
+	st_local(_listnamechar, attr.get("list_name")->char)
+	st_local(_isotherchar,  attr.get("is_other")->char)
 }
 
 `AttribSetS' get_attribs(`SM' survey,
 	/* column headers */ `SS' _type, `SS' _name, `SS' _label, `SS' _disabled,
-	`SS' _dropattrib, `SS' _keepattrib)
+	`SS' _dropattrib, `SS' _keepattrib, `SS' charpre)
 {
-	`RS' dropall, keepall, cols, max, n, i, j
+	`RS' dropall, keepall, cols, n, i, j
 	`RR' col
 	`SS' char, base
 	`SR' dropattrib, keepattrib, headers, opts, notfound, newattribs,
@@ -2189,7 +2194,7 @@ void write_survey(
 	n = length(newattribs)
 	for (i = 1; i <= n; i++) {
 		attrib = attr.add(newattribs[i])
-		attrib->char = newattribs[i]
+		attrib->char = charpre + newattribs[i]
 		attrib->form = 0
 		attrib->special = 1
 		attrib->keep = !dropall
@@ -2207,17 +2212,17 @@ void write_survey(
 		attrib->col = min(select(col, survey[1,] :== attrib->header))
 
 		// .char
-		j = 2
-		max = 32 - strlen(`CharPre')
 		base = strlower(subinstr(strtoname(attrib->header), "`", "_", .))
 		while (strpos(base, "__"))
 			base = subinstr(base, "__", "_", .)
 		while (substr(base, -1, 1) == "_" & strlen(base) > 1)
 			base = substr(base, 1, strlen(base) - 1)
-		char = base = substr(base, 1, max)
+		base = charpre + substr(base, 1, 32 - strlen(charpre))
+		j = 2
 		chars = attr.vals("char")
+		char = base
 		while (anyof(chars, char)) {
-			char = substr(base, 1, max - strlen(strofreal(j, `RealFormat'))) +
+			char = substr(base, 1, 32 - strlen(strofreal(j, `RealFormat'))) +
 				strofreal(j, `RealFormat')
 			j++
 		}
@@ -2593,7 +2598,7 @@ void get_fields(pointer(`FieldS') rowvector fields,
 	check_duplicate_repeat_names(repeats)
 }
 
-void write_survey_start(`DoFileWriterS' df, `AttribSetS' attr)
+void write_survey_start(`DoFileWriterS' df, `AttribSetS' attr, `SS' charpre)
 {
 	`RS' ndiffs, i
 	`RR' form
@@ -2604,17 +2609,19 @@ void write_survey_start(`DoFileWriterS' df, `AttribSetS' attr)
 	headers = select(attr.vals("header"), form)
 	chars   = select(attr.vals("char"),   form)
 
-	diff = headers :!= chars
+	diff = headers :!= subinstr(chars, charpre, "", 1)
 	ndiffs = sum(diff)
 	headers = select(headers, diff)
 	chars   = select(chars,   diff)
+
 	df.put(sprintf("%s Import ODK attributes as characteristics.",
 		(ndiffs <= 3 ? "*" : "/*")))
 	for (i = 1; i <= ndiffs; i++) {
-		df.put(sprintf("%s- %s will be imported to the characteristic %s%s.%s",
-			(ndiffs <= 3 ? "* " : ""), headers[i], `CharPre', chars[i],
-			(ndiffs > 3 & i == ndiffs ? " */" : "")))
+		df.put(sprintf("%s- %s will be imported to the characteristic %s.",
+			(ndiffs <= 3 ? "* " : ""), headers[i], chars[i]))
 	}
+	if (ndiffs > 3)
+		df.put("*/")
 	df.put("")
 }
 
@@ -2863,48 +2870,47 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 		}
 
 		// Field name
-		write_char(df, var, `CharPre' + attr.get("name")->char,
+		write_char(df, var, attr.get("name")->char,
 			fields[i]->name(), "", loop)
-		write_char(df, var, `CharPre' + attr.get("bad_name")->char, "",
-			badname, loop)
+		write_char(df, var, attr.get("bad_name")->char,
+			"", badname, loop)
 
 		// Group
 		if (fields[i]->group()->inside()) {
-			write_char(df, var, `CharPre' + "group",
+			write_char(df, var, attr.get("group")->char,
 				fields[i]->group()->st_list(), "", loop)
 		}
-		write_char(df, var, `CharPre' + "long_name", fields[i]->long_name(),
-			"", loop)
+		write_char(df, var, attr.get("long_name")->char,
+			fields[i]->long_name(), "", loop)
 
 		// Repeat
-		if (fields[i]->repeat()->inside())
-			write_char(df, var, `CharPre' + "repeat",
-				fields[i]->repeat()->name(), "", loop)
+		if (fields[i]->repeat()->inside()) {
+			write_char(df, var, attr.get("repeat")->char,
+				fields[i]->repeat()->long_name(), "", loop)
+		}
 
 		// Type
-		write_char(df, var, `CharPre' + attr.get("type")->char,
+		write_char(df, var, attr.get("type")->char,
 			fields[i]->type(), "", loop)
 		if (prematch(fields[i]->type(), "select_one ") |
 			prematch(fields[i]->type(), "select_multiple ")) {
-			write_char(df, var, `CharPre' + attr.get("type")->char,
-				fields[i]->type(), "", loop)
 			list = substr(fields[i]->type(),
 				strpos(fields[i]->type(), " ") + 1, .)
 			if (postmatch(list, " or_other"))
 				list = substr(list, 1, strpos(list, " ") - 1)
-			write_char(df, var, `CharPre' + "list_name", list,
-				"", loop)
+			write_char(df, var, attr.get("list_name")->char,
+				list, "", loop)
 		}
 		else if (geopoint) {
-			write_char(df, var, `CharPre' + "geopoint", "",
-				"\`suffix'", loop)
+			write_char(df, var, attr.get("geopoint")->char,
+				"", "\`suffix'", loop)
 		}
-		write_char(df, var, `CharPre' + "or_other", (other ? "1" : "0"),
-			"", loop)
+		write_char(df, var, attr.get("or_other")->char,
+			(other ? "1" : "0"), "", loop)
 		if (other)
 			df.put(`"local isother = "\`suffix'" != """')
-		write_char(df, var, `CharPre' + "is_other", (other ? "" : "0"),
-			other * "\`isother'", loop)
+		write_char(df, var, attr.get("is_other")->char,
+			(other ? "" : "0"), other * "\`isother'", loop)
 
 		// Label
 		if (fields[i]->label() != "") {
@@ -2913,14 +2919,14 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 				df.put(sprintf("local labend " +
 					`""\`=cond("\`suffix'" == "", "", "%s(Other)")'""', space))
 			}
-			write_char(df, var, `CharPre' + attr.get("label")->char,
+			write_char(df, var, attr.get("label")->char,
 				fields[i]->label(),
 				loop * (geopoint ? space + "(\`suffix')" : "\`labend'"), loop)
 		}
 
 		// Other attributes
 		for (j = 1; j <= nattribs; j++) {
-			write_char(df, var, `CharPre' + attribchars[j],
+			write_char(df, var, attribchars[j],
 				fields[i]->attrib(j), "", loop)
 		}
 
@@ -2950,14 +2956,15 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 	}
 }
 
-void write_dta_loop_start(`DoFileWriterS' df)
+void write_dta_loop_start(`DoFileWriterS' df, `AttribSetS' attr)
 {
 	df.put("foreach dta of local dtas {")
 	df.put(`"use "\`dta'", clear"')
 	df.put("")
 	df.put("unab all : _all")
 	df.put("gettoken first : all")
-	df.put(sprintf("local repeat : char \`first'[%srepeat]", `CharPre'))
+	df.put(sprintf("local repeat : char \`first'[%s]",
+		attr.get("repeat")->char))
 	df.put("")
 }
 
@@ -2992,19 +2999,19 @@ void write_rename_for_split(`DoFileWriterS' df,
 void write_split_select_multiple(`DoFileWriterS' df, `AttribSetS' attr)
 {
 	df.put("* Split select_multiple variables.")
-	df.put(sprintf("ds, has(char %s%s)", `CharPre', attr.get("type")->char))
+	df.put(sprintf("ds, has(char %s)", attr.get("type")->char))
 	df.put("foreach typevar in \`r(varlist)' {")
-	df.put(sprintf(`"if strmatch("\`:char \`typevar'[%s%s]'", "' +
-		`""select_multiple *") & ///"', `CharPre', attr.get("type")->char))
-	df.put(sprintf("!\`:char \`typevar'[%sis_other]' {"', `CharPre'))
+	df.put(sprintf(`"if strmatch("\`:char \`typevar'[%s]'", "' +
+		`""select_multiple *") & ///"', attr.get("type")->char))
+	df.put(sprintf("!\`:char \`typevar'[%s]' {"', attr.get("is_other")->char))
 
 	df.put("* Add an underscore to the variable name if it ends in a number.")
 	df.put("local var \`typevar'")
-	df.put(sprintf("local list : char \`var'[%slist_name]", `CharPre'))
+	df.put(sprintf("local list : char \`var'[%s]", attr.get("list_name")->char))
 	df.put(`"local pos : list posof "\`list'" in labs"')
 	df.put("local nparts : word \`pos' of \`nassoc'")
 	df.put(sprintf("if \`:list list in otherlabs' & " +
-		"!\`:char \`var'[%sor_other]' ///", `CharPre'))
+		"!\`:char \`var'[%s]' ///", attr.get("or_other")->char))
 	df.put("local --nparts")
 	df.put(`"if inrange(substr("\`var'", -1, 1), "0", "9") & ///"')
 	df.put(`"length("\`var'") < 32 - strlen("\`nparts'") {"')
@@ -3040,8 +3047,7 @@ void write_split_select_multiple(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("")
 
 	df.put("local chars : char \`var'[]")
-	df.put(sprintf("local label : char \`var'[%s%s]",
-		`CharPre', attr.get("label")->char))
+	df.put(sprintf("local label : char \`var'[%s]", attr.get("label")->char))
 	df.put("local len : length local label")
 	df.put("local i 0")
 	df.put("foreach part of local parts {")
@@ -3053,9 +3059,8 @@ void write_split_select_multiple(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("}")
 	df.put("")
 	df.put("if \`len' {")
-	df.put(sprintf(`"mata: st_global("\`part'[%s%s]", ///"',
-		`CharPre', attr.get("label")->char))
-	df.put(`"st_local("label") + ///"')
+	df.put(sprintf(`"mata: st_global("\`part'[%s]", st_local("label") + ///"',
+		attr.get("label")->char))
 	df.put(`"(substr(st_local("label"), -1, 1) == " " ? "" : " ") + ///"')
 	df.put(`""(#\`i'/\`nparts')")"')
 	df.put("}")
@@ -3073,10 +3078,10 @@ void write_split_select_multiple(`DoFileWriterS' df, `AttribSetS' attr)
 void write_drop_note_vars(`DoFileWriterS' df, `AttribSetS' attr)
 {
 	df.put("* Drop note variables.")
-	df.put(sprintf("ds, has(char %s%s)", `CharPre', attr.get("type")->char))
+	df.put(sprintf("ds, has(char %s)", attr.get("type")->char))
 	df.put("foreach var in \`r(varlist)' {")
-	df.put(sprintf(`"if "\`:char \`var'[%s%s]'" == "note" ///"',
-		`CharPre', attr.get("type")->char))
+	df.put(sprintf(`"if "\`:char \`var'[%s]'" == "note" ///"',
+		attr.get("type")->char))
 	df.put("drop \`var'")
 	df.put("}")
 	df.put("")
@@ -3087,18 +3092,16 @@ void write_dates_times(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("* Date and time variables")
 	df.put("capture confirm variable SubmissionDate, exact")
 	df.put("if !_rc {")
-	df.put(sprintf("local type : char SubmissionDate[%s%s]",
-		`CharPre', attr.get("type")->char))
+	df.put(sprintf("local type : char SubmissionDate[%s]",
+		attr.get("type")->char))
 	df.put("assert !\`:length local type'")
-	df.put(sprintf("char SubmissionDate[%s%s] datetime",
-		`CharPre', attr.get("type")->char))
+	df.put(sprintf("char SubmissionDate[%s] datetime", attr.get("type")->char))
 	df.put("}")
 	df.put("local datetime date today time datetime start end")
 	df.put("tempvar temp")
-	df.put(sprintf("ds, has(char %s%s)", `CharPre', attr.get("type")->char))
+	df.put(sprintf("ds, has(char %s)", attr.get("type")->char))
 	df.put("foreach var in \`r(varlist)' {")
-	df.put(sprintf("local type : char \`var'[%s%s]",
-		`CharPre', attr.get("type")->char))
+	df.put(sprintf("local type : char \`var'[%s]", attr.get("type")->char))
 	df.put("if \`:list type in datetime' {")
 	df.put("capture confirm numeric variable \`var'")
 	df.put("if !_rc {")
@@ -3152,8 +3155,34 @@ void write_dates_times(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("}")
 	df.put("capture confirm variable SubmissionDate, exact")
 	df.put("if !_rc ///")
-	df.put(sprintf("char SubmissionDate[%s%s]",
-		`CharPre', attr.get("type")->char))
+	df.put(sprintf("char SubmissionDate[%s]", attr.get("type")->char))
+	df.put("")
+}
+
+void write_attach_vallabs(`DoFileWriterS' df, `AttribSetS' attr)
+{
+	df.put("* Attach value labels.")
+	df.put("ds, not(vallab)")
+	df.put(`"if "\`r(varlist)'" != "" ///"')
+	df.put(sprintf("ds \`r(varlist)', has(char %s)",
+		attr.get("list_name")->char))
+	df.put("foreach var in \`r(varlist)' {")
+	df.put(sprintf("if !\`:char \`var'[%s]' {", attr.get("is_other")->char))
+	df.put("capture confirm string variable \`var', exact")
+	df.put("if !_rc {")
+	df.put(`"replace \`var' = ".o" if \`var' == "other""')
+	df.put("destring \`var', replace")
+	df.put("}")
+	df.put("")
+
+	df.put(sprintf("local list : char \`var'[%s]", attr.get("list_name")->char))
+	df.put("if !\`:list list in labs' {")
+	df.put(`"display as err "list \`list' not found in choices sheet""')
+	df.put("exit 9")
+	df.put("}")
+	df.put("label values \`var' \`list'")
+	df.put("}")
+	df.put("}")
 	df.put("")
 }
 
@@ -3164,11 +3193,10 @@ void write_field_labels(`DoFileWriterS' df, `AttribSetS' attr)
 	notepre = "Question text: "
 
 	df.put("* Attach field labels as variable labels and notes.")
-	df.put(sprintf("ds, has(char %slong_name)", `CharPre'))
+	df.put(sprintf("ds, has(char %s)", attr.get("long_name")->char))
 	df.put("foreach var in \`r(varlist)' {")
 	df.put("* Variable label")
-	df.put(sprintf("local label : char \`var'[%s%s]",
-		`CharPre', attr.get("label")->char))
+	df.put(sprintf("local label : char \`var'[%s]", attr.get("label")->char))
 	df.put(`"mata: st_varlabel("\`var'", st_local("label"))"')
 	df.put("")
 
@@ -3177,8 +3205,7 @@ void write_field_labels(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("char \`var'[note0] 1")
 	df.put(sprintf(`"mata: st_global("\`var'[note1]", %s + ///"',
 		adorn_quotes(notepre)))
-	df.put(sprintf(`"st_global("\`var'[%s%s]"))"',
-		`CharPre', attr.get("label")->char))
+	df.put(sprintf(`"st_global("\`var'[%s]"))"', attr.get("label")->char))
 	df.put(`"mata: st_local("temp", ///"')
 	df.put(`"" " * (strlen(st_global("\`var'[note1]")) + 1))"')
 	df.put("#delimit ;")
@@ -3199,33 +3226,6 @@ void write_field_labels(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put(`"mata: st_global("\`var'[note1]", ///"')
 	df.put(`"subinstr(st_global("\`var'[note1]"), "\`from'", "\`to'", .))"')
 	df.put("}")
-	df.put("}")
-	df.put("}")
-	df.put("")
-}
-
-void write_attach_vallabs(`DoFileWriterS' df, `AttribSetS' attr)
-{
-	df.put("* Attach value labels.")
-	df.put("ds, not(vallab)")
-	df.put(`"if "\`r(varlist)'" != "" ///"')
-	df.put(sprintf("ds \`r(varlist)', has(char %slist_name)", `CharPre'))
-	df.put("foreach var in \`r(varlist)' {")
-	df.put(sprintf("if !\`:char \`var'[%sis_other]' {", `CharPre'))
-	df.put("capture confirm string variable \`var', exact")
-	df.put("if !_rc {")
-	df.put(`"replace \`var' = ".o" if \`var' == "other""')
-	df.put("destring \`var', replace")
-	// Necessary for variable labels that contain difficult characters
-	df.put(sprintf(`"mata: st_varlabel("\`var'", st_global("\`var'[%s%s]"))"',
-		`CharPre', attr.get("label")->char))
-	df.put("}")
-	df.put(sprintf("local list : char \`var'[%slist_name]", `CharPre'))
-	df.put("if !\`:list list in labs' {")
-	df.put(`"display as err "list \`list' not found in choices sheet""')
-	df.put("exit 9")
-	df.put("}")
-	df.put("label values \`var' \`list'")
 	df.put("}")
 	df.put("}")
 	df.put("")
@@ -3265,14 +3265,17 @@ void write_repeat_locals(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat,
 
 	// Define `allbadnames'.
 	df.put("local badnames")
-	df.put(sprintf("ds, has(char %sbad_name)", `CharPre'))
+	df.put(sprintf("ds, has(char %s)", attr.get("bad_name")->char))
 	df.put("foreach var in \`r(varlist)' {")
-	df.put(sprintf(`"if \`:char \`var'[%sbad_name]' & ///"', `CharPre'))
-	df.put(sprintf(`"("\`:char \`var'[%s%s]'" != "begin repeat" | ///"',
-		`CharPre', attr.get("type")->char))
+	df.put(sprintf(`"if \`:char \`var'[%s]' & ///"',
+		attr.get("bad_name")->char))
+	// Exclude SET-OF variables in the parent repeat groups, since they will be
+	// dropped.
+	df.put(sprintf(`"("\`:char \`var'[%s]'" != "begin repeat" | ///"',
+		attr.get("type")->char))
 	df.put(`"("\`repeat'" != "" & ///"')
-	df.put(sprintf(`""\`:char \`var'[%s%s]'" == "SET-OF-\`repeat'")) {"',
-		`CharPre', attr.get("name")->char))
+	df.put(sprintf(`""\`:char \`var'[%s]'" == "SET-OF-\`repeat'")) {"',
+		attr.get("name")->char))
 	df.put("local badnames : list badnames | var")
 	df.put("}")
 	df.put("}")
@@ -3280,7 +3283,7 @@ void write_repeat_locals(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat,
 	df.put("")
 
 	// Define `alldatanotform'.
-	df.put(sprintf("ds, not(char %slong_name)", `CharPre'))
+	df.put(sprintf("ds, not(char %s)", attr.get("name")->char))
 	df.put("local datanotform \`r(varlist)'")
 	df.put("local exclude SubmissionDate KEY PARENT_KEY metainstanceID")
 	df.put("local datanotform : list datanotform - exclude")
@@ -3300,7 +3303,7 @@ void write_drop_attrib(`DoFileWriterS' df, `AttribSetS' attr)
 		df.put("foreach var of varlist _all {")
 		if (n <= 3) {
 			for (i = 1; i <= n; i++) {
-				df.put(sprintf("char \`var'[%s%s]", `CharPre', drop[i]))
+				df.put(sprintf("char \`var'[%s]", drop[i]))
 			}
 		}
 		else {
@@ -3309,7 +3312,7 @@ void write_drop_attrib(`DoFileWriterS' df, `AttribSetS' attr)
 				df.write(drop[i] + " ")
 			}
 			df.put("{")
-			df.put(sprintf("char \`var'[%s\`char']", `CharPre'))
+			df.put(sprintf("char \`var'[\`char']"))
 			df.put("}")
 		}
 		df.put("}")
@@ -3321,8 +3324,8 @@ void write_search_set_of(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat)
 {
 	df.put("local setof")
 	df.put("foreach var of varlist _all {")
-	df.put(sprintf(`"if "\`:char \`var'[%s%s]'" == "SET-OF-%s" {"',
-		`CharPre', attr.get("name")->char, repeat))
+	df.put(sprintf(`"if "\`:char \`var'[%s]'" == "SET-OF-%s" {"',
+		attr.get("name")->char, repeat))
 	df.put("local setof \`var'")
 	df.put("continue, break")
 	df.put("}")
@@ -3443,8 +3446,8 @@ void write_reshape_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 	else {
 		df.put("drop KEY")
 		df.put("foreach var of local before {")
-		df.put(sprintf(`"if "\`:char \`var'[%s%s]'" == "SET-OF-%s" {"',
-			`CharPre', attr.get("name")->char, repeat->name()))
+		df.put(sprintf(`"if "\`:char \`var'[%s]'" == "SET-OF-%s" {"',
+			attr.get("name")->char, repeat->name()))
 		df.put("drop \`var'")
 		df.put("continue, break")
 		df.put("}")
@@ -3482,8 +3485,8 @@ void write_reshape_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 	// Restore variable labels.
 	df.put("* Restore variable labels.")
 	df.put("foreach var of varlist _all {")
-	df.put(sprintf(`"mata: st_varlabel("\`var'", st_global("\`var'[%s%s]"))"',
-		`CharPre', attr.get("label")->char))
+	df.put(sprintf(`"mata: st_varlabel("\`var'", st_global("\`var'[%s]"))"',
+		attr.get("label")->char))
 	df.put("}")
 
 	// Zero observations
@@ -3575,6 +3578,7 @@ void write_choices(
 	/* output do-files */ `SS' _vallabdo, `SS' _encodedo,
 	`SS' _choices,
 	/* column headers */ `SS' _listname, `SS' _name, `SS' _label,
+	/* characteristic names */ `SS' _listnamechar, `SS' _isotherchar,
 	/* other values */ `SS' _otherlists, `SS' _other,
 	`RS' _oneline)
 {
@@ -3657,7 +3661,7 @@ void write_choices(
 	df.open(_encodedo)
 
 	if (strlists != "") {
-		write_encode_start(df, strlists)
+		write_encode_start(df, strlists, _listnamechar, _isotherchar)
 		write_lists(df, lists, _oneline, "encode")
 		write_encode_end(df)
 	}
@@ -3879,15 +3883,17 @@ void write_save_label_info(`DoFileWriterS' df)
 	df.put("")
 }
 
-void write_encode_start(`DoFileWriterS' df, `SS' strlists)
+void write_encode_start(`DoFileWriterS' df, `SS' strlists, `SS' _listnamechar,
+	`SS' _isotherchar)
 {
 	df.put("* Encode fields whose list contains a noninteger name.")
 	df.put("local lists " + strlists)
 	df.put("tempvar temp")
-	df.put(sprintf("ds, has(char %slist_name)", `CharPre'))
+	df.put(sprintf("ds, has(char %s)", _listnamechar))
 	df.put("foreach var in \`r(varlist)' {")
-	df.put(sprintf("local list : char \`var'[%slist_name]", `CharPre'))
-	df.put("if \`:list list in lists' & !\`:char \`var'[Odk_is_other]' {")
+	df.put(sprintf("local list : char \`var'[%s]", _listnamechar))
+	df.put(sprintf("if \`:list list in lists' & !\`:char \`var'[%s]' {",
+		_isotherchar))
 	df.put("capture confirm numeric variable \`var'")
 	df.put("if !_rc {")
 	df.put(sprintf("tostring \`var', replace format(%s)", `RealFormat'))
