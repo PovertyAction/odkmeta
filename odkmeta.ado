@@ -1488,7 +1488,7 @@ field's variables' long names. Return codes:
 		for (i = 1; i <= n; i++) {
 			if (repeat->field(i)->order != order &
 				(repeat->field(i)->st_long() == "" |
-				repeat->field(i)->is_dup() != "")) {
+				repeat->field(i)->is_dup())) {
 				return(`InsheetV')
 			}
 		}
