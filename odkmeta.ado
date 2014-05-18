@@ -1701,11 +1701,13 @@ void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
 	}
 
 	// Clean up strings.
-	res = strip_quotes(res, "simple")
-	res = subinstr(res, `""""', `"""', .)
-	res = subinstr(res, char(13) + char(10), " ", .)
-	res = subinstr(res, char(13), " ", .)
-	res = subinstr(res, char(10), " ", .)
+	if (rows(res)) {
+		res = strip_quotes(res, "simple")
+		res = subinstr(res, `""""', `"""', .)
+		res = subinstr(res, char(13) + char(10), " ", .)
+		res = subinstr(res, char(13), " ", .)
+		res = subinstr(res, char(10), " ", .)
+	}
 
 	return(res)
 }
