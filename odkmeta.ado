@@ -1406,24 +1406,6 @@ void `Field'::set_label(`SS' newlabel)
 void `Field'::set_attribs(`SR' newattribs)
 	attribs = newattribs
 
-// Returns 1 if the Stata name of the field is the same as a previous field's;
-// otherwise it returns 0.
-`RS' `Field'::is_dup()
-	return(otherdup != "")
-
-/* If -is_dup()- == 1 and the field is associated with multiple variables,
-returns the ODK long name of the first variable of the field with a duplicate
-Stata name. For example, if mygeo is a geopoint field, then field.name() ==
-"mygeo", and field.dup_var() could be "mygeo-Latitude". If -is_dup()- == 0 or
-the field is associated with a single variable, -dup_var()- returns "". */
-`SS' `Field'::dup_var()
-	return(dupvar)
-
-// If -is_dup()- == 1, returns the ODK long name of the other field with the
-// same Stata name. Otherwise, it returns "".
-`SS' `Field'::other_dup_name()
-	return(otherdup)
-
 // Sets the name of the other field with the same Stata name and, for fields
 // associated with multiple variables, the name of the first variable with a
 // duplicate Stata name.
@@ -1432,11 +1414,6 @@ void `Field'::set_dup(`SS' newotherdup, |`SS' newdupvar)
 	otherdup = newotherdup
 	dupvar   = newdupvar
 }
-
-// For fields associated with multiple variables, sets the name of the first
-// variable with a duplicate Stata name.
-void `Field'::set_dup_var(`SS' newdupvar)
-	dupvar = newdupvar
 
 // Returns a pointer to the group in which the field is nested.
 // If the field is not in a group, it returns NULL.
@@ -1455,6 +1432,29 @@ pointer(`RepeatS') scalar `Field'::repeat()
 // Sets the pointer to the repeat group in which the field is nested.
 void `Field'::set_repeat(pointer(`RepeatS') scalar newrepeat)
 	repeat = newrepeat
+
+// Returns 1 if the Stata name of the field is the same as a previous field's;
+// otherwise it returns 0.
+`RS' `Field'::is_dup()
+	return(otherdup != "")
+
+/* If is_dup() == 1 and the field is associated with multiple variables, returns
+the ODK long name of the first variable of the field with a duplicate Stata
+name. For example, if mygeo is a geopoint field, then name() == "mygeo", and
+dup_var() could be "mygeo-Latitude". If is_dup() == 0 or the field is associated
+with a single variable, -dup_var()- returns "". */
+`SS' `Field'::dup_var()
+	return(dupvar)
+
+// For fields associated with multiple variables, sets the name of the first
+// variable with a duplicate Stata name.
+void `Field'::set_dup_var(`SS' newdupvar)
+	dupvar = newdupvar
+
+// If is_dup() == 1, returns the ODK long name of the other field with the same
+// Stata name. Otherwise, it returns "".
+`SS' `Field'::other_dup_name()
+	return(otherdup)
 
 // Returns the long name of the field.
 `SS' `Field'::long_name()
