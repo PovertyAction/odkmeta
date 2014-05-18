@@ -788,8 +788,8 @@ void `DoFileWriter'::change_comment(`SS' line)
 	}
 }
 
-void `DoFileWriter'::write(`SS' linestub)
-	linestart = linestart + linestub
+void `DoFileWriter'::write(`SS' s)
+	linestart = linestart + s
 
 void `DoFileWriter'::put(`SS' line)
 {
