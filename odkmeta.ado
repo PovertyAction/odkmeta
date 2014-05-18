@@ -698,7 +698,12 @@ void `DoFileWriter'::set_autotab(`RS' setting)
 
 void `DoFileWriter'::open(`SS' fn, |`SS' mode, `RS' new_do)
 {
-	fh = fopen(fn, (args() == 2 ? mode : "w"))
+	if (args() < 2)
+		mode = "w"
+	else if (mode != "w" & mode != "a")
+		_error("invalid mode")
+
+	fh = fopen(fn, mode)
 
 	if (new_do)
 		new_do_file()
