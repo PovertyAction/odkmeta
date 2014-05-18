@@ -717,7 +717,7 @@ void `DoFileWriter'::indent(|`RS' tabchange)
 	if (args())
 		tab = tab + (nonmissing(tabchange) ? tabchange : 0)
 	else
-		tab = tab + 1
+		tab++
 }
 
 // Returns the command (the first word) of a line.
@@ -821,7 +821,7 @@ void `DoFileWriter'::put(`SS' line)
 				tab = tab - close_block(trim)
 		}
 		else if (joinline == 2)
-			tab = tab + 1
+			tab++
 	}
 
 	if (debug) {
@@ -852,7 +852,7 @@ void `DoFileWriter'::put(`SS' line)
 	// Track our place in the line-join block.
 	lastjoin = joinline > 1
 	if (delim == "cr" & !comment & regexm(trim, sprintf("[ %s]///$", tab())))
-		joinline = joinline + 1
+		joinline++
 	else
 		joinline = 1
 
