@@ -898,12 +898,12 @@ struct `Attrib' {
 // so I opted for this approach.
 class `AttribSet' {
 	public:
-		`RS' n()
-		`TR' vals()
-		pointer(`AttribPropsS') scalar add(), get()
+		`RS'							n()
+		`TR'							vals()
+		pointer(`AttribPropsS') scalar	add(), get()
 
 	private:
-		`AttribR' attribs
+		`AttribR'		attribs
 		static `TS'		val()
 }
 
