@@ -1483,8 +1483,7 @@ field's variables' long names. Return codes:
 
 	// geopoint variables (not fields) have a nonnumeric suffix, so they never
 	// match the pattern v#.
-	if (regexm(st_long(), "^v[1-9][0-9]*$") & type != "geopoint" &
-		group->main()) {
+	if (regexm(st_long(), "^v[1-9][0-9]*$") & type != "geopoint") {
 		n = length(repeat->fields())
 		for (i = 1; i <= n; i++) {
 			if (repeat->field(i)->order != order &
