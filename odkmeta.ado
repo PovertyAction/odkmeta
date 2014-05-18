@@ -3194,6 +3194,20 @@ void write_attach_vallabs(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("")
 }
 
+void write_recode_or_other(`DoFileWriterS' df)
+{
+	df.put("* select or_other variables")
+	df.put("forvalues i = 1/\`:list sizeof otherlabs' {")
+	df.put("local lab      : word \`i' of \`otherlabs'")
+	df.put("local otherval : word \`i' of \`othervals'")
+	df.put("")
+	df.put("ds, has(vallab \`lab')")
+	df.put(`"if "\`r(varlist)'" != "" ///"')
+	df.put("recode \`r(varlist)' (.o=\`otherval')")
+	df.put("}")
+	df.put("")
+}
+
 void write_field_labels(`DoFileWriterS' df, `AttribSetS' attr)
 {
 	`SS' notepre
@@ -3235,20 +3249,6 @@ void write_field_labels(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put(`"subinstr(st_global("\`var'[note1]"), "\`from'", "\`to'", .))"')
 	df.put("}")
 	df.put("}")
-	df.put("}")
-	df.put("")
-}
-
-void write_recode_or_other(`DoFileWriterS' df)
-{
-	df.put("* select or_other variables")
-	df.put("forvalues i = 1/\`:list sizeof otherlabs' {")
-	df.put("local lab      : word \`i' of \`otherlabs'")
-	df.put("local otherval : word \`i' of \`othervals'")
-	df.put("")
-	df.put("ds, has(vallab \`lab')")
-	df.put(`"if "\`r(varlist)'" != "" ///"')
-	df.put("recode \`r(varlist)' (.o=\`otherval')")
 	df.put("}")
 	df.put("")
 }
