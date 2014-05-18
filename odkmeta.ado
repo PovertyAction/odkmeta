@@ -901,6 +901,7 @@ class `AttribSet' {
 		`RS'							n()
 		`TR'							vals()
 		pointer(`AttribPropsS') scalar	add(), get()
+		void							drop()
 
 	private:
 		`AttribR'		attribs
@@ -926,6 +927,21 @@ pointer(`AttribPropsS') scalar `AttribSet'::add(`SS' name)
 	attrib.name = name
 	attribs = attribs, attrib
 	return(&attribs[length(attribs)].props)
+}
+
+void `AttribSet'::drop(`SS' name)
+{
+	`RS' n, i
+
+	n = n()
+	for (i = 1; i <= n; i++) {
+		if (attribs[i].name == name) {
+			attribs = attribs[select(1..n, (1..n) :!= i)]
+			return
+		}
+	}
+
+	_error(sprintf("attribute '%s' not found", name))
 }
 
 // Returns a single attribute's properties.
