@@ -1465,11 +1465,12 @@ field's variables' long names. Return codes:
 `InsheetOK'		All the variables' names are OK.
 `InsheetBad'	-insheet- will not convert at least one of the variables' names
 				to a Stata name.
-`InsheetDup' 	At least one of the variables' names is duplicate, either with
-				another variable of the same field or with a variable of another
-				field.
-`InsheetV'		At least one of the variables' names is a v# name and another
-				field in the same repeat group is `InsheetBad' or `InsheetDup'.
+`InsheetDup' 	At least one of the variables' Stata name is duplicate, either
+				with another variable of the same field or with a variable of
+				another field in the same repeat group.
+`InsheetV'		At least one of the variables' Stata name is a v# name, and
+				another field in the same repeat group is `InsheetBad' or
+				`InsheetDup'.
 */
 `InsheetCodeS' `Field'::insheet()
 {
