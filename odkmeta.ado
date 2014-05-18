@@ -157,7 +157,7 @@ pr error_overlap
 	syntax anything(name=overlap id=overlap), ///
 		opts(namelist min=2 max=2) [SUBopts]
 
-	mata: error_overlap(st_local("overlap"), tokens("`opts'"), ///
+	mata: error_overlap(strip_quotes(st_local("overlap")), tokens("`opts'"), ///
 		"`subopts'" != "")
 end
 
@@ -215,7 +215,7 @@ pr parse_survey, sclass
 
 		foreach opt2 of loc opts {
 			if `"``opt1''"' == `"``opt2''"' {
-				error_overlap ``opt1'', opts(`opt1' `opt2') sub
+				error_overlap `"``opt1''"', opts(`opt1' `opt2') sub
 				error_parsing 198, `opt'
 				/*NOTREACHED*/
 			}
@@ -291,7 +291,7 @@ pr parse_choices, sclass
 
 		foreach opt2 of loc opts {
 			if `"``opt1''"' == `"``opt2''"' {
-				error_overlap ``opt1'', opts(`opt1' `opt2') sub
+				error_overlap `"``opt1''"', opts(`opt1' `opt2') sub
 				error_parsing 198, `opt'
 				/*NOTREACHED*/
 			}
