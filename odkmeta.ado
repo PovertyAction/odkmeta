@@ -11,7 +11,7 @@ pr odkmeta
 	}
 
 	#d ;
-	syntax [using/], csv(str)
+	syntax using/, csv(str)
 		/* survey options */
 		Survey(str asis) [DROPattrib(str asis) KEEPattrib(str asis) RELax]
 		/* choices options */
