@@ -85,19 +85,19 @@ pr odkmeta
 	in -write_survey()-. */
 	parse_survey `survey'
 	// "s" prefix for "-survey()-": "sfn" for "-survey()- filename."
-	loc sfn      "`s(fn)'"
-	loc type     "`s(type)'"
-	loc sname    "`s(name)'"
-	loc slabel   "`s(label)'"
-	loc disabled "`s(disabled)'"
+	loc sfn			"`s(fn)'"
+	loc type		"`s(type)'"
+	loc sname		"`s(name)'"
+	loc slabel		"`s(label)'"
+	loc disabled	"`s(disabled)'"
 
 	* Parse -choices()-.
 	parse_choices `choices'
 	// "c" prefix for "-choices()-": "cfn" for "-choices()- filename."
-	loc cfn      "`s(fn)'"
-	loc listname "`s(listname)'"
-	loc cname    "`s(name)'"
-	loc clabel   "`s(label)'"
+	loc cfn			"`s(fn)'"
+	loc listname	"`s(listname)'"
+	loc cname		"`s(name)'"
+	loc clabel		"`s(label)'"
 
 	tempfile startdo enddo chardo cleando1 cleando2 vallabdo encodedo ///
 		encodetab fulldo
@@ -266,11 +266,11 @@ pr parse_survey, sclass
 		!regexm(`stdtype', "^end (group|repeat)$") & `nonmiss', ///
 		`opt' sub(name) `listvars'
 
-	sret loc fn       "`fn'"
-	sret loc type     "`type'"
-	sret loc name     "`name'"
-	sret loc label    "`label'"
-	sret loc disabled "`disabled'"
+	sret loc fn			"`fn'"
+	sret loc type		"`type'"
+	sret loc name		"`name'"
+	sret loc label		"`label'"
+	sret loc disabled	"`disabled'"
 end
 
 pr parse_choices, sclass
@@ -318,10 +318,10 @@ pr parse_choices, sclass
 		`opt' sub(listname) `listvars'
 	check_col `name' if mi(`name') & `nonmiss', `opt' sub(name) `listvars'
 
-	sret loc fn       "`fn'"
-	sret loc listname "`listname'"
-	sret loc name     "`name'"
-	sret loc label    "`label'"
+	sret loc fn			"`fn'"
+	sret loc listname	"`listname'"
+	sret loc name		"`name'"
+	sret loc label		"`label'"
 end
 
 					/* parse user input		*/
