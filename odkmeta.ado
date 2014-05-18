@@ -619,13 +619,13 @@ name, and -insheet_name()- returns "". */
 
 
 /* -------------------------------------------------------------------------- */
-					/* do-file writer class	*/
+					/* do-file writer class		*/
 
 class `DoFileWriter' {
 	public:
-		`RS' debug(), autotab()
-		void set_debug(), set_autotab(), open(), close(), indent(), write(),
-			put()
+		`RS'	debug(), autotab()
+		void	set_debug(), set_autotab(), open(), close(), indent(), write(),
+				put()
 
 	private:
 		`RS' fh
@@ -666,8 +666,8 @@ class `DoFileWriter' {
 		// These take the current line as an argument and assume that it is
 		// trimmed of leading and trailing white space.
 		`RS' open_block(), close_block()
-		`SS' command()
-		void change_delim(), change_comment()
+		`SS'			command()
+		void			change_delim(), change_comment()
 }
 
 void `DoFileWriter'::new_do_file()
@@ -858,7 +858,7 @@ void `DoFileWriter'::put(`SS' line)
 	linestart = ""
 }
 
-					/* do-file writer class	*/
+					/* do-file writer class		*/
 /* -------------------------------------------------------------------------- */
 
 
