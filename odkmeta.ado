@@ -3944,7 +3944,7 @@ Subsequent characters can include numbers, dashes, and periods."
 
 List names are much less restrictive: they may include even spaces or single or
 double quotes. List names are case-sensitive. -odkmeta- requires that list names
-are Stata names.
+be Stata names.
 
 Useful sources, including for terminology:
 
