@@ -1719,7 +1719,7 @@ void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
 	// "nopts" for "number of options"
 	`RS' rows, cols, nopts, min, len, i
 	`RR' col, optindex
-	`SS' var, optvars
+	`SS' var, type
 	`SR' vars
 	`SM' csv
 
@@ -1757,12 +1757,11 @@ void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
 			var = sprintf("v%f", i)
 		vars = vars, var
 		if (rows == 1)
-			len = 0
+			type = "str1"
 		else
-			len = max(strlen(csv[|2, i \ ., i|]))
-		len = max((len, 1))
-		len = min((len, c("maxstrvarlen")))
-		(void) st_addvar(sprintf("str%f", len), var)
+			type = smallest_vartype(csv[|2, i \ ., i|])
+		(void) st_addvar(type, var)
+
 		st_global(sprintf("%s[Column_header]", var), csv[1, i])
 	}
 	if (rows > 1)
