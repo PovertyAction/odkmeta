@@ -558,9 +558,6 @@ It is assumed that s can be enclosed in double quotes. See -help specialexp-. */
 	if (!anyof(("simple", "compound", ""), style))
 		_error("unknown style " + style)
 
-	if (!length(s))
-		return(J(0, 0, ""))
-
 	rows = rows(s)
 	cols = cols(s)
 	strip = J(rows, cols, "")
@@ -570,8 +567,7 @@ It is assumed that s can be enclosed in double quotes. See -help specialexp-. */
 				substr(s[i, j], -1, .) == `"""') {
 				strip[i, j] = substr(s[i, j], 2, strlen(s[i, j]) - 2)
 			}
-			else if (style != "simple" &
-				substr(s[i, j], 1, 2)  == "`" + `"""' &
+			else if (style != "simple" & substr(s[i, j], 1, 2) == "`" + `"""' &
 				substr(s[i, j], -2, .) == `"""' + "'") {
 				strip[i, j] = substr(s[i, j], 3, strlen(s[i, j]) - 4)
 			}
