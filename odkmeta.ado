@@ -2844,18 +2844,21 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 				loop * "\`suffix'")))
 			df.put("local var : word \`pos' of \`all'")
 
-			// If insheet == `InsheetV', there's only a chance that the variable
-			// name differs from the field name. In a loop, some but not all
-			// variables could be problematic.
+			// If insheet == `InsheetV', there is only a chance that the
+			// variable name differs from the field name. In a loop, some but
+			// not all variables could be problematic.
 			if (insheet == `InsheetV' | loop) {
 				df.write(`"local isbadname = "\`var'" != "')
-				if (strlen(fields[i]->st_long()) < 32 & loop) {
-					df.put(sprintf(`"substr("%s", 1, 32)"',
-						fields[i]->st_long() + loop * "\`suffix'"))
+				if (strlen(fields[i]->st_long()) + max(strlen(suffix)) <= 32) {
+					df.put(adorn_quotes(fields[i]->st_long() +
+						loop * "\`suffix'"))
 				}
 				else {
-					df.put(adorn_quotes(fields[i]->st_long()))
+					df.put(sprintf(`"substr(%s, 1, 32)"',
+						adorn_quotes(fields[i]->st_long() +
+						loop * "\`suffix'")))
 				}
+
 				badname = "\`isbadname'"
 			}
 			else {
