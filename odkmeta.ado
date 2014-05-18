@@ -3452,7 +3452,7 @@ void write_reshape_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 		df.put("drop KEY " + repeat->child_set_of()->st_long())
 	else {
 		df.put("drop KEY")
-		df.put("foreach var of local before {")
+		df.put("foreach var of varlist _all {")
 		df.put(sprintf(`"if "\`:char \`var'[%s]'" == "SET-OF-%s" {"',
 			attr.get("name")->char, repeat->name()))
 		df.put("drop \`var'")
