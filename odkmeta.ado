@@ -2665,7 +2665,7 @@ void write_insheet(`DoFileWriterS' df, `SS' csv, `RS' insheetable)
 		form, and it would become problematic if the user could add a separate
 		field with the same name to the form and this resulted in duplicate .csv
 		column names. */
-		df.put(`"assert wordcount("\`field'") == 1"')
+		df.put(`"assert \`:list sizeof field' == 1"')
 		df.put("assert !\`:list field in fields'")
 		df.put("local fields : list fields | field")
 		df.put("}")
