@@ -1504,7 +1504,7 @@ field's variables' long names. Return codes:
 {
 	pointer(`FieldS') scalar first
 
-	if (!repeat->inside())
+	if (repeat->main())
 		return(0)
 
 	first = repeat->first_field()
@@ -1519,7 +1519,7 @@ field's variables' long names. Return codes:
 {
 	pointer(`FieldS') scalar last
 
-	if (!repeat->inside())
+	if (repeat->main())
 		return(0)
 
 	last = repeat->last_field()
