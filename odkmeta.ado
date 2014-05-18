@@ -90,7 +90,6 @@ pr odkmeta
 	loc sname    "`s(name)'"
 	loc slabel   "`s(label)'"
 	loc disabled "`s(disabled)'"
-	loc headers  "`s(headers)'"
 
 	* Parse -choices()-.
 	parse_choices `choices'
