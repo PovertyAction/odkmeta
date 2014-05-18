@@ -3269,6 +3269,7 @@ void write_repeat_locals(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat,
 		df.put("tempfile child")
 		df.put("local childfiles : list childfiles | child")
 	}
+	df.put("")
 
 	// Define `allbadnames'.
 	df.put("local badnames")
@@ -3504,6 +3505,7 @@ void write_reshape_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 	df.put("foreach var in \`r(varlist)' {")
 	df.put("ren \`var' \`var'1")
 	df.put("}")
+	df.put("")
 	df.put("drop " + mergekey)
 	df.put(sprintf(`"gen %s = """', mergekey))
 	df.put("}")
