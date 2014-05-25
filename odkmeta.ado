@@ -1,4 +1,4 @@
-*! version 1.0.0 Matthew White 19dec2013
+*! version 1.1.0 Matthew White 08jan2014
 pr odkmeta
 	vers 11
 
@@ -1840,7 +1840,7 @@ void write_do_start(`SS' _outfile, `SS' _0)
 		strofreal(date(c("current_date"), "DMY"), "%tdMonth_dd,_CCYY"),
 		c("current_time")))
 	df.put("* odkmeta " + _0)
-	df.put("* -odkmeta- version 1.0.0 was used.")
+	df.put("* -odkmeta- version 1.1.0 was used.")
 	df.put("")
 
 	// -version-

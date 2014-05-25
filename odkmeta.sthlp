@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.0 Matthew White 19dec2013}{...}
+{* *! version 1.1.0 Matthew White 05jan2014}{...}
 {title:Title}
 
 {phang}
