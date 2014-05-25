@@ -2718,6 +2718,7 @@ void write_save_dta(`DoFileWriterS' df, `SS' _csv, `SS' repeat, `RS' anyrepeat,
 	// Define `allformnotdata'.
 	if (_relax)
 		df.put(`"local allformnotdata `"\`allformnotdata' "\`formnotdata'""'"')
+
 	df.put("")
 }
 
@@ -2843,6 +2844,7 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 			}
 			else if (insheet == `InsheetV')
 				df.put("* Variable name is v#.")
+
 			// This could lead to incorrect results if there are duplicate field
 			// names. Previous code checks that this is not the case.
 			df.put(sprintf("local pos : list posof %s in fields",
@@ -3113,6 +3115,7 @@ void write_dates_times(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("assert !\`:length local type'")
 	df.put(sprintf("char SubmissionDate[%s] datetime", attr.get("type")->char))
 	df.put("}")
+
 	df.put("local datetime date today time datetime start end")
 	df.put("tempvar temp")
 	df.put(sprintf("ds, has(char %s)", attr.get("type")->char))
@@ -3722,8 +3725,7 @@ void write_lists(`DoFileWriterS' df, `ListR' lists, `RS' oneline, |`SS' action)
 			if (!list.vallab)
 				list.names = strofreal(1::rows(list.names), `RealFormat')
 			if (!list.matalab) {
-				list.labels =
-					adorn_quotes(strip_quotes(list.labels), "label")
+				list.labels = adorn_quotes(strip_quotes(list.labels), "label")
 			}
 			ls = ls, list
 		}
