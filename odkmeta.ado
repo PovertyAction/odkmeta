@@ -2474,9 +2474,10 @@ void _get_fields(pointer(`FieldS') rowvector fields,
 		else {
 			// Add the repeat group to repeats.
 			newrepeat = repeats[rpos++]
-			newrepeat->set_name(longname)
+			newrepeat->set_name(name)
 			newrepeat->set_parent(parentrepeat)
 			parentrepeat->add_child(newrepeat)
+			newrepeat->set_parent_group(parentgroup)
 
 			// Process the first row as the SET-OF field in the parent
 			// repeat group.
@@ -2636,7 +2637,7 @@ void write_survey_start(`DoFileWriterS' df, `AttribSetS' attr, `SS' charpre)
 	insheetable = 1
 	n = length(fields)
 	for (i = 1; i <= n; i++) {
-		if (fields[i]->repeat()->name() == repeatname)
+		if (fields[i]->repeat()->long_name() == repeatname)
 			insheetable = insheetable & fields[i]->insheet() == `InsheetOK'
 	}
 
@@ -2761,8 +2762,9 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 
 			df.put("* begin repeat " + fields[i]->repeat()->name())
 			df.put("")
-			write_insheet(df, _csv + "-" + fields[i]->repeat()->name() + ".csv",
-				insheetable_names(fields, fields[i]->repeat()->name()))
+			write_insheet(df,
+				_csv + "-" + fields[i]->repeat()->long_name() + ".csv",
+				insheetable_names(fields, fields[i]->repeat()->long_name()))
 
 			if (_relax) {
 				df.put("local formnotdata")
@@ -2956,7 +2958,8 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 		}
 		// end repeat
 		if (fields[i]->end_repeat()) {
-			write_save_dta(df, _csv, fields[i]->repeat()->name(), 1, _relax)
+			write_save_dta(df, _csv, fields[i]->repeat()->long_name(), 1,
+				_relax)
 			df.put("* end repeat " + fields[i]->repeat()->name())
 			df.put("")
 		}
@@ -2993,8 +2996,8 @@ void write_rename_for_split(`DoFileWriterS' df,
 		df.put("// rename ...")
 	else {
 		for (i = 1; i <= n; i++) {
-			df.put(sprintf(`"if "\`repeat'" == %s%s {"',
-				adorn_quotes(repeats[i]->name()),
+			df.put(sprintf(`"%sif "\`repeat'" == %s%s {"',
+				(i > 1) * "else ", adorn_quotes(repeats[i]->long_name()),
 				repeats[i]->main() * " /* main fields (not a repeat group) */"))
 			df.put("// rename ...")
 			df.put("}")
@@ -3352,12 +3355,12 @@ void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 	nchildren = length(repeat->children())
 	multiple = nchildren > 1
 	if (!multiple)
-		loopname = repeat->child(1)->name()
+		loopname = repeat->child(1)->long_name()
 	else {
 		df.put("tempvar merge")
 		df.write("foreach repeat in ")
 		for (i = 1; i <= nchildren; i++) {
-			df.write(sprintf("%s ", repeat->child(i)->name()))
+			df.write(sprintf("%s ", repeat->child(i)->long_name()))
 		}
 		df.put("{")
 		loopname = "\`repeat'"
@@ -3391,8 +3394,8 @@ void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 	df.put("gettoken first : overlap")
 	df.put(sprintf("noisily display as err " +
 		`""error merging %s and repeat group %s""',
-		(repeat->main() ? "the main fields" : "repeat group " + repeat->name()),
-		loopname))
+		(repeat->main() ? "the main fields" :
+		"repeat group " + repeat->long_name()), loopname))
 	df.put("noisily display as err " +
 		`""variable \`first' exists in both datasets""')
 	df.put("noisily display as err " +
@@ -3515,7 +3518,8 @@ void write_reshape_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 	df.put("")
 
 	// Save.
-	df.put(sprintf(`"local pos : list posof "%s" in repeats"', repeat->name()))
+	df.put(sprintf(`"local pos : list posof %s in repeats"',
+		adorn_quotes(repeat->long_name())))
 	df.put("local child : word \`pos' of \`childfiles'")
 	df.put("save \`child'")
 	df.put("")
@@ -3548,7 +3552,7 @@ void write_merge_repeats(`DoFileWriterS' df,
 			"Main fields (not a repeat group)"))
 		df.put("")
 
-		repeatcsv = _csv + repeats[i]->inside() * "-" + repeats[i]->name()
+		repeatcsv = _csv + repeats[i]->inside() * "-" + repeats[i]->long_name()
 		dtaq = adorn_quotes(repeatcsv + (strpos(repeatcsv, ".") ? ".dta" : ""),
 			"list")
 		df.put(sprintf("use %s, clear", dtaq))
