@@ -2187,6 +2187,8 @@ void write_survey(
 	// Other (not special) attributes
 	cols = cols(survey)
 	for (i = 1; i <= cols; i++) {
+		// If survey has duplicate column headers, only the first column for
+		// each column header is used.
 		if (!anyof((attr.vals("header"), dropattrib), survey[1, i]) & !dropall &
 			any(survey[|2, i \ ., i|] :!= "")) {
 			attrib = attr.add(sprintf("col%f", i))
@@ -2294,8 +2296,8 @@ void _get_fields_base(pointer(`FieldS') rowvector fields, `RS' fpos,
 			}
 			// 234 = 244 - 10, where 10 is the length of the longest variable
 			// suffix ("-Longitude"). This check is necessary because -insheet-
-			// is used in the do-file to create lists of full field names, and
-			// -insheet- truncates strings at 244 characters.
+			// is used in the do-file to create lists of field long names, and
+			// -insheet- truncates strings to 244 characters.
 			if (strlen(fields[fpos]->long_name()) > 234) {
 				// [ID 157], [ID 158], [ID 159]
 				errprintf("the long name of field %s%s exceeds " +
@@ -2358,7 +2360,7 @@ void _get_fields_base(pointer(`FieldS') rowvector fields, `RS' fpos,
 
 /* fields is a rowvector of pointers to the fields, groups is a rowvector of
 pointers to the fields' groups, and repeats is a rowvector of pointers to the
-fields' repeat groups. These arguments are replaced.
+fields' repeat groups.
 
 fpos (for "fields position") is the index of the first element of fields in
 which no field has been saved. gpos (for "groups" position) is the index of the
@@ -2375,8 +2377,7 @@ nested.
 
 odknames and stnames (for "Stata names") are parallel lists that contain,
 respectively, the ODK and Stata long names of the fields of parentrepeat. A
-field whose Stata name is already in stnames has a duplicate Stata name.
-*/
+field whose Stata name is already in stnames has a duplicate Stata name. */
 void _get_fields(pointer(`FieldS') rowvector fields,
 	pointer(`GroupS') rowvector groups, pointer(`RepeatS') rowvector repeats,
 	`RS' fpos, `RS' gpos, `RS' rpos, `SM' survey, `AttribSetS' attr,
@@ -2479,16 +2480,16 @@ void _get_fields(pointer(`FieldS') rowvector fields,
 			parentrepeat->add_child(newrepeat)
 			newrepeat->set_parent_group(parentgroup)
 
-			// Process the first row as the SET-OF field in the parent
-			// repeat group.
+			// Process the first row as the SET-OF field in the parent repeat
+			// group.
 			_get_fields_base(fields, fpos, survey[|1, . \ 1, .|], attr,
 				parentgroup, parentrepeat, odknames, stnames)
 			newrepeat->set_parent_set_of(fields[fpos - 1])
 
 			// Process the fields nested in the repeat group.
-			// Passing groups[1] (the main fields) as parentgroup because
-			// the fields of a repeat group are treated as if they are not
-			// nested in the repeat group's group.
+			// Passing groups[1] (the main fields) as parentgroup because the
+			// fields of a repeat group are treated as if they are not nested in
+			// the repeat group's group.
 			pragma unset repeatodk
 			pragma unset repeatstata
 			_get_fields(fields, groups, repeats,
@@ -2497,9 +2498,9 @@ void _get_fields(pointer(`FieldS') rowvector fields,
 
 			/* Process the first row as the SET-OF field in the child repeat
 			group (the newly created repeat group).
-			This comes after the other fields of the repeat group because
-			the SET-OF field is the last field in the .csv file. It only
-			matters for determining duplicate Stata names. */
+			This comes after the other fields of the repeat group because the
+			SET-OF field is the last field in the .csv file. It only matters for
+			determining duplicate Stata names. */
 			_get_fields_base(fields, fpos, survey[|1, . \ 1, .|], attr,
 				groups[1], newrepeat, repeatodk, repeatstata)
 			newrepeat->set_child_set_of(fields[fpos - 1])
@@ -2688,9 +2689,8 @@ void write_char(`DoFileWriterS' df, `SS' var, `SS' char, `SS' text, `SS' suffix,
 		pragma unset nstrs
 		exp = specialexp(text, nstrs)
 		if (nstrs == 1) {
-			// Turning off autotab because text could contain an unenclosed
-			// trailing open brace that `DoFileWriter'::put() would mistake as
-			// an open block.
+			// Turning off autotab because text could contain a trailing open
+			// brace that `DoFileWriter'.put() could mistake as an open block.
 			autotab = df.autotab()
 			df.set_autotab(0)
 			df.put(sprintf("char %s[%s] %s", var, char,
@@ -2819,6 +2819,9 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 			if (strlen(fields[i]->st_long()) + max(strlen(suffix)) <= 32)
 				var = fields[i]->st_long() + loop * "\`suffix'"
 			else {
+				// `varsuf' is never blank, because if it were,
+				// strlen(fields[i]->st_long()) == 32, and
+				// insheet != `InsheetOK'.
 				df.put(sprintf(`"local varsuf = substr("\`suffix'", 1, %f)"',
 					32 - strlen(fields[i]->st_long())))
 				var = fields[i]->st_long() + "\`varsuf'"
@@ -2827,6 +2830,7 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 			badname = "0"
 		}
 		else {
+			// Add a comment that describes the -insheet- issue.
 			if (insheet == `InsheetDup') {
 				if (fields[i]->dup_var() == "") {
 					df.put("* Duplicate variable name with " +
@@ -2840,7 +2844,7 @@ void write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
 			else if (insheet == `InsheetV')
 				df.put("* Variable name is v#.")
 			// This could lead to incorrect results if there are duplicate field
-			// names. -write_do_start()- checks that this is not the case.
+			// names. Previous code checks that this is not the case.
 			df.put(sprintf("local pos : list posof %s in fields",
 				adorn_quotes(fields[i]->long_name() + geopoint * "-" +
 				loop * "\`suffix'")))
@@ -3100,6 +3104,8 @@ void write_drop_note_vars(`DoFileWriterS' df, `AttribSetS' attr)
 void write_dates_times(`DoFileWriterS' df, `AttribSetS' attr)
 {
 	df.put("* Date and time variables")
+
+	// Add a type attribute to SubmissionDate.
 	df.put("capture confirm variable SubmissionDate, exact")
 	df.put("if !_rc {")
 	df.put(sprintf("local type : char SubmissionDate[%s]",
@@ -3163,6 +3169,8 @@ void write_dates_times(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("rename \`temp' \`var'")
 	df.put("}")
 	df.put("}")
+
+	// Remove the type attribute from SubmissionDate.
 	df.put("capture confirm variable SubmissionDate, exact")
 	df.put("if !_rc ///")
 	df.put(sprintf("char SubmissionDate[%s]", attr.get("type")->char))
@@ -3420,7 +3428,7 @@ void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 	// Clean up.
 	// Sort order
 	// This sort may be unnecessary: -merge- may complete it automatically.
-	// However, this is not ensured in the documentation, and the -reshape-
+	// However, this is not assured in the documentation, and the -reshape-
 	// requires it. (Otherwise, _j could be incorrect.)
 	df.put("sort \`order'")
 	df.put("drop \`order' \`merge'")
@@ -3634,15 +3642,19 @@ void write_choices(
 					choices[,listname] :== list.listname)
 				list.labels = select(choices[,label],
 					choices[,listname] :== list.listname)
+				// .vallab is 1 if list looks like an ordinary Stata value
+				// label, and all its names are integers; it is 0 otherwise.
 				list.vallab = !hasmissing(strtoreal(list.names)) &
 					strtoreal(list.names) == floor(strtoreal(list.names)) &
-					/* distinct names can be converted to the same number, e.g.,
-					1 and 01 */
+					/* Distinct names can be converted to the same number, e.g.,
+					1 and 01; guard against this. */
 					length(uniqrows(list.names)) ==
 					length(uniqrows(strtoreal(list.names)))
 				if (!list.vallab)
 					strlists = strlists + (strlists != "") * " " + list.listname
 
+				// .matalab is 1 if the value label must be created in Mata; it
+				// is 0 if not.
 				list.matalab = 0
 				nvals = length(list.names)
 				for (j = 1; j <= nvals; j++) {
@@ -3777,7 +3789,7 @@ void write_lists(`DoFileWriterS' df, `ListR' lists, `RS' oneline, |`SS' action)
 			}
 		}
 
-		// Middle of the label
+		// Middle of the label: write each association.
 		nassoc = length(ls[i].labels)
 		if (!labdef)
 			maxspaces = max(strlen(ls[i].labels))
