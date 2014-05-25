@@ -483,7 +483,7 @@ the list of the {it:groups} in which the field is nested
 with the field "short name," with elements separated by {cmd:"-"}.
 
 {pmore2}
-{cmd:Odk_repeat} contains the name of the repeat group
+{cmd:Odk_repeat} contains the (long) name of the repeat group
 in which the variable is nested.
 
 {pmore2}
