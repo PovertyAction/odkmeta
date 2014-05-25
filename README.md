@@ -9,8 +9,8 @@ odkmeta
 - Split `select_multiple` variables
 - Drop `note` variables
 - [Format](http://www.stata.com/help.cgi?format) `date`, `time`, and `datetime` variables
-- Attach field labels as [variable labels](http://www.stata.com/help.cgi?label) and [notes](http://www.stata.com/help.cgi?notes)
 - Attach value labels
+- Attach field labels as [variable labels](http://www.stata.com/help.cgi?label) and [notes](http://www.stata.com/help.cgi?notes)
 - [Merge](http://www.stata.com/help.cgi?merge) repeat groups
 
 Stata help file
@@ -108,8 +108,8 @@ log html odkmeta.sthlp odkmeta.md
         o Split <b>select_multiple</b> variables
         o Drop <b>note</b> variables
         o Format <b>date</b>, <b>time</b>, and <b>datetime</b> variables
-        o Attach field labels as variable labels and notes
         o Attach value labels
+        o Attach field labels as variable labels and notes
         o Merge repeat groups
 <p>
     After <b>select_multiple</b> variables have been split, tasks can be removed
@@ -386,8 +386,8 @@ log html odkmeta.sthlp odkmeta.md
             nested with the field "short name," with elements separated by
             <b>"-"</b>.
 <p>
-            <b>Odk_repeat</b> contains the name of the repeat group in which the
-            variable is nested.
+            <b>Odk_repeat</b> contains the (long) name of the repeat group in which
+            the variable is nested.
 <p>
             <b>Odk_list_name</b> contains the name of a <b>select</b> field's list.
 <p>
