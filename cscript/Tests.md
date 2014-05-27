@@ -499,12 +499,6 @@ Contributions of new tests are welcome. When adding a test to the cscript, pleas
 	<td>Same as [ID 1], but the disabled attribute of the disabled field is "yes " with a space instead of "yes". The result should be the same as [ID 1].</td>
 </tr>
 <tr>
-	<td>97</td>
-	<td><a href="https://github.com/matthew-white">matthew-white</a></td>
-	<td>Groups and repeats</td>
-	<td>Same as [ID 70], but "begin repeat" is replaced with begin_repeat, and "end repeat" is replaced with end_repeat. The result should be the same as [ID 70].</td>
-</tr>
-<tr>
 	<td>98</td>
 	<td><a href="https://github.com/matthew-white">matthew-white</a></td>
 	<td>Groups and repeats</td>
