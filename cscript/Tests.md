@@ -145,12 +145,6 @@ Contributions of new tests are welcome. When adding a test to the cscript, pleas
 	<td>Have only one field named thisisaveryveryveryunreasonablylongfieldname. It's OK as an ODK field name, but too long for a Stata name. When imported to Stata, its name should be truncated to thisisaveryveryveryunreasonablyl, but otherwise everything else should be OK.</td>
 </tr>
 <tr>
-	<td>31</td>
-	<td><a href="https://github.com/internetlindsey">internetlindsey</a></td>
-	<td>Field types</td>
-	<td>Same as [ID 1], except that the audio and video fields are nonempty.</td>
-</tr>
-<tr>
 	<td>32</td>
 	<td>NA</td>
 	<td>Basic</td>
