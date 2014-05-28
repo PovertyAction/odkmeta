@@ -1,0 +1,2 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+integer,age,"Over the past 12 months, has anyone in your household had for private use any car, van, tractor, bus, 3 wheeler, or truck?",,,,,,,,,,,,,

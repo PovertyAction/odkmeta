@@ -1,0 +1,9 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+text,name,What is your name?,,,,,,,,,,,,,
+begin repeat,repeat1,,,,,,,,,,,,,,
+integer,number1,Name any number.,,,,,,,,,,,,,
+end repeat,repeat1,,,,,,,,,,,,,,
+begin repeat,repeat1,,,,,,,,,,,,,,
+integer,number2,Name any number.,,,,,,,,,,,,,
+end repeat,repeat1,Which language is your primary language?,,,,,,,,,,,,,
+select_one languages,language,,,,,,,,,,,,,,

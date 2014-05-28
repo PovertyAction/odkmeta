@@ -1,0 +1,7 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+begin group,group1,Group 1,,,,,,,,,,,,,
+integer,number,Name any number.,,,,,,,,,,,,,
+end group,group1,,,,,,,,,,,,,,
+begin group,group2,Group 2,,,,,,,,,,,,,
+text,word,Name any word.,,,,,,,,,,,,,
+end group,group2,,,,,,,,,,,,,,

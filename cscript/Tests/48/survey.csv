@@ -1,0 +1,58 @@
+media:video,media:audio,media:image,calculation,read only,required,disabled,relevance,constraint message,constraint,appearance,default,hint,label,name,type
+,,,,,,,,,,,,,,starttime,start
+,,,,,,,,,,,,,,endtime,end
+,,,,,,,,,,,,,,deviceid,deviceid
+,,,,,,,,,,,,,,subscriberid,subscriberid
+,,,,,,,,,,,,,,simid,simserial
+,,,,,,,,,,,,,,devicephonenum,phonenumber
+,,,,,,,,,,p=100,,,,textaudit,text audit
+,,,,,,,,,,p=100; s=1-60; d=30,,,,audioaudit,audio audit
+,,,,,,,,,,,,,Welcome to Lindsey's form. Swipe to move forward. ,intronote,note
+,,,,,yes,,,,,,,,Would you like to continue?,consent,select_one yesno
+,,,,,,,,,,,,,Please select the household ID. ,preloadid,select_one preloadid
+,,,,,,,,,,,,,Please record the date and time of this interview. ,datetime,datetime 
+,,,,,yes,,${consent}=1,,,,,,What is your name?,name,text
+,,,,,,,${consent}=1,,,,,,"Thank you, ${name}, for agreeing to participate.",thankname,note
+,,,,,,,${consent}=1,,,,,,Now I'd like to ask a few questions about you.,intronotetable,note
+,,,,,,,${consent}=1 ,,,,,,How old are you?,hhmemberage,integer 
+,,,,,,,${consent}=1 ,,,,,,What is your occupation?,hhmemberoccupation,select_multiple occupation
+,,,,,,,${consent}=1 and ${hhmemberoccupation}=666,,,,,,What is your OTHER occupation?,hhmemberoccupationother,text 
+,,,,,,,${consent}=1 ,,,,,,What is your favorite kind of fruit?,favfruit,select_one fruit 
+,,,,,,,${consent}=1 ,,,,,,What is your favorite kind of fruit?,favfruitother,select_one fruit or_other
+,,,,,,,${consent}=1 ,,,,,,What is your favorite kind of vegetable?,favveg,select_multiple vegetable 
+,,,,,,,${consent}=1 ,,,,,,What is your favorite kind of vegetable?,favvegother,select_multiple vegetable or_other
+,,,,,,,${consent}=1,,,,,,Now let's test out some special answer features. ,notespecialanswer ,note 
+,,,,,,,${consent}=1,,,,,,Please record an image using your phone's camera feature. ,recordimage,image 
+,,,,,,,${consent}=1,,,,,,Please record audio using your phone's audio recording feature. ,recordaudio,audio 
+,,,,,,,${consent}=1,,,,,,Please record a video using your phone's camera feature. ,recordvideo,video 
+,,,,,,,${consent}=1,,,,,,Please record your current GPS location. ,recordgps,geopoint 
+,,,,,yes,,${consent}=1,You must enter a number greater than 0 and lesser than 100.,. > 0 and . < 100,,,,Try to enter an integer lesser than 1 or greater than 99. ,constraintdemo,integer 
+,,,,,,yes,,,,,,,This question will not appear because it has been disabled. ,disabledemo,select_one yesno
+,,,,,,,${consent}=1 ,,,,,,"Do you own or have the right to farm any farm plots, even if you did not farm them this past season?",farmownership,select_one yesno
+,,,,,,,${consent}=1 and ${farmownership}=1,,,,,,Did you cultivate any of your farms this past season?,cultivatethisyear,select_one yesno
+,,,,,,,${consent}=1 and ${cultivatethisyear}=1,,,,,,How many farm plots did you cultivate this past season? (up to 3 for now) ,farmnumberofplots,integer 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0,,,,,,What is the name of the first farm?,farm1name,text 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0,,,,,,How many years have you farmed on ${farm1name}?,farm1years,integer 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0,,,,,,What kind of crop(s) do you grow on ${farm1name}?,farm1crops,select_multiple crop
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0 and ${farm1crops}=666,,,,,,What other kind of crop do you grow on ${farm1name}?,farm1cropsother,text
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0 and ${farm1crops}=1,,,,,,How many bags of maize did you harvest from ${farm1name} this past season?,farm1harvmaize,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0 and ${farm1crops}=2,,,,,,How many bags of wheat did you harvest from ${farm1name} this past season?,farm1harvwheat,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0 and ${farm1crops}=3,,,,,,How many bags of rice did you harvest from ${farm1name} this past season?,farm1harvrice,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0 and ${farm1crops}=666,,,,,,How many bags of ${farm1cropsother} did you harvest from ${farm1name} this past season?,farm1harvother,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >1,,,,,,What is the name of the second farm?,farm2name,text 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >1,,,,,,How many years have you farmed on ${farm2name}?,farm2years,integer 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >1,,,,,,What kind of crop(s) do you grow on ${farm2name}?,farm2crops,select_multiple crop
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0 and ${farm2crops}=666,,,,,,What other kind of crop do you grow on ${farm2name}?,farm2cropsother,text
+,,,,,,,${consent}=1 and ${farmnumberofplots} >1 and ${farm2crops}=1,,,,,,How many bags of maize did you harvest from ${farm2name} this past season?,farm2harvmaize,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >1 and ${farm2crops}=2,,,,,,How many bags of wheat did you harvest from ${farm2name} this past season?,farm2harvwheat,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >1 and ${farm2crops}=3,,,,,,How many bags of rice did you harvest from ${farm2name} this past season?,farm2harvrice,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >1 and ${farm2crops}=666,,,,,,How many bags of ${farm2cropsother} did you harvest from ${farm2name} this past season?,farm2harvother,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >2,,,,,,What is the name of the third farm?,farm3name,text 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >2,,,,,,How many years have you farmed on ${farm3name}?,farm3years,integer 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >2,,,,,,What kind of crop(s) do you grow on ${farm3name}?,farm3crops,select_multiple crop
+,,,,,,,${consent}=1 and ${farmnumberofplots} >0 and ${farm3crops}=666,,,,,,What other kind of crop do you grow on ${farm3name}?,farm3cropsother,text
+,,,,,,,${consent}=1 and ${farmnumberofplots} >2 and ${farm3crops}=1,,,,,,How many bags of maize did you harvest from ${farm3name} this past season?,farm3harvmaize,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >2 and ${farm3crops}=2,,,,,,How many bags of wheat did you harvest from ${farm3name} this past season?,farm3harvwheat,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >2 and ${farm3crops}=3,,,,,,How many bags of rice did you harvest from ${farm3name} this past season?,farm3harvrice,decimal 
+,,,,,,,${consent}=1 and ${farmnumberofplots} >2 and ${farm3crops}=666,,,,,,How many bags of ${farm3cropsother} did you harvest from ${farm3name} this past season?,farm3harvother,decimal 
+,,,,,,,,,,,,,"Thank you, ${name}. We have reached the end of this survey. ",endnote,note 

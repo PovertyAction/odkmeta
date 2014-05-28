@@ -1,0 +1,10 @@
+noun,PARENT_KEY,KEY,SET-OF-repeat2
+Tests,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat2[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat2
+loans,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat2[2],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat2
+Phones,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat2[3],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat2
+Yaks,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2]/repeat2[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2]/repeat2
+Red balloons,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat2[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat2
+Mouse pass,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat2[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat2
+Hats,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat2[3],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat2
+Vehicles,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat2[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat2
+Texts,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat2[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat2

@@ -1,0 +1,11 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+text,name,What is your name?,,,,,,,,,,,,,
+begin repeat,repeat1,Repeat group 1,,,,,,,,,,,,,
+integer,number,Name any number.,,,,,,,,,,,,,
+begin repeat,repeat2,Repeat group 2,,,,,,,,,,,,,
+text,noun,Name any noun.,,,,,,,,,,,,,
+end repeat,repeat2,,,,,,,,,,,,,,
+begin repeat,repeat3,Repeat group 3,,,,,,,,,,,,,
+text,adjective,Name any adjective. ,,,,,,,,,,,,,
+end repeat,repeat3,,,,,,,,,,,,,,
+end repeat,repeat1,,,,,,,,,,,,,,

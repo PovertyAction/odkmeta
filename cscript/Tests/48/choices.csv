@@ -1,0 +1,24 @@
+image,label,name,list_name
+,ID001 Name001,ID001,preloadid
+,ID002 Name002,ID002,preloadid
+,ID003 Name003,ID003,preloadid
+,ID004 Name004,ID004,preloadid
+,ID005 Name005,ID005,preloadid
+,Yes,1,yesno
+,No,0,yesno
+,Butcher,1,occupation
+,Baker,2,occupation
+,Candlestick maker,3,occupation
+,Other,666,occupation
+,Maize,1,crop
+,Wheat ,2,crop
+,Rice ,3,crop
+,Other ,666,crop
+,Mango,1,fruit
+,Banana,2,fruit
+,Pineapple,3,fruit
+,Tomato ,4,fruit
+,Maize,1,vegetable
+,Rice ,2,vegetable
+,Wheat ,3,vegetable
+,Onion ,4,vegetable

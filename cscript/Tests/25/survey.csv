@@ -1,0 +1,2 @@
+type,name,label,bad_name,group,long_name,repeat,list_name,or_other,is_other,disabled,required,read only,calculation,media:image,media:audio,media:video
+integer,age,How old are you?,7,1,2,3,4,5,6,,,,,,,

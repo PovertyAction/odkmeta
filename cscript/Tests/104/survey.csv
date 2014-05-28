@@ -1,0 +1,7 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+integer,mygeoLatitude,Give me a number.,,,,,,,,,,,,,
+geopoint,mygeo,Geopoint 1,,,,,,,,,,,,,
+select_one fruit or_other,myfruit,Which is your favorite fruit?,,,,,,,,,,,,,
+select_multiple fruit or_other,myfruits,Which fruit(s) do you like to eat?,,,,,,,,,,,,,
+integer,my.fruit,Give me a number.,,,,,,,,,,,,,
+integer,my.fruits,Give me a number.,,,,,,,,,,,,,

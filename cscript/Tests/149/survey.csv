@@ -1,0 +1,13 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+begin repeat,A,,,,,,,,,,,,,,
+integer,F1,,,,,,,,,,,,,,
+begin repeat,B,,,,,,,,,,,,,,
+integer,F2,,,,,,,,,,,,,,
+end repeat,,,,,,,,,,,,,,,
+end repeat,,,,,,,,,,,,,,,
+begin repeat,C,,,,,,,,,,,,,,
+integer,F3,,,,,,,,,,,,,,
+begin repeat,B,,,,,,,,,,,,,,
+integer,F4,,,,,,,,,,,,,,
+end repeat,,,,,,,,,,,,,,,
+end repeat,,,,,,,,,,,,,,,

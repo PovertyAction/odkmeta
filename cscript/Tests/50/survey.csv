@@ -1,0 +1,9 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+integer,integer,Integer field,,,,,,,,,,,,,
+date,date,Date field,,,,,,,,,,,,,
+time,time,Time field,,,,,,,,,,,,,
+today ,today ,Today field,,,,,,,,,,,,,
+acknowledge,acknowledge,Acknowledge field,,,,,,,,,,,,,
+barcode,barcode,Barcode field,,,,,,,,,,,,,
+calculate ,calculate ,Calculate field,,,,,,,,,,${integer} * 2,,,
+note,note,Note to display calculation: ${calculate} ,,,,,,,,,,,,,

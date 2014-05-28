@@ -1,0 +1,7 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+integer,SETOFmygroupmyrepeat,How old are you?,,,,,,,,,,,,,
+begin group,mygroup,,,,,,,,,,,,,,
+begin repeat,myrepeat,,,,,,,,,,,,,,
+integer,SETOFmyrepeat,What is a number you like?,,,,,,,,,,,,,
+end repeat,myrepeat,,,,,,,,,,,,,,
+end group ,mygroup ,,,,,,,,,,,,,,

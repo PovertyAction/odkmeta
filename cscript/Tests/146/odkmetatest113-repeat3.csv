@@ -1,0 +1,8 @@
+adjective,PARENT_KEY,KEY,SET-OF-repeat3
+Nice,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat3[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat3
+Fair,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat3[2],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat3
+Bored,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2]/repeat3[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2]/repeat3
+Pretty,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat3[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat3
+Hot,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat3[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat3
+Fiery,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat3[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat3
+Boring,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat3[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat3

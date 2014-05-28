@@ -1,0 +1,5 @@
+number,SET-OF-repeat2,SET-OF-repeat3,PARENT_KEY,KEY,SET-OF-repeat1
+40934,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat2,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1]/repeat3,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[1],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1
+690,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2]/repeat2,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2]/repeat3,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086,uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1[2],uuid:0c0bac69-15ed-4522-92de-ee361d3e1086/repeat1
+56,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat2,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1]/repeat3,uuid:58188f2e-1187-4800-b758-07ed0bd3022a,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[1],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1
+5555,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat2,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2]/repeat3,uuid:58188f2e-1187-4800-b758-07ed0bd3022a,uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1[2],uuid:58188f2e-1187-4800-b758-07ed0bd3022a/repeat1

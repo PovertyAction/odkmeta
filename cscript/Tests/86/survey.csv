@@ -1,0 +1,10 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+integer,a.b,1,,,,,,,,,,,,,
+integer,a..b,2,,,,,,,,,,,,,
+integer,a...b,3,,,,,,,,,,,,,
+integer,a....b,4,,,,,,,,,,,,,
+integer,a.....b,5,,,,,,,,,,,,,
+integer,a......b,6,,,,,,,,,,,,,
+integer,a.......b,7,,,,,,,,,,,,,
+integer,a........b,8,,,,,,,,,,,,,
+geopoint,v5,Input your location.,,,,,,,,,,,,,
