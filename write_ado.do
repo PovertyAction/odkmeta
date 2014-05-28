@@ -9,10 +9,6 @@ adopath ++ `"`c(pwd)'"'
 
 include io.mata
 
-loc boolean		`RS'
-loc True		1
-loc False		0
-
 mata:
 
 `SS' eol()

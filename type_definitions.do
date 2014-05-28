@@ -1,5 +1,13 @@
 vers 11.2
 
+* Convert real x to string using -strofreal(x, `RealFormat')-.
+loc RealFormat	""%24.0g""
+
+* Names of locals specified by the user at the start of the do-file
+loc DateMask		""datemask""
+loc TimeMask		""timemask""
+loc DatetimeMask	""datetimemask""
+
 loc RS	real scalar
 loc RR	real rowvector
 loc RC	real colvector
@@ -13,13 +21,9 @@ loc TR	transmorphic rowvector
 loc TC	transmorphic colvector
 loc TM	transmorphic matrix
 
-* Convert real x to string using -strofreal(x, `RealFormat')-.
-loc RealFormat	""%24.0g""
-
-* Names of locals specified by the user at the start of the do-file
-loc DateMask		""datemask""
-loc TimeMask		""timemask""
-loc DatetimeMask	""datetimemask""
+loc boolean		`RS'
+loc True		1
+loc False		0
 
 loc InsheetCode		real
 loc InsheetCodeS	`InsheetCode' scalar
