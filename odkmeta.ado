@@ -582,19 +582,6 @@ pointer(`GroupS') rowvector `Field'::_end_groups(pointer(`GroupS') scalar g)
 
 
 /* -------------------------------------------------------------------------- */
-					/* list structure		*/
-
-struct `List' {
-	`SS' listname
-	`SC' names, labels
-	`RS' vallab, matalab
-}
-
-					/* list structure		*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
 					/* error message functions	*/
 
 void error_parsing(`RS' rc, `SS' opt, |`SS' subopt)

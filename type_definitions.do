@@ -58,4 +58,11 @@ loc ListS	struct `List' scalar
 loc ListR	struct `List' rowvector
 
 mata:
+
+struct `List' {
+	`SS' listname
+	`SC' names, labels
+	`RS' vallab, matalab
+}
+
 end
