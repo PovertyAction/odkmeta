@@ -1,0 +1,5 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+integer ,age,How old are you?,,,,,,,,,,,,,
+begin repeat ,lindseyrepeat,lindseyrepeat,,,,,,,,,,,,,
+integer ,age2,How old is your sibling?,,,,,,,,,,,,,
+end repeat,lindseyrepeat ,,,,,,,,,,,,,,

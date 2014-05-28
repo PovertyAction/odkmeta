@@ -1,0 +1,6 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+begin group,G1,,,,,,,,,,,,,,
+begin group,G2,,,,,,,,,,,,,,
+integer,age,How old are you?,,,,,,,,,,,,,
+end group,,,,,,,,,,,,,,,
+end group,,,,,,,,,,,,,,,

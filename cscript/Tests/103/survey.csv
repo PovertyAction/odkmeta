@@ -1,0 +1,7 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+geopoint,thirtycharacterthirtycharacter,Geopoint 1 - thirtycharacterthirtycharacter,,,,,,,,,,,,,
+geopoint,thirtyonecharactersvariablehere,Geopoint 2 - thirtyonecharactersvariablehere,,,,,,,,,,,,,
+select_one fruit or_other ,thirtyonecharactersonfruitshere,Select_one or_other 1 - thirtyonecharactersonfruitshere,,,,,,,,,,,,,
+select_one fruit or_other ,thirtytwocharactersallaboutfruit,Select_one or_other 2 - thirtytwocharactersallaboutfruit,,,,,,,,,,,,,
+select_multiple fruit or_other,thirtyonecharactersagainonfruit,Select_multiple or_other 1 - thirtyonecharactersagainonfruit,,,,,,,,,,,,,
+select_multiple fruit or_other,thirtytwocharactersagainonfruits,Select_multiple or_other 2 - thirtytwocharactersagainonfruits,,,,,,,,,,,,,

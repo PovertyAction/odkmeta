@@ -1,0 +1,13 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+integer,ab,How old are you?,,,,,,,,,,,,,
+integer,a#b,How old is your mother?,,,,,,,,,,,,,
+integer,v1,How old is your father?,,,,,,,,,,,,,
+integer,v2,How old is your sister?,,,,,,,,,,,,,
+integer,v3,How old is your brother?,,,,,,,,,,,,,
+integer,v4,How old is your accountant?,,,,,,,,,,,,,
+integer,v5,How old is your Pilates instructor?,,,,,,,,,,,,,
+integer,v6,How old is your butcher?,,,,,,,,,,,,,
+integer,v7,How old is your babysitter?,,,,,,,,,,,,,
+integer,v8,How old is your first love?,,,,,,,,,,,,,
+integer,v9,How old is your driver?,,,,,,,,,,,,,
+integer,DoesntExist,,,,,,,,,,,,,,

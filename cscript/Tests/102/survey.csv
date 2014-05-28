@@ -1,0 +1,13 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+date,a,,,,,,,,,,,,,,
+datetime,b,,,,,,,,,,,,,,
+end,c,,,,,,,,,,,,,,
+geopoint,dgeo,,,,,,,,,,,,,,
+note,e,,,,,,,,,,,,,,
+select_one list,f,,,,,,,,,,,,,,
+select_one list or_other,gother,,,,,,,,,,,,,,
+select_multiple list,h,,,,,,,,,,,,,,
+select_multiple list or_other,iother,,,,,,,,,,,,,,
+start,j,,,,,,,,,,,,,,
+time,k,,,,,,,,,,,,,,
+today,l,,,,,,,,,,,,,,

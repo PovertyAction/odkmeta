@@ -1,0 +1,3 @@
+type,name,label,hint,default,appearance,constraint,constraint message,relevance,disabled,required,read only,calculation,media:image,media:audio,media:video
+select_multiple fruit,favfruit13,What is your favorite fruit?,,,,,,,,,,,,,
+integer,favfruit13_,I really mean it this time: what is your favorite fruit?,,,,,,,,,,,,,
