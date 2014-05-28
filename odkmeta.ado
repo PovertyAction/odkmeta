@@ -1,9 +1,6 @@
 /* -------------------------------------------------------------------------- */
 					/* type definitions, etc.	*/
 
-* Using `:char evarname[charname]' instead of `evarname[charname]':
-* <http://www.stata.com/statalist/archive/2013-08/msg00186.html>.
-
 vers 11
 
 loc RS	real scalar
