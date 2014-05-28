@@ -973,8 +973,8 @@ cd ..
 
 * Test 124
 cd 124
-if `test124' {
 * Do-file only
+if `test124' {
 forv i = 1/25 {
 	drop _all
 	set obs `=ceil(10 * runiform())'
