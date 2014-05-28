@@ -1,5 +1,5 @@
 pr odkmeta
-	vers 11
+	vers 11.2
 
 	cap mata: mata which specialexp()
 	if _rc {
