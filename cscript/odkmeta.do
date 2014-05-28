@@ -1741,6 +1741,7 @@ cd ..
 					/* finish up			*/
 
 timer off 1
+timer list 1
 
 if `profile' {
 	cap conf f C:\ado\profile.do
