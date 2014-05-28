@@ -1,4 +1,3 @@
-*! version 1.1.0 Matthew White 08jan2014
 pr odkmeta
 	vers 11
 
