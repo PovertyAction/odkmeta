@@ -1496,7 +1496,8 @@ cd 82
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest36.csv) survey(survey.csv) choices(choices.csv) replace
 rcof `"run "ODK to Stata""' == 9
-compall Expected
+loc dtas : dir . file "*.dta"
+assert !`:list sizeof dtas'
 cd ..
 
 * Test 119
