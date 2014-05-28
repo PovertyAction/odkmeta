@@ -33,6 +33,7 @@ clear matrix
 clear mata
 if c(maxvar) < 5450 ///
 	set maxvar 5450
+set varabbrev off
 set type float
 vers 11.2: set seed 889305539
 set more off

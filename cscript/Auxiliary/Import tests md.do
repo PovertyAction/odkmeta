@@ -2,6 +2,8 @@
 
 vers 13.1
 
+set varabbrev off
+
 infix str line 1-`c(maxstrvarlen)' using Tests.md, clear
 
 replace line = strtrim(line)
