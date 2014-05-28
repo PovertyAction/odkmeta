@@ -37,7 +37,6 @@ set varabbrev off
 set type float
 vers 11.2: set seed 889305539
 set more off
-pause off
 
 timer clear 1
 timer on 1
