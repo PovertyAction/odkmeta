@@ -1,3 +1,5 @@
+* @drop
+
 vers 11.2
 
 if "$nodecl" == "" {
@@ -40,9 +42,12 @@ class `Field' {
 		void							new()
 }
 
+* @drop
 end
+* @drop
 }
 
+* @drop
 mata:
 
 void `Field'::new()
