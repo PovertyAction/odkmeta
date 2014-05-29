@@ -1,4 +1,4 @@
-* Purpose: Get the warning messages of an -odkmeta- do-file.
+* Gets the warning messages of an -odkmeta- do-file.
 pr get_warnings, rclass
 	vers 9
 

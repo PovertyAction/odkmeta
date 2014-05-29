@@ -1,3 +1,5 @@
+* -odkmeta- cscript
+
 * -version- intentionally omitted for -cscript-.
 
 * 1 to complete test 124; 0 not to.
@@ -38,6 +40,12 @@ set type float
 vers 11.2: set seed 889305539
 set more off
 
+cd ..
+do write_ado
+adopath ++ `"`c(pwd)'"'
+adopath ++ `"`c(pwd)'/cscript/ado"'
+cd cscript
+
 timer clear 1
 timer on 1
 
@@ -55,11 +63,6 @@ if c(stata_version) >= 13 {
 
 * Restore globals.
 glo FASTCDPATH : copy loc FASTCDPATH
-
-cd ..
-adopath ++ `"`c(pwd)'"'
-adopath ++ `"`c(pwd)'/cscript/ado"'
-cd cscript
 
 * Define -shortnames-, a program to change an -odkmeta- do-file so that it
 * attempts to name variables using their short names.
