@@ -3,10 +3,8 @@
 
 vers 11.2
 
-if "$noinclude" == "" {
-	findfile type_definitions.do
-	include `"`r(fn)'"'
-}
+findfile type_definitions.do
+include `"`r(fn)'"'
 
 mata:
 
@@ -52,6 +50,35 @@ void write_file(`SS' fn, `SC' lines, |`boolean' write)
 		(*writer)(fh, lines[i])
 
 	fclose(fh)
+}
+
+// Parse a class declaration from source code, including only the -class- block
+// and excluding method definitions.
+`SC' parse_class_decl(`SC' lines)
+{
+	`RS' first, last, n
+	`RC' linenum, test
+
+	n = length(lines)
+	if (!n)
+		_error("no code")
+
+	linenum = 1::n
+
+	test = regexm(lines, "^class ")
+	if (sum(test) != 1)
+		_error("exactly one -class- not found")
+	first = select(linenum, test)
+
+	test = lines :== "}"
+	if (!any(test))
+		_error("close brace not found")
+	last = min(select(linenum, test))
+
+	if (first > last)
+		_error("close brace before -class-")
+
+	return(lines[|first \ last|])
 }
 
 end

@@ -8,9 +8,7 @@ clear all
 adopath ++ `"`c(pwd)'"'
 
 include io.mata
-glo noinclude noinclude
 include io_aux.mata
-glo noinclude
 
 mata:
 
