@@ -42,7 +42,7 @@ class `Field' {
 		void							new()
 }
 
-* @drop
+// @drop
 end
 * @drop
 }

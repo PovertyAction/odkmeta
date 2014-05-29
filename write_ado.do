@@ -17,8 +17,8 @@ mata:
 	`SS' l
 
 	l = strltrim(subinstr(line, char(9), " ", .))
-	if (substr(l, 1, 1) == "*")
-		return(tokens(substr(l, 2, .)))
+	if (regexm(l, "^(\*|//)"))
+		return(tokens(subinstr(l, regexs(0), "", 1)))
 	else
 		return(J(1, 0, ""))
 	/*NOTREACHED*/
