@@ -1,5 +1,6 @@
 vers 11.2
 
+if "$nodecl" == "" {
 findfile add_class_decl.do
 include `"`r(fn)'"'
 add_class_decl Collection.mata
@@ -38,6 +39,11 @@ class `Field' {
 		pointer(`GroupS') rowvector		_begin_groups(), _end_groups()
 		void							new()
 }
+
+end
+}
+
+mata:
 
 void `Field'::new()
 {
