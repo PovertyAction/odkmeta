@@ -1,3 +1,5 @@
+* Uses -parse_class_decl()- to extract a class declaration from a source code
+* file, then adds it to memory.
 pr add_class_decl
 	vers 11.2
 

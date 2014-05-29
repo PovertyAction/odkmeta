@@ -1,5 +1,5 @@
-* Purpose: Change an -odkmeta- do-file so that it attempts to name variables
-* using their short names.
+* Changes an -odkmeta- do-file so that it attempts to name variables using their
+* short field names.
 pr shortnames
 	vers 9
 

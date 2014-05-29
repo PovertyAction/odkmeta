@@ -1,3 +1,5 @@
+* Create odkmeta.ado by appending all source code.
+
 vers 11.2
 
 * Set the working directory to the odkmeta directory.

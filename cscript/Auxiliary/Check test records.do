@@ -1,5 +1,5 @@
-* Purpose: Compare the list of tests actually completed in the cscript to those
-* described in Tests.md.
+* Compare the list of tests actually completed in the cscript to those described
+* in Tests.md.
 
 vers 13.1
 

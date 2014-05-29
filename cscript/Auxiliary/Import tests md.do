@@ -1,4 +1,4 @@
-* Purpose: Import Tests.md as a Stata dataset.
+* Import Tests.md as a Stata dataset.
 
 vers 13.1
 

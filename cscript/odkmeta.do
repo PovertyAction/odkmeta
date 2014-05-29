@@ -1,3 +1,5 @@
+* -odkmeta- cscript
+
 * -version- intentionally omitted for -cscript-.
 
 * 1 to complete test 124; 0 not to.

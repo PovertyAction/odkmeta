@@ -1,3 +1,4 @@
+* Uses -compdta- to compare two directories' sets of datasets.
 pr compall
 	vers 9
 
