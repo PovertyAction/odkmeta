@@ -11,6 +11,9 @@ glo nodecl
 
 mata:
 
+// Using `:char evarname[charname]' instead of `evarname[charname]':
+// <http://www.stata.com/statalist/archive/2013-08/msg00186.html>.
+
 void write_survey(
 	/* output do-files */ `SS' _chardo, `SS' _cleando1, `SS' _cleando2,
 	/* output locals */ `SS' _anyrepeat, `SS' _otherlists, `SS' _listnamechar,
