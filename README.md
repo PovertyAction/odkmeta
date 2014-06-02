@@ -25,7 +25,7 @@ Contributing
 
 Help keep `odkmeta` up-to-date by contributing code. See the [issues](https://github.com/matthew-white/odkmeta/issues?state=open) for current to-dos. If you have experience with an ODK flavor not yet supported, please contribute your knowledge through pull requests or issues.
 
-Most contributors will wish to modify one of `write_*.mata`, e.g., [`write_choices.mata`](/write_choices.mata). The `odkmeta` Stata program itself is stored in [`odkmeta.do`](/odkmeta.do); review it for an overview of the program flow. When contributing code, adding associated [cscript tests](/Tests.md) is much appreciated.
+Most contributors will wish to modify one of `write_*.mata`, e.g., [`write_choices.mata`](/write_choices.mata). The `odkmeta` Stata program itself is stored in [`odkmeta.do`](/odkmeta.do); review it for an overview of the program flow. When contributing code, adding associated [cscript tests](/cscript/Tests.md) is much appreciated.
 
 Follow [these steps](/doc/Development environment.md) to set up your Stata environment for `odkmeta` development. At the end, individual source code files should be able to run on their own: there is no need to run `write_ado.do` when working on a single source code file.
 
