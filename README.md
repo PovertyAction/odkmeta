@@ -13,6 +13,24 @@ odkmeta
 - Attach field labels as [variable labels](http://www.stata.com/help.cgi?label) and [notes](http://www.stata.com/help.cgi?notes)
 - [Merge](http://www.stata.com/help.cgi?merge) repeat groups
 
+The latest stable version is [`stable/odkmeta.ado`](/stable/odkmeta.ado). Run [`write_ado.do`](/write_ado.do) to append all working source code files into a single `odkmeta.ado` containing the latest changes.
+
+Certification script
+--------------------
+
+The [certification script](http://www.stata.com/help.cgi?cscript) of `odkmeta` is [`cscript/odkmeta.do`](/cscript/odkmeta.do). If you are new to certification scripts, you may find [this](http://www.stata-journal.com/sjpdf.html?articlenum=pr0001) Stata Journal article helpful. See [this guide](/cscript/Tests.md) for more on `odkmeta` testing.
+
+Contributing
+------------
+
+Help keep `odkmeta` up-to-date by contributing code. See the [issues](https://github.com/matthew-white/odkmeta/issues?state=open) for current to-dos. If you have experience with an ODK flavor not yet supported, please contribute your knowledge through pull requests or issues.
+
+Most contributors will wish to modify one of `write_*.mata`, e.g., [`write_choices.mata`](/write_choices.mata). The `odkmeta` Stata program itself is stored in [`odkmeta.do`](/odkmeta.do); review it for an overview of the program flow. When contributing code, adding associated [cscript tests](/Tests.md) is much appreciated.
+
+Follow [these steps](/doc/Development environment.md) to set up your Stata environment for `odkmeta` development. At the end, individual source code files should be able to run on their own: there is no need to run `write_ado.do` when working on a single source code file.
+
+Development files for which GitHub is not suitable are stored on Box: https://app.box.com/odkmeta-public. The Box has public read access; contact Matt for write access. If an issue refers to files that cannot be uploaded to GitHub, they should be saved in Box. The Box should never contain personally identifiable or other sensitive information.
+
 Stata help file
 ---------------
 
@@ -21,6 +39,8 @@ Converted automatically from SMCL:
 ```
 log html odkmeta.sthlp odkmeta.md
 ```
+
+The help file looks best when viewed in Stata as SMCL.
 
 <pre>
 <b><u>Title</u></b>
