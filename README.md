@@ -13,7 +13,7 @@ odkmeta
 - Attach field labels as [variable labels](http://www.stata.com/help.cgi?label) and [notes](http://www.stata.com/help.cgi?notes)
 - [Merge](http://www.stata.com/help.cgi?merge) repeat groups
 
-The latest stable version is [`stable/odkmeta.ado`](/stable/odkmeta.ado). Run [`write_ado.do`](/write_ado.do) to append all working source code files into a single `odkmeta.ado` containing the latest changes.
+The latest stable version is [`stable/odkmeta.ado`](/stable/odkmeta.ado), and is available through [SSC](http://www.stata.com/support/ssc-installation/): type `ssc install odkmeta` in Stata to install. Run [`write_ado.do`](/write_ado.do) to append all working source code files into a single `odkmeta.ado` containing the latest changes.
 
 Certification script
 --------------------
