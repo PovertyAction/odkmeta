@@ -34,7 +34,7 @@ Development files for which GitHub is not suitable are stored on Box: https://ap
 License
 -------
 
-See [LICENSE.txt](/LICENSE.txt) for licensing information.
+See [LICENSE.txt](/LICENSE.txt) for licensing information (MIT).
 
 Stata help file
 ---------------
