@@ -31,6 +31,11 @@ Follow [these steps](/doc/Development environment.md) to set up your Stata envir
 
 Development files for which GitHub is not suitable are stored on Box: https://app.box.com/odkmeta-public. The Box has public read access; contact Matt for write access. If an issue refers to files that cannot be uploaded to GitHub, they should be saved in Box. The Box should never contain personally identifiable or other sensitive information.
 
+License
+-------
+
+See [LICENSE.txt](/LICENSE.txt) for licensing information.
+
 Stata help file
 ---------------
 
