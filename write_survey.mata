@@ -131,11 +131,10 @@ void write_survey(
 		write_recode_or_other(df)
 
 	write_field_labels(df, attr)
-	write_compress(df)
 	write_repeat_locals(df, attr, (anyrepeat ? "\`repeat'" : ""), anyrepeat)
 
 	if (!anyrepeat) {
-		write_drop_attrib(df, attr)
+		write_clean_before_final_save(df, attr)
 		write_save_dta(df, _csv, "", anyrepeat, _relax)
 	}
 	else {
@@ -1376,6 +1375,16 @@ void write_drop_attrib(`DoFileWriterS' df, `AttribSetS' attr)
 	}
 }
 
+// -write_clean_before_final_save()- writes code to complete final cleaning of
+// an end-user dataset immediately before it is saved.
+// It is destructive, dropping characteristics for instance, so
+// it is usually best to limit any code between this clean and -save-.
+void write_clean_before_final_save(`DoFileWriterS' df, `AttribSetS' attr)
+{
+	write_drop_attrib(df, attr)
+	write_compress(df)
+}
+
 void write_search_set_of(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat)
 {
 	df.put("local setof")
@@ -1391,7 +1400,7 @@ void write_search_set_of(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat)
 }
 
 void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
-	`AttribSetS' attr, `RS' dropattrib)
+	`AttribSetS' attr, `boolean' finalsave)
 {
 	`RS' nchildren, multiple, i
 	`SS' loopname, setof
@@ -1483,10 +1492,8 @@ void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 		df.put("}")
 	df.put("")
 
-	if (dropattrib)
-		write_drop_attrib(df, attr)
-
-	write_compress(df)
+	if (finalsave)
+		write_clean_before_final_save(df, attr)
 
 	df.put("save, replace")
 	df.put("")
@@ -1613,13 +1620,11 @@ void write_merge_repeats(`DoFileWriterS' df,
 		if (repeats[i]->inside()) {
 			write_reshape_repeat(df, repeats[i], attr)
 
-			if (any(!attr.vals("keep"))) {
-				df.put(sprintf("use %s, clear", dtaq))
-				df.put("")
-				write_drop_attrib(df, attr)
-				df.put("save, replace")
-				df.put("")
-			}
+			df.put(sprintf("use %s, clear", dtaq))
+			df.put("")
+			write_clean_before_final_save(df, attr)
+			df.put("save, replace")
+			df.put("")
 		}
 	}
 }
