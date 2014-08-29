@@ -24,7 +24,9 @@ After this, the command `c odkmeta` will change the working directory to `GitHub
 
 `fastcd` is the name of the SSC package, not the command itself; the command is named `c`. To change the working directory, type `c` in Stata, not `fastcd`. To view the help file, type `help fastcd`, not `help c`.
 
-Finally, add `odkmeta` to your [ado-path](http://www.stata.com/help.cgi?sysdir):
+Next, install [`compdta`](https://github.com/matthew-white/compdta), adding it to a [system directory](http://www.stata.com/help.cgi?sysdir) or your [ado-path](http://www.stata.com/help.cgi?adopath).
+
+Finally, add `odkmeta` to your ado-path:
 
 ```
 c odkmeta
