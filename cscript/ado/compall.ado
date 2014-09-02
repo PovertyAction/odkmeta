@@ -37,6 +37,7 @@ pr compall
 
 	foreach dta of loc dtas1 {
 		di as txt "Comparing {res:`dta'}..."
-		compdta "`dir1'/`dta'" "`dir2'/`dta'"
+		compdta "`dir1'/`dta'" "`dir2'/`dta'", ///
+			form(not) char(drop("^(destring|tostring)$"))
 	}
 end
