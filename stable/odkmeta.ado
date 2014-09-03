@@ -1,6 +1,6 @@
-*! version 1.1.0 Matthew White 08jan2014
+*! version 1.2.0 Matthew White 02sep2014
 pr odkmeta
-	vers 11
+	vers 11.2
 
 	cap mata: mata which specialexp()
 	if _rc {
@@ -344,14 +344,17 @@ end
 					/* parse user input		*/
 /* -------------------------------------------------------------------------- */
 
+// type_definitions.do
 
-/* -------------------------------------------------------------------------- */
-					/* type definitions, etc.	*/
+vers 11.2
 
-* Using `:char evarname[charname]' instead of `evarname[charname]':
-* <http://www.stata.com/statalist/archive/2013-08/msg00186.html>.
+* Convert real x to string using -strofreal(x, `RealFormat')-.
+loc RealFormat	""%24.0g""
 
-vers 11
+* Names of locals specified by the user at the start of the do-file
+loc DateMask		""datemask""
+loc TimeMask		""timemask""
+loc DatetimeMask	""datetimemask""
 
 loc RS	real scalar
 loc RR	real rowvector
@@ -366,13 +369,9 @@ loc TR	transmorphic rowvector
 loc TC	transmorphic colvector
 loc TM	transmorphic matrix
 
-* Convert real x to string using -strofreal(x, `RealFormat')-.
-loc RealFormat	""%24.0g""
-
-* Names of locals specified by the user at the start of the do-file
-loc DateMask		""datemask""
-loc TimeMask		""timemask""
-loc DatetimeMask	""datetimemask""
+loc boolean		`RS'
+loc True		1
+loc False		0
 
 loc InsheetCode		real
 loc InsheetCodeS	`InsheetCode' scalar
@@ -412,12 +411,7 @@ loc ListR	struct `List' rowvector
 
 mata:
 
-					/* type definitions, etc.	*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* string functions		*/
+// string.mata
 
 `SS' tab(|`RS' n)
 	return((args() ? n : 1) * char(9))
@@ -446,12 +440,201 @@ mata:
 	return(std)
 }
 
-					/* string functions		*/
-/* -------------------------------------------------------------------------- */
+// io.mata
 
+// Read the .csv file fn, returning it as a string matrix.
+// If dropmiss is not specified or nonzero, rows of the .csv file whose values
+// are all blank will be dropped.
+`SM' read_csv(`SS' fn, |`RS' dropmiss)
+{
+	`RS' fh, pos, rows, cols, preveol, linecol, i, j
+	`RR' eol, eolpos
+	`RC' nonmiss
+	`SS' csv
+	`SR' tokens, line
+	`SM' res
+	transmorphic t
 
-/* -------------------------------------------------------------------------- */
-					/* interface with Stata		*/
+	// Read fn, storing it in csv.
+	// The use of -st_fopen()- means that fn does not need the .csv extension.
+	fh = st_fopen(fn, ".csv", "r")
+	fseek(fh, 0, 1)
+	pos = ftell(fh)
+	fseek(fh, 0, -1)
+	csv = fread(fh, pos)
+	fclose(fh)
+
+	if (!strlen(csv))
+		return(J(0, 0, ""))
+
+	// Tokenize csv, storing the result in tokens.
+	t = tokeninit("", (",", char(13) + char(10), char(10), char(13)), `""""')
+	tokenset(t, csv)
+	tokens = tokengetall(t)
+	eol = tokens :== char(13) + char(10) :| tokens :== char(10) :|
+		tokens :== char(13)
+	if (!eol[length(eol)]) {
+		tokens = tokens, char(10)
+		eol    = eol,    1
+	}
+
+	// Parse tokens.
+	rows = sum(eol)
+	res = J(rows, cols = 1, "")
+	eolpos = select(1..cols(tokens), eol)
+	// preveol is the position in tokens of the previous EOL character.
+	preveol = 0
+	for (i = 1; i <= rows; i++) {
+		pos = eolpos[i]
+
+		line = J(1, cols, "")
+		linecol = 1
+		for (j = preveol + 1; j < pos; j++) {
+			if (tokens[j] != ",")
+				line[linecol] = line[linecol] + tokens[j]
+			else {
+				// Adjust the number of columns of line.
+				if (linecol >= cols)
+					line = line, ""
+				linecol++
+			}
+		}
+
+		// Adjust the number of columns of res.
+		if (cols < linecol) {
+			res = res, J(rows(res), linecol - cols, "")
+			cols = linecol
+		}
+		res[i,] = line
+
+		preveol = pos
+	}
+
+	// Implement -dropmiss-: drop missing rows.
+	if (dropmiss) {
+		nonmiss = J(rows(res), 1, 0)
+		for (i = 1; i <= cols; i++) {
+			nonmiss = nonmiss :| res[,i] :!= ""
+		}
+		res = select(res, nonmiss)
+	}
+
+	// Clean up strings.
+	if (rows(res)) {
+		res = strip_quotes(res, "simple")
+		res = subinstr(res, `""""', `"""', .)
+		res = subinstr(res, char(13) + char(10), " ", .)
+		res = subinstr(res, char(13), " ", .)
+		res = subinstr(res, char(10), " ", .)
+	}
+
+	return(res)
+}
+
+/* Load the .csv file _fn into memory, clearing the dataset currently in memory.
+-load_csv()- checks that the column headers specified to _opts exist:
+_opts is a vector of names of locals that contain column headers.
+_opt is the name of the -odkmeta- option associated with the .csv file.
+_optvars is the name of a local in which -load_csv()- will save the
+corresponding variable names of the column headers specified to _opts. */
+void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
+{
+	// "nopts" for "number of options"
+	`RS' rows, cols, nopts, min, v, i
+	`RR' col, optindex
+	`SS' var, type
+	`SR' vars
+	`SM' csv
+
+	csv = read_csv(_fn, 0)
+	rows = rows(csv)
+	cols = cols(csv)
+	if (cols)
+		col = 1..cols(csv)
+
+	// Check that the required column headers exist.
+	nopts = length(_opts)
+	optindex = J(1, nopts, .)
+	for (i = 1; i <= nopts; i++) {
+		if (rows)
+			min = min(select(col, csv[1,] :== st_local(_opts[i])))
+		else
+			min = .
+		if (min != .)
+			optindex[i] = min
+		else {
+			// [ID 35], [ID 37], [ID 39], [ID 40], [ID 53], [ID 188]
+			errprintf("column header %s not found\n", st_local(_opts[i]))
+			error_parsing(111, _opt, _opts[i] + "()")
+			/*NOTREACHED*/
+		}
+	}
+
+	st_dropvar(.)
+	st_addobs(rows(csv) - 1)
+
+	vars = J(1, cols, "")
+	for (i = 1; i <= cols; i++) {
+		var = insheet_name(csv[1, i])
+		v = i
+		while (var == "" | anyof(vars, var)) {
+			var = sprintf("v%f", v++)
+		}
+		vars[i] = var
+
+		if (rows == 1)
+			type = "str1"
+		else
+			type = smallest_vartype(csv[|2, i \ ., i|])
+		(void) st_addvar(type, var)
+
+		st_global(sprintf("%s[Column_header]", var), csv[1, i])
+	}
+	if (rows > 1)
+		st_sstore(., ., csv[|2, . \ ., .|])
+
+	st_local(_optvars, invtokens(vars[optindex]))
+}
+
+// Add a tab to the start of each nonblank line of _infile, saving the result to
+// _outfile.
+void tab_file(`SS' _infile, `SS' _outfile)
+{
+	`RS' fhin, fhout
+	`SM' line
+
+	fhin = fopen(_infile, "r")
+	fhout = fopen(_outfile, "w")
+	while ((line = fget(fhin)) != J(0, 0, "")) {
+		fput(fhout, tab(line != "") + line)
+	}
+	fclose(fhin)
+	fclose(fhout)
+}
+
+// Append the files specified to _infiles, saving the result to _outfile.
+void append_files(`SR' _infiles, `SS' _outfile)
+{
+	`RS' fhout, fhin, n, i
+	`SM' line
+
+	fhout = fopen(_outfile, "w")
+
+	n = length(_infiles)
+	for (i = 1; i <= n; i++) {
+		if (fileexists(_infiles[i])) {
+			fhin = fopen(_infiles[i], "r")
+			while ((line = fget(fhin)) != J(0, 0, "")) {
+				fput(fhout, line)
+			}
+			fclose(fhin)
+		}
+	}
+
+	fclose(fhout)
+}
+
+// stata.mata
 
 void pause_on()
 	stata("pause on")
@@ -622,12 +805,27 @@ name, and -insheet_name()- returns "". */
 	return(substr(name, 1, 32))
 }
 
-					/* interface with Stata		*/
-/* -------------------------------------------------------------------------- */
+// error.mata
 
+void error_parsing(`RS' rc, `SS' opt, |`SS' subopt)
+{
+	// [ID 61]
+	if (subopt != "")
+		errprintf("invalid %s suboption\n", subopt)
+	errprintf("invalid %s() option\n", opt)
+	exit(rc)
+}
 
-/* -------------------------------------------------------------------------- */
-					/* do-file writer class		*/
+void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
+{
+	// No [ID] required.
+	errprintf("%s cannot be specified to both options %s() and %s()\n",
+		adorn_quotes(overlap, "list"), opts[1], opts[2])
+	if (args() < 3 | !subopts)
+		exit(198)
+}
+
+// DoFileWriter.mata
 
 class `DoFileWriter' {
 	public:
@@ -866,12 +1064,7 @@ void `DoFileWriter'::put(`SS' line)
 	linestart = ""
 }
 
-					/* do-file writer class		*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* attribute classes	*/
+// AttribSet.mata
 
 // The properties of a single field attribute
 struct `AttribProps' {
@@ -1002,15 +1195,7 @@ pointer(`AttribPropsS') scalar `AttribSet'::get(`SS' name)
 	return(vals)
 }
 
-					/* attribute classes	*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* collection class		*/
-
-// Parent class of `Group' and `Repeat'
-// There are no instances of `Collection', only of `Group' and `Repeat'.
+// `Collection' class declaration
 class `Collection' {
 	public:
 		/* getters and setters */
@@ -1038,6 +1223,87 @@ class `Collection' {
 		pointer(`FieldS') rowvector		all_fields()
 		void							new()
 }
+
+// `Group' class declaration
+class `Group' extends `Collection' {
+	public:
+		/* getters and setters */
+		pointer(`GroupS') scalar		parent(), child()
+		pointer(`GroupS') rowvector		children()
+		void							set_parent(), add_child()
+
+		`SS'							long_name(), st_list()
+
+	protected:
+		virtual pointer(`TS') scalar		trans_parent()
+		virtual pointer(`TS') rowvector		trans_children()
+
+	private:
+		pointer(`GroupS') scalar		parent
+		pointer(`GroupS') rowvector		children
+}
+
+// `Repeat' class declaration
+class `Repeat' extends `Collection' {
+	public:
+		/* getters and setters */
+		pointer(`RepeatS') scalar		parent(), child()
+		pointer(`RepeatS') rowvector	children()
+		pointer(`GroupS') scalar		parent_group()
+		pointer(`FieldS') scalar		parent_set_of(), child_set_of()
+		void							set_parent(), add_child(),
+										set_parent_group(), set_parent_set_of(),
+										set_child_set_of()
+
+		`SS'							long_name()
+
+	protected:
+		virtual pointer(`TS') scalar		trans_parent()
+		virtual pointer(`TS') rowvector		trans_children()
+
+	private:
+		pointer(`RepeatS') scalar		parent
+		pointer(`RepeatS') rowvector	children
+		pointer(`GroupS') scalar		parentgroup
+		pointer(`FieldS') scalar		parentsetof, childsetof
+}
+
+// `Field' class declaration
+class `Field' {
+	public:
+		/* getters and setters */
+		`RS'							order(), is_dup()
+		`SS'							name(), type(), label(), attrib(),
+										dup_var(), other_dup_name()
+		`SR'							attribs()
+		pointer(`GroupS') scalar		group()
+		pointer(`RepeatS') scalar		repeat()
+		void							set_name(), set_type(), set_label(),
+										set_attribs(), set_group(),
+										set_repeat(), set_dup_var(),
+										set_other_dup_name()
+
+		`RS'							begin_repeat(), end_repeat()
+		`SS'							long_name(), st_long()
+		`InsheetCodeS'					insheet()
+		pointer(`GroupS') rowvector		begin_groups(), end_groups()
+
+	private:
+		static `RS'						ctr
+		`RS'							order
+		`SS'							name, type, label, dupvar, otherdup
+		`SR'							attribs
+		pointer(`GroupS') scalar		group
+		pointer(`RepeatS') scalar		repeat
+
+		pointer(`GroupS') rowvector		_begin_groups(), _end_groups()
+		void							new()
+}
+
+// Collection.mata
+
+// Parent class of `Group' and `Repeat'
+// There are no instances of `Collection', only of `Group' and `Repeat'.
 
 void `Collection'::new()
 {
@@ -1161,31 +1427,24 @@ pointer(`FieldS') scalar `Collection'::last_field(|`RS' include_children)
 	/*NOTREACHED*/
 }
 
-					/* collection class		*/
-/* -------------------------------------------------------------------------- */
+// Returns the field orders of a rowvector of fields.
+`RR' `Collection'::field_orders(pointer(`FieldS') rowvector f)
+{
+	`RS' n, i
+	`RR' orders
 
+	n = length(f)
+	orders = J(1, n, .)
+	for (i = 1; i <= n; i++) {
+		orders[i] = f[i]->order()
+	}
 
-/* -------------------------------------------------------------------------- */
-					/* group class			*/
+	return(orders)
+}
+
+// Group.mata
 
 // Represents ODK groups.
-class `Group' extends `Collection' {
-	public:
-		/* getters and setters */
-		pointer(`GroupS') scalar		parent(), child()
-		pointer(`GroupS') rowvector		children()
-		void							set_parent(), add_child()
-
-		`SS'							long_name(), st_list()
-
-	protected:
-		virtual pointer(`TS') scalar		trans_parent()
-		virtual pointer(`TS') rowvector		trans_children()
-
-	private:
-		pointer(`GroupS') scalar		parent
-		pointer(`GroupS') rowvector		children
-}
 
 pointer(`TS') scalar `Group'::trans_parent()
 	return(parent)
@@ -1235,37 +1494,9 @@ void `Group'::add_child(pointer(`GroupS') scalar newchild)
 	/*NOTREACHED*/
 }
 
-					/* group class			*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* repeat class			*/
+// Repeat.mata
 
 // Represents repeat groups.
-class `Repeat' extends `Collection' {
-	public:
-		/* getters and setters */
-		pointer(`RepeatS') scalar		parent(), child()
-		pointer(`RepeatS') rowvector	children()
-		pointer(`GroupS') scalar		parent_group()
-		pointer(`FieldS') scalar		parent_set_of(), child_set_of()
-		void							set_parent(), add_child(),
-										set_parent_group(), set_parent_set_of(),
-										set_child_set_of()
-
-		`SS'							long_name()
-
-	protected:
-		virtual pointer(`TS') scalar		trans_parent()
-		virtual pointer(`TS') rowvector		trans_children()
-
-	private:
-		pointer(`RepeatS') scalar		parent
-		pointer(`RepeatS') rowvector	children
-		pointer(`GroupS') scalar		parentgroup
-		pointer(`FieldS') scalar		parentsetof, childsetof
-}
 
 pointer(`TS') scalar `Repeat'::trans_parent()
 	return(parent)
@@ -1325,59 +1556,7 @@ void `Repeat'::set_child_set_of(pointer(`FieldS') scalar newsetof)
 	/*NOTREACHED*/
 }
 
-					/* repeat class			*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* field and collection classes		*/
-
-class `Field' {
-	public:
-		/* getters and setters */
-		`RS'							order(), is_dup()
-		`SS'							name(), type(), label(), attrib(),
-										dup_var(), other_dup_name()
-		`SR'							attribs()
-		pointer(`GroupS') scalar		group()
-		pointer(`RepeatS') scalar		repeat()
-		void							set_name(), set_type(), set_label(),
-										set_attribs(), set_group(),
-										set_repeat(), set_dup_var(),
-										set_other_dup_name()
-
-		`RS'							begin_repeat(), end_repeat()
-		`SS'							long_name(), st_long()
-		`InsheetCodeS'					insheet()
-		pointer(`GroupS') rowvector		begin_groups(), end_groups()
-
-	private:
-		static `RS'						ctr
-		`RS'							order
-		`SS'							name, type, label, dupvar, otherdup
-		`SR'							attribs
-		pointer(`GroupS') scalar		group
-		pointer(`RepeatS') scalar		repeat
-
-		pointer(`GroupS') rowvector		_begin_groups(), _end_groups()
-		void							new()
-}
-
-// Last method of `Collection' to define
-// Returns the field orders of a rowvector of fields.
-`RR' `Collection'::field_orders(pointer(`FieldS') rowvector f)
-{
-	`RS' n, i
-	`RR' orders
-
-	n = length(f)
-	orders = J(1, n, .)
-	for (i = 1; i <= n; i++) {
-		orders[i] = f[i]->order()
-	}
-
-	return(orders)
-}
+// Field.mata
 
 void `Field'::new()
 {
@@ -1585,12 +1764,7 @@ pointer(`GroupS') rowvector `Field'::_end_groups(pointer(`GroupS') scalar g)
 	/*NOTREACHED*/
 }
 
-					/* field and collection classes		*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* list structure		*/
+// List.mata
 
 struct `List' {
 	`SS' listname
@@ -1598,236 +1772,7 @@ struct `List' {
 	`RS' vallab, matalab
 }
 
-					/* list structure		*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* error message functions	*/
-
-void error_parsing(`RS' rc, `SS' opt, |`SS' subopt)
-{
-	// [ID 61]
-	if (subopt != "")
-		errprintf("invalid %s suboption\n", subopt)
-	errprintf("invalid %s() option\n", opt)
-	exit(rc)
-}
-
-void error_overlap(`SS' overlap, `SR' opts, |`RS' subopts)
-{
-	// No [ID] required.
-	errprintf("%s cannot be specified to both options %s() and %s()\n",
-		adorn_quotes(overlap, "list"), opts[1], opts[2])
-	if (args() < 3 | !subopts)
-		exit(198)
-}
-
-					/* error message functions	*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* file I/O				*/
-
-// Read the .csv file fn, returning it as a string matrix.
-// If dropmiss is not specified or nonzero, rows of the .csv file whose values
-// are all blank will be dropped.
-`SM' read_csv(`SS' fn, |`RS' dropmiss)
-{
-	`RS' fh, pos, rows, cols, preveol, linecol, i, j
-	`RR' eol, eolpos
-	`RC' nonmiss
-	`SS' csv
-	`SR' tokens, line
-	`SM' res
-	transmorphic t
-
-	// Read fn, storing it in csv.
-	// The use of -st_fopen()- means that fn does not need the .csv extension.
-	fh = st_fopen(fn, ".csv", "r")
-	fseek(fh, 0, 1)
-	pos = ftell(fh)
-	fseek(fh, 0, -1)
-	csv = fread(fh, pos)
-	fclose(fh)
-
-	if (!strlen(csv))
-		return(J(0, 0, ""))
-
-	// Tokenize csv, storing the result in tokens.
-	t = tokeninit("", (",", char(13) + char(10), char(10), char(13)), `""""')
-	tokenset(t, csv)
-	tokens = tokengetall(t)
-	eol = tokens :== char(13) + char(10) :| tokens :== char(10) :|
-		tokens :== char(13)
-	if (!eol[length(eol)]) {
-		tokens = tokens, char(10)
-		eol    = eol,    1
-	}
-
-	// Parse tokens.
-	rows = sum(eol)
-	res = J(rows, cols = 1, "")
-	eolpos = select(1..cols(tokens), eol)
-	// preveol is the position in tokens of the previous EOL character.
-	preveol = 0
-	for (i = 1; i <= rows; i++) {
-		pos = eolpos[i]
-
-		line = J(1, cols, "")
-		linecol = 1
-		for (j = preveol + 1; j < pos; j++) {
-			if (tokens[j] != ",")
-				line[linecol] = line[linecol] + tokens[j]
-			else {
-				// Adjust the number of columns of line.
-				if (linecol >= cols)
-					line = line, ""
-				linecol++
-			}
-		}
-
-		// Adjust the number of columns of res.
-		if (cols < linecol) {
-			res = res, J(rows(res), linecol - cols, "")
-			cols = linecol
-		}
-		res[i,] = line
-
-		preveol = pos
-	}
-
-	// Implement -dropmiss-: drop missing rows.
-	if (dropmiss) {
-		nonmiss = J(rows(res), 1, 0)
-		for (i = 1; i <= cols; i++) {
-			nonmiss = nonmiss :| res[,i] :!= ""
-		}
-		res = select(res, nonmiss)
-	}
-
-	// Clean up strings.
-	if (rows(res)) {
-		res = strip_quotes(res, "simple")
-		res = subinstr(res, `""""', `"""', .)
-		res = subinstr(res, char(13) + char(10), " ", .)
-		res = subinstr(res, char(13), " ", .)
-		res = subinstr(res, char(10), " ", .)
-	}
-
-	return(res)
-}
-
-/* Load the .csv file _fn into memory, clearing the dataset currently in memory.
--load_csv()- checks that the column headers specified to _opts exist:
-_opts is a vector of names of locals that contain column headers.
-_opt is the name of the -odkmeta- option associated with the .csv file.
-_optvars is the name of a local in which -load_csv()- will save the
-corresponding variable names of the column headers specified to _opts. */
-void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
-{
-	// "nopts" for "number of options"
-	`RS' rows, cols, nopts, min, v, i
-	`RR' col, optindex
-	`SS' var, type
-	`SR' vars
-	`SM' csv
-
-	csv = read_csv(_fn, 0)
-	rows = rows(csv)
-	cols = cols(csv)
-	if (cols)
-		col = 1..cols(csv)
-
-	// Check that the required column headers exist.
-	nopts = length(_opts)
-	optindex = J(1, nopts, .)
-	for (i = 1; i <= nopts; i++) {
-		if (rows)
-			min = min(select(col, csv[1,] :== st_local(_opts[i])))
-		else
-			min = .
-		if (min != .)
-			optindex[i] = min
-		else {
-			// [ID 35], [ID 37], [ID 39], [ID 40], [ID 53], [ID 188]
-			errprintf("column header %s not found\n", st_local(_opts[i]))
-			error_parsing(111, _opt, _opts[i] + "()")
-			/*NOTREACHED*/
-		}
-	}
-
-	st_dropvar(.)
-	st_addobs(rows(csv) - 1)
-
-	vars = J(1, cols, "")
-	for (i = 1; i <= cols; i++) {
-		var = insheet_name(csv[1, i])
-		v = i
-		while (var == "" | anyof(vars, var)) {
-			var = sprintf("v%f", v++)
-		}
-		vars[i] = var
-
-		if (rows == 1)
-			type = "str1"
-		else
-			type = smallest_vartype(csv[|2, i \ ., i|])
-		(void) st_addvar(type, var)
-
-		st_global(sprintf("%s[Column_header]", var), csv[1, i])
-	}
-	if (rows > 1)
-		st_sstore(., ., csv[|2, . \ ., .|])
-
-	st_local(_optvars, invtokens(vars[optindex]))
-}
-
-// Add a tab to the start of each nonblank line of _infile, saving the result to
-// _outfile.
-void tab_file(`SS' _infile, `SS' _outfile)
-{
-	`RS' fhin, fhout
-	`SM' line
-
-	fhin = fopen(_infile, "r")
-	fhout = fopen(_outfile, "w")
-	while ((line = fget(fhin)) != J(0, 0, "")) {
-		fput(fhout, tab(line != "") + line)
-	}
-	fclose(fhin)
-	fclose(fhout)
-}
-
-// Append the files specified to _infiles, saving the result to _outfile.
-void append_files(`SR' _infiles, `SS' _outfile)
-{
-	`RS' fhout, fhin, n, i
-	`SM' line
-
-	fhout = fopen(_outfile, "w")
-
-	n = length(_infiles)
-	for (i = 1; i <= n; i++) {
-		if (fileexists(_infiles[i])) {
-			fhin = fopen(_infiles[i], "r")
-			while ((line = fget(fhin)) != J(0, 0, "")) {
-				fput(fhout, line)
-			}
-			fclose(fhin)
-		}
-	}
-
-	fclose(fhout)
-}
-
-					/* file I/O				*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* do-file start/end	*/
+// write_do_start.mata
 
 void write_do_start(`SS' _outfile, `SS' _0)
 {
@@ -1880,6 +1825,21 @@ void write_do_start(`SS' _outfile, `SS' _0)
 	df.close()
 }
 
+void write_temp_mata(`DoFileWriterS' df)
+{
+	df.put("* Find unused Mata names.")
+	df.put("foreach var in values text {")
+	df.put(`"mata: st_local("external", invtokens(direxternal("*")'))"')
+	df.put("tempname \`var'")
+	df.put("while \`:list \`var' in external' {")
+	df.put("tempname \`var'")
+	df.put("}")
+	df.put("}")
+	df.put("")
+}
+
+// write_do_end.mata
+
 void write_do_end(`SS' _outfile, `RS' _relax)
 {
 	`DoFileWriterS' df
@@ -1894,19 +1854,6 @@ void write_do_end(`SS' _outfile, `RS' _relax)
 	write_final_warnings(df, _relax)
 
 	df.close()
-}
-
-void write_temp_mata(`DoFileWriterS' df)
-{
-	df.put("* Find unused Mata names.")
-	df.put("foreach var in values text {")
-	df.put(`"mata: st_local("external", invtokens(direxternal("*")'))"')
-	df.put("tempname \`var'")
-	df.put("while \`:list \`var' in external' {")
-	df.put("tempname \`var'")
-	df.put("}")
-	df.put("}")
-	df.put("")
 }
 
 void write_drop_temp_mata(`DoFileWriterS' df)
@@ -1973,12 +1920,10 @@ void write_final_warnings(`DoFileWriterS' df, `RS' _relax)
 	df.put("}")
 }
 
-					/* do-file start/end	*/
-/* -------------------------------------------------------------------------- */
+// write_survey.mata
 
-
-/* -------------------------------------------------------------------------- */
-					/* -survey()-			*/
+// Using `:char evarname[charname]' instead of `evarname[charname]':
+// <http://www.stata.com/statalist/archive/2013-08/msg00186.html>.
 
 void write_survey(
 	/* output do-files */ `SS' _chardo, `SS' _cleando1, `SS' _cleando2,
@@ -2097,11 +2042,10 @@ void write_survey(
 		write_recode_or_other(df)
 
 	write_field_labels(df, attr)
-	write_compress(df)
 	write_repeat_locals(df, attr, (anyrepeat ? "\`repeat'" : ""), anyrepeat)
 
 	if (!anyrepeat) {
-		write_drop_attrib(df, attr)
+		write_clean_before_final_save(df, attr)
 		write_save_dta(df, _csv, "", anyrepeat, _relax)
 	}
 	else {
@@ -3043,16 +2987,12 @@ void write_split_select_multiple(`DoFileWriterS' df, `AttribSetS' attr)
 	df.put("")
 
 	df.put("capture confirm numeric variable \`var', exact")
-	df.put("if !_rc {")
-	df.put("local parts")
-	df.put("local next 1")
-	df.put("}")
-	df.put("else {")
+	df.put("if !_rc ///")
+	df.put(sprintf("tostring \`var', replace format(%s)", `RealFormat'))
 	df.put("split \`var'")
 	df.put("local parts \`r(varlist)'")
 	df.put("local next = \`r(nvars)' + 1")
 	df.put("destring \`parts', replace")
-	df.put("}")
 	df.put("")
 
 	df.put("forvalues i = \`next'/\`nparts' {")
@@ -3342,6 +3282,16 @@ void write_drop_attrib(`DoFileWriterS' df, `AttribSetS' attr)
 	}
 }
 
+// -write_clean_before_final_save()- writes code to complete final cleaning of
+// an end-user dataset immediately before it is saved.
+// It is destructive, dropping characteristics for instance, so
+// it is usually best to limit any code between this clean and -save-.
+void write_clean_before_final_save(`DoFileWriterS' df, `AttribSetS' attr)
+{
+	write_drop_attrib(df, attr)
+	write_compress(df)
+}
+
 void write_search_set_of(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat)
 {
 	df.put("local setof")
@@ -3357,7 +3307,7 @@ void write_search_set_of(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat)
 }
 
 void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
-	`AttribSetS' attr, `RS' dropattrib)
+	`AttribSetS' attr, `boolean' finalsave)
 {
 	`RS' nchildren, multiple, i
 	`SS' loopname, setof
@@ -3449,10 +3399,8 @@ void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
 		df.put("}")
 	df.put("")
 
-	if (dropattrib)
-		write_drop_attrib(df, attr)
-
-	write_compress(df)
+	if (finalsave)
+		write_clean_before_final_save(df, attr)
 
 	df.put("save, replace")
 	df.put("")
@@ -3579,23 +3527,16 @@ void write_merge_repeats(`DoFileWriterS' df,
 		if (repeats[i]->inside()) {
 			write_reshape_repeat(df, repeats[i], attr)
 
-			if (any(!attr.vals("keep"))) {
-				df.put(sprintf("use %s, clear", dtaq))
-				df.put("")
-				write_drop_attrib(df, attr)
-				df.put("save, replace")
-				df.put("")
-			}
+			df.put(sprintf("use %s, clear", dtaq))
+			df.put("")
+			write_clean_before_final_save(df, attr)
+			df.put("save, replace")
+			df.put("")
 		}
 	}
 }
 
-					/* -survey()-			*/
-/* -------------------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------------------- */
-					/* -choices()-			*/
+// write_choices.mata
 
 void write_choices(
 	/* output do-files */ `SS' _vallabdo, `SS' _encodedo,
@@ -3945,24 +3886,5 @@ void write_encode_end(`DoFileWriterS' df)
 	df.put("")
 }
 
-					/* -choices()-			*/
-/* -------------------------------------------------------------------------- */
-
 end
-exit
 
-ODK notes
----------
-
-From SurveyCTO: "[Field] names must begin with a letter, colon, or underscore.
-Subsequent characters can include numbers, dashes, and periods."
-
-List names are much less restrictive: they may include even spaces or single or
-double quotes. List names are case-sensitive. -odkmeta- requires that list names
-be Stata names.
-
-Useful sources, including for terminology:
-
-http://opendatakit.org/help/form-design/guidelines/
-http://opendatakit.org/help/form-design/examples/
-http://opendatakit.org/help/form-design/xlsform/
