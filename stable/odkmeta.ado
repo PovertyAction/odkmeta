@@ -1,5 +1,4 @@
-// odkmeta.do
-
+*! version 1.2.0 Matthew White 02sep2014
 pr odkmeta
 	vers 11.2
 
