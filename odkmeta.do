@@ -6,6 +6,8 @@ pr odkmeta
 		* [ID 185]
 		di as err "SSC package specialexp required"
 		di as err "to install, type {cmd:ssc install specialexp}"
+		di as err "{p}after installation, you may need to " ///
+			"{help mata mlib:index Mata} or restart Stata{p_end}"
 		ex 198
 	}
 
