@@ -2,8 +2,6 @@
 
 * -version- intentionally omitted for -cscript-.
 
-* 1 to run the cscript on the stable ado-file; 0 not to.
-local stable 0
 * 1 to complete test 124; 0 not to.
 local test124 0
 * 1 to complete live-project testing; 0 not to.
@@ -16,7 +14,6 @@ local profile 1
 					/* initialize			*/
 
 * Check the parameters.
-assert inlist(`stable',  0, 1)
 assert inlist(`test124', 0, 1)
 assert inlist(`project', 0, 1)
 assert inlist(`profile', 0, 1)
@@ -44,10 +41,7 @@ vers 11.2: set seed 889305539
 set more off
 
 cd ..
-if `stable' ///
-	copy stable/odkmeta.ado odkmeta.ado, replace
-else ///
-	do write_ado
+do write_ado
 adopath ++ `"`c(pwd)'"'
 adopath ++ `"`c(pwd)'/cscript/ado"'
 cd cscript
