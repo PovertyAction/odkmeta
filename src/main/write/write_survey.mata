@@ -1,5 +1,7 @@
 vers 11.2
 
+matamac
+
 foreach fn in DoFileWriter.mata AttribSet.mata Repeat.mata {
 	findfile "`fn'"
 	include `"`r(fn)'"'

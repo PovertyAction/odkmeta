@@ -2,6 +2,8 @@
 
 vers 11.2
 
+matamac
+
 if "$nodecl" == "" {
 findfile add_class_decl.do
 include `"`r(fn)'"'

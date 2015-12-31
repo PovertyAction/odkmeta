@@ -1,5 +1,7 @@
 vers 11.2
 
+matamac
+
 findfile Group.mata
 include `"`r(fn)'"'
 

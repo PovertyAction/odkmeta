@@ -1,7 +1,6 @@
 vers 11.2
 
-findfile type_definitions.do
-include `"`r(fn)'"'
+matamac
 
 mata:
 

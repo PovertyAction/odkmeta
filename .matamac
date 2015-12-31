@@ -1,0 +1,48 @@
+*** Project Mata ***
+
+[cons]
+	True = 1
+	False = 0
+
+[type]
+	C = complex
+	N = numeric
+	R = real
+	S = string
+	T = transmorphic
+
+	Boolean = real
+	FileHandle = real
+	LclName = string
+	Name = string
+
+*** odkmeta ***
+
+[cons]
+	* Convert real x to string using -strofreal(x, `RealFormat')-.
+	RealFormat = `""%24.0g""'
+
+	* Names of locals specified by the user at the start of the do-file
+	DateMask = `""datemask""'
+	TimeMask = `""timemask""'
+	DatetimeMask = `""datetimemask""'
+
+[type]
+	* Deprecated
+	boolean = real scalar
+
+	* io
+	DoFileWriter = class do_file_writer
+
+	* xlsform
+	AttribProps = struct odk_attrib_props
+	Attrib = struct odk_attrib
+	AttribSet = class odk_attrib_set
+	Collection = class odk_collection
+	Group = class odk_group
+	Repeat = class odk_repeat_group
+	Field = class odk_field
+	List = struct odk_list
+
+[enum]
+	InsheetCode = (Insheet) OK Bad Dup V

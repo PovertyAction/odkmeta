@@ -1,5 +1,7 @@
 vers 11.2
 
+matamac
+
 findfile DoFileWriter.mata
 include `"`r(fn)'"'
 
