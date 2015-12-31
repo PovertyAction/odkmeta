@@ -1,11 +1,7 @@
 vers 11.2
 
 matamac
-
-foreach fn in DoFileWriter.mata List.mata {
-	findfile "`fn'"
-	include `"`r(fn)'"'
-}
+matainclude DoFileWriter List
 
 mata:
 

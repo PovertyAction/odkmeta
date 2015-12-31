@@ -1,10 +1,7 @@
 vers 11.2
 
 matamac
-
-findfile add_class_decl.do
-include `"`r(fn)'"'
-add_class_decl Field.mata
+declareclass Field
 
 mata:
 

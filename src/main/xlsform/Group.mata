@@ -1,9 +1,7 @@
 vers 11.2
 
 matamac
-
-findfile Collection.mata
-include `"`r(fn)'"'
+declareclass Collection Field
 
 mata:
 

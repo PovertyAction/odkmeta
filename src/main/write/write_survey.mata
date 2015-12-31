@@ -1,15 +1,7 @@
 vers 11.2
 
 matamac
-
-foreach fn in DoFileWriter.mata AttribSet.mata Repeat.mata {
-	findfile "`fn'"
-	include `"`r(fn)'"'
-}
-glo nodecl nodecl
-findfile Field.mata
-include `"`r(fn)'"'
-glo nodecl
+matainclude DoFileWriter AttribSet Field
 
 mata:
 

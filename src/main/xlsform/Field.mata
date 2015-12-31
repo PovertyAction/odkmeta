@@ -1,15 +1,7 @@
-* @drop
-
 vers 11.2
 
 matamac
-
-if "$nodecl" == "" {
-findfile add_class_decl.do
-include `"`r(fn)'"'
-add_class_decl Collection.mata
-add_class_decl Group.mata
-add_class_decl Repeat.mata
+declareclass Collection Group Repeat
 
 mata:
 
@@ -43,14 +35,6 @@ class `Field' {
 		pointer(`GroupS') rowvector		_begin_groups(), _end_groups()
 		void							new()
 }
-
-// @drop
-end
-* @drop
-}
-
-* @drop
-mata:
 
 void `Field'::new()
 {
