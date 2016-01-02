@@ -21,9 +21,8 @@ assert inlist(`profile', 0, 1)
 * Check that -renvars- is installed.
 which renvars
 
-* Set the working directory to odkmeta directory.
 c odkmeta
-cd cscript
+cd src/cscript
 
 cap log close odkmeta
 log using odkmeta, name(odkmeta) s replace
@@ -40,11 +39,9 @@ set type float
 vers 11.2: set seed 889305539
 set more off
 
-cd ..
-do write_ado
-adopath ++ `"`c(pwd)'"'
-adopath ++ `"`c(pwd)'/cscript/ado"'
-cd cscript
+adopath ++ `"`c(pwd)'/../build"'
+adopath ++ `"`c(pwd)'/ado"'
+write_odkmeta_ado
 
 timer clear 1
 timer on 1
@@ -73,9 +70,9 @@ run shortnames
 * Syntax: -get_warnings do_file_name-
 run get_warnings
 
-cd Tests
+cd tests
 
-* Erase do-files and .dta files not in an Expected directory.
+* Erase do-files and .dta files not in an "expected" directory.
 loc dirs : dir . dir *
 foreach dir of loc dirs {
 	loc dtas : dir "`dir'" file "*.dta"
@@ -98,7 +95,7 @@ cd 1
 odkmeta using "ODK to Stata.do", ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 
@@ -117,7 +114,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 19
@@ -126,7 +123,7 @@ forv i = 1/2 {
 	odkmeta using "ODK to Stata.do", ///
 		csv(odkmetatest2.csv) survey(survey.csv) choices(choices.csv) replace
 	run "ODK to Stata"
-	compall Expected
+	compall expected
 }
 cd ..
 
@@ -135,7 +132,7 @@ cd 48
 odkmeta using "ODK to Stata.do", ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 52
@@ -149,7 +146,7 @@ odkmeta using "ODK to Stata.do",
 ;
 #d cr
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 54
@@ -157,7 +154,7 @@ cd 54
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest2.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 71
@@ -167,7 +164,7 @@ odkmeta using "ODK to Stata", ///
 	csv(odkmetatest2.csv) survey(survey.csv) choices(choices.csv) replace
 conf f "ODK to Stata.do"
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 73
@@ -175,7 +172,7 @@ cd 73
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest2) survey(survey) choices(choices) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 75
@@ -183,7 +180,7 @@ cd 75
 odkmeta using "ODK to Stata.do", ///
 	csv("odkmetatest2.csv") survey("survey.csv") choices("choices.csv") replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 76
@@ -197,7 +194,7 @@ odkmeta using "ODK to Stata.do",
 ;
 #d cr
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 /*
@@ -207,7 +204,7 @@ odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest2.csv) survey(survey.csv, type(t\`ype)) ///
 	choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 */
 
@@ -216,7 +213,7 @@ cd 89
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest2.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 90
@@ -224,7 +221,7 @@ cd 90
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest2.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 96
@@ -232,7 +229,7 @@ cd 96
 odkmeta using "ODK to Stata.do", ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 108
@@ -240,7 +237,7 @@ cd 108
 odkmeta using import, ///
 	csv("survey data") survey("survey survey") choices("survey choices") replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 109
@@ -248,14 +245,14 @@ cd 109
 odkmeta using import, ///
 	csv(survey data) survey(survey survey) choices(survey choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 157
 cd 157
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 199
@@ -263,7 +260,7 @@ cd 199
 odkmeta using "ODK to Stata.do", ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 208
@@ -271,7 +268,7 @@ cd 208
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest2.csv) survey(survey.csv) choices(choices.csv)
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 
@@ -283,7 +280,7 @@ cd 3
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest3.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 4
@@ -291,7 +288,7 @@ cd 4
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest3.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 5
@@ -299,7 +296,7 @@ cd 5
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest5.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 6
@@ -307,7 +304,7 @@ cd 6
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest5.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 7
@@ -315,7 +312,7 @@ cd 7
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest5.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 8
@@ -323,7 +320,7 @@ cd 8
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest8.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 9
@@ -331,7 +328,7 @@ cd 9
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest9.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 10
@@ -339,7 +336,7 @@ cd 10
 odkmeta using "ODK to Stata.do", ///
 	csv("odkmetatest10 data.csv") survey("odk survey.csv") choices("odk choices.csv") replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 27
@@ -353,7 +350,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 28
@@ -367,7 +364,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 29
@@ -375,7 +372,7 @@ cd 29
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest29.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 80
@@ -389,7 +386,7 @@ assert `"`r(datanotform_repeats)'"' == `""" """'
 assert "`r(datanotform_vars)'" == "_uuid _submission_time"
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 84
@@ -403,7 +400,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 85
@@ -420,7 +417,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 86
@@ -434,7 +431,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 91
@@ -442,7 +439,7 @@ cd 91
 odkmeta using import, ///
 	csv(odkmetatest91.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 103
@@ -460,7 +457,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 104
@@ -474,7 +471,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 148
@@ -482,7 +479,7 @@ cd 148
 odkmeta using import, ///
 	csv(Audio.audit.test.csv) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 
@@ -494,7 +491,7 @@ cd 50
 odkmeta using import, ///
 	csv(odkmetatest50.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 102
@@ -502,7 +499,7 @@ cd 102
 odkmeta using import, ///
 	csv(odkmetatest102.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 141
@@ -516,7 +513,7 @@ filefilter import.do `temp', ///
 assert r(occurrences) == 1
 copy `temp' import.do, replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 145
@@ -536,7 +533,7 @@ filefilter import.do `temp', ///
 assert r(occurrences) == 1
 copy `temp' import.do, replace
 run import
-compall Expected
+compall expected
 cd ..
 
 
@@ -549,7 +546,7 @@ odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest2.csv) choices(choices.csv) replace ///
 	survey(survey.csv, type(Type))
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 24
@@ -557,7 +554,7 @@ cd 24
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest24.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 25
@@ -565,7 +562,7 @@ cd 25
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest25.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 101
@@ -573,7 +570,7 @@ cd 101
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest101.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 
@@ -585,7 +582,7 @@ cd 12
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest12.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 20
@@ -593,7 +590,7 @@ cd 20
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest20.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 21
@@ -601,7 +598,7 @@ cd 21
 odkmeta using import, ///
 	csv(odkmetatest21.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 22
@@ -609,7 +606,7 @@ cd 22
 odkmeta using import, ///
 	csv(odkmetatest22.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 23
@@ -617,7 +614,7 @@ cd 23
 odkmeta using import, ///
 	csv(odkmetatest23.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 36
@@ -631,7 +628,7 @@ assert `"`r(datanotform_repeats)'"' == `""" """'
 assert "`r(datanotform_vars)'" == "_uuid _submission_time"
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 41
@@ -640,7 +637,7 @@ odkmeta using "import online.do", ///
 	csv(odkmetatest36.csv) survey(survey.csv) choices(choices.csv) replace ///
 	oneline
 run "import online"
-compall Expected
+compall expected
 tempfile new
 filefilter "import online.do" `new', from(;)
 assert r(occurrences) == 4
@@ -659,7 +656,7 @@ cd 47
 odkmeta using import, ///
 	csv(odkmetatest47.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 56
@@ -667,7 +664,7 @@ cd 56
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest56.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 57
@@ -676,7 +673,7 @@ odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest56.csv) survey(survey.csv) choices(choices.csv) replace ///
 	other(max)
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 58
@@ -685,7 +682,7 @@ odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest56.csv) survey(survey.csv) choices(choices.csv) replace ///
 	other(min)
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 59
@@ -694,7 +691,7 @@ odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest56.csv) survey(survey.csv) choices(choices.csv) replace ///
 	other(99)
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 60
@@ -703,7 +700,7 @@ odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest56.csv) survey(survey.csv) choices(choices.csv) replace ///
 	other(.o)
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 72
@@ -711,7 +708,7 @@ cd 72
 odkmeta using import, ///
 	csv(odkmetatest72.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 83
@@ -719,7 +716,7 @@ cd 83
 odkmeta using "ODK to Stata.do", ///
 	csv(odkmetatest36.csv) survey(survey.csv) choices(choices.csv) replace
 run "ODK to Stata"
-compall Expected
+compall expected
 cd ..
 
 * Test 87
@@ -727,49 +724,49 @@ cd 87
 odkmeta using import, ///
 	csv(odkmetatest87.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 92
 cd 92
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 93
 cd 93
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 94
 cd 94
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 106
 cd 106
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 107
 cd 107
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 137
 cd 137
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 138
@@ -777,7 +774,7 @@ cd 138
 odkmeta using import, ///
 	csv(odkmetatest36.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 139
@@ -785,7 +782,7 @@ cd 139
 odkmeta using import, ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 140
@@ -793,7 +790,7 @@ cd 140
 odkmeta using import, ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 142
@@ -802,7 +799,7 @@ odkmeta using "import.do", ///
 	csv("data.csv") ///
 	survey("survey.csv") choices("choices.csv") replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 143
@@ -811,7 +808,7 @@ odkmeta using "import.do", ///
 	csv("data.csv") ///
 	survey("survey.csv") choices("choices.csv") replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 144
@@ -820,7 +817,7 @@ odkmeta using "import.do", ///
 	csv("data.csv") ///
 	survey("survey.csv") choices("choices.csv") replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 197
@@ -829,7 +826,7 @@ odkmeta using "import.do", ///
 	csv("data.csv") ///
 	survey("survey.csv") choices("choices.csv") replace
 run import
-compall Expected
+compall expected
 cd ..
 
 
@@ -841,7 +838,7 @@ cd 191
 odkmeta using import, ///
 	csv(odkmetatest21.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 192
@@ -849,7 +846,7 @@ cd 192
 odkmeta using import, ///
 	csv(odkmetatest21.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 193
@@ -857,7 +854,7 @@ cd 193
 odkmeta using import, ///
 	csv(odkmetatest21.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 194
@@ -865,7 +862,7 @@ cd 194
 odkmeta using import, ///
 	csv(odkmetatest21.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 195
@@ -873,7 +870,7 @@ cd 195
 odkmeta using import, ///
 	csv(odkmetatest21.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 196
@@ -881,7 +878,7 @@ cd 196
 odkmeta using import, ///
 	csv(odkmetatest12.csv) survey(survey.csv) choices(choices.csv) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 
@@ -899,14 +896,14 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 110
 cd 110
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 111
@@ -914,7 +911,7 @@ cd 111
 odkmeta using import, ///
 	csv(odkmetatest111) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 112
@@ -922,7 +919,7 @@ cd 112
 odkmeta using import, ///
 	csv(odkmetatest112) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 113
@@ -930,7 +927,7 @@ cd 113
 odkmeta using import, ///
 	csv(odkmetatest113) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 114
@@ -938,7 +935,7 @@ cd 114
 odkmeta using import, ///
 	csv(odkmetatest114) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 115
@@ -946,7 +943,7 @@ cd 115
 odkmeta using import, ///
 	csv(odkmetatest115) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 116
@@ -954,7 +951,7 @@ cd 116
 odkmeta using import, csv(data) survey(survey) choices(choices) replace
 run import
 * Check the dataset.
-compall Expected
+compall expected
 * Check the do-file.
 infix str line 1-244 using import.do, clear
 gen ln = _n
@@ -971,7 +968,7 @@ cd 117
 odkmeta using import, ///
 	csv(odkmetatest117) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 124
@@ -1041,7 +1038,7 @@ filefilter import.do `temp', ///
 assert r(occurrences) == 1
 copy `temp' import.do, replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 147
@@ -1055,7 +1052,7 @@ filefilter import.do `temp', ///
 assert r(occurrences) == 1
 copy `temp' import.do, replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 162
@@ -1069,7 +1066,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 163
@@ -1083,7 +1080,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 164
@@ -1091,7 +1088,7 @@ cd 164
 odkmeta using import, ///
 	csv(odkmetatest111) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 165
@@ -1099,7 +1096,7 @@ cd 165
 odkmeta using import, ///
 	csv(odkmetatest165) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 166
@@ -1107,7 +1104,7 @@ cd 166
 odkmeta using import, ///
 	csv(odkmetatest166) survey(survey) choices(choices) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 167
@@ -1121,7 +1118,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 184
@@ -1135,7 +1132,7 @@ assert `"`r(datanotform_repeats)'"' == "roster"
 assert "`r(datanotform_vars)'" == "DATA_NOT_FORM"
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 203
@@ -1149,7 +1146,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 * Test 209
@@ -1162,7 +1159,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == ""
 assert "`r(formnotdata_vars)'" == ""
-compall Expected
+compall expected
 cd ..
 
 
@@ -1175,7 +1172,7 @@ odkmeta using import, ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) ///
 	dropattrib(type "constraint message" constraint_message) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 172
@@ -1184,7 +1181,7 @@ odkmeta using import, ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) ///
 	dropattrib(_all) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 173
@@ -1193,7 +1190,7 @@ odkmeta using import, ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) ///
 	dropattrib(_all type) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 174
@@ -1202,7 +1199,7 @@ odkmeta using import, ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) ///
 	keepattrib(type "constraint message" constraint_message) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 175
@@ -1211,7 +1208,7 @@ odkmeta using import, ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) ///
 	keepattrib(_all) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 176
@@ -1220,7 +1217,7 @@ odkmeta using import, ///
 	csv(Audio audit test.csv) survey(survey.csv) choices(choices.csv) ///
 	keepattrib(_all type) replace
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 178
@@ -1229,7 +1226,7 @@ odkmeta using import, ///
 	csv(odkmetatest111) survey(survey) choices(choices) replace ///
 	dropattrib(type)
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 179
@@ -1238,7 +1235,7 @@ odkmeta using import, ///
 	csv(odkmetatest111) survey(survey) choices(choices) replace ///
 	dropattrib(_all)
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 180
@@ -1247,7 +1244,7 @@ odkmeta using import, ///
 	csv(odkmetatest111) survey(survey) choices(choices) replace ///
 	keepattrib(type)
 run import
-compall Expected
+compall expected
 cd ..
 
 * Test 181
@@ -1256,7 +1253,7 @@ odkmeta using import, ///
 	csv(odkmetatest111) survey(survey) choices(choices) replace ///
 	keepattrib(_all)
 run import
-compall Expected
+compall expected
 cd ..
 
 
@@ -1278,7 +1275,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == `""""'
 assert "`r(formnotdata_vars)'" == "DoesntExist"
-compall Expected
+compall expected
 cd ..
 
 * Test 81
@@ -1293,7 +1290,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == `""""'
 assert "`r(formnotdata_vars)'" == "DoesntExist"
-compall Expected
+compall expected
 cd ..
 
 * Test 122
@@ -1308,7 +1305,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == `""" roster roster"'
 assert "`r(formnotdata_vars)'" == "DoesntExist1 DoesntExist2 DoesntExist3"
-compall Expected
+compall expected
 cd ..
 
 * Test 170
@@ -1323,7 +1320,7 @@ assert `"`r(datanotform_repeats)'"' == `""""'
 assert "`r(datanotform_vars)'" == "_submission_time"
 assert `"`r(formnotdata_repeats)'"' == `""""'
 assert "`r(formnotdata_vars)'" == "DoesntExist"
-compall Expected
+compall expected
 cd ..
 
 * Test 182
@@ -1338,7 +1335,7 @@ assert `"`r(datanotform_repeats)'"' == `""""'
 assert "`r(datanotform_vars)'" == "_submission_time"
 assert `"`r(formnotdata_repeats)'"' == `""""'
 assert "`r(formnotdata_vars)'" == "DoesntExist"
-compall Expected
+compall expected
 cd ..
 
 * Test 183
@@ -1353,7 +1350,7 @@ assert `"`r(datanotform_repeats)'"' == ""
 assert "`r(datanotform_vars)'" == ""
 assert `"`r(formnotdata_repeats)'"' == "roster"
 assert "`r(formnotdata_vars)'" == "DoesntExist"
-compall Expected
+compall expected
 cd ..
 
 
@@ -1373,12 +1370,12 @@ if `project' {
 					/* help file examples	*/
 
 loc curdir "`c(pwd)'"
-cd ../../help/example
+cd ../../../doc/help/example
 
 cap erase import.do
 odkmeta using import.do, csv("ODKexample.csv") survey("survey.csv") choices("choices.csv")
 run import
-compall Expected
+compall expected
 
 odkmeta using import.do, csv("ODKexample.csv") ///
 	survey("survey_fieldname.csv", name(fieldname)) choices("choices.csv") ///
