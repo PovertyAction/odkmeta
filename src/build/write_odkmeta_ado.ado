@@ -23,6 +23,8 @@ pr write_odkmeta_ado
 			stata
 			error
 			DoFileWriter
+			AttribProps
+			Attrib
 			AttribSet
 			List
 			write_do_start
