@@ -3,9 +3,10 @@ pr write_odkmeta_ado
 
 	matamac
 
+	_find_project_root
 	#d ;
 	writeado
-		using `"$MATAMAC_ROOT_PATH/src/build/odkmeta.ado"',
+		using `"`r(path)'/src/build/odkmeta.ado"',
 		stata(main/odkmeta.do)
 		class_declarations(
 			Collection
