@@ -23,7 +23,7 @@ The [certification script](http://www.stata.com/help.cgi?cscript) of `odkmeta` i
 Contributing
 ------------
 
-Help keep `odkmeta` up-to-date by contributing code. See the [issues](https://github.com/matthew-white/odkmeta/issues?state=open) for current to-dos. If you have experience with an ODK flavor not yet supported, please contribute your knowledge through pull requests or issues.
+Help keep `odkmeta` up-to-date by contributing code. See the [issues](https://github.com/PovertyAction/odkmeta/issues?state=open) for current to-dos. If you have experience with an ODK flavor not yet supported, please contribute your knowledge through pull requests or issues.
 
 Most contributors will wish to modify one of `write_*.mata`, e.g., [`write_choices.mata`](/write_choices.mata). The `odkmeta` Stata program itself is stored in [`odkmeta.do`](/src/main/odkmeta.do); review it for an overview of the program flow. When contributing code, adding associated [cscript tests](/doc/develop/cscript/Tests.md) is much appreciated.
 

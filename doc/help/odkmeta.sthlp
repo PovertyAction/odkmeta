@@ -657,5 +657,5 @@ contributed information about ODK.
 {pstd}Matthew White{p_end}
 
 {pstd}For questions or suggestions, submit a
-{browse "https://github.com/matthew-white/odkmeta/issues":GitHub issue}
+{browse "https://github.com/PovertyAction/odkmeta/issues":GitHub issue}
 or e-mail researchsupport@poverty-action.org.{p_end}
