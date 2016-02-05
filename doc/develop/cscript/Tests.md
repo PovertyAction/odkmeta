@@ -1,9 +1,9 @@
 odkmeta tests
 =============
 
-Below is a list of `odkmeta` tests. Unless marked otherwise, all tests are implemented in the [cscript](/cscript/odkmeta.do). Each test is associated with a unique positive integer ID. IDs are consecutive starting with 137. Some live-project tests with IDs before 137 are stored off GitHub and are not listed in the table below. If you are an [IPA](http://poverty-action.org/) employee, contact Matt or Lindsey to gain access.
+Below is a list of `odkmeta` tests. Unless marked otherwise, all tests are implemented in the [cscript](/src/cscript/cscript.do). Each test is associated with a unique positive integer ID. IDs are consecutive starting with 137. Some live-project tests with IDs before 137 are stored off GitHub and are not listed in the table below. If you are an [IPA](http://poverty-action.org/) employee, contact Matt or Lindsey to gain access.
 
-Contributions of new tests are welcome. When adding a test to the cscript, please add a row to the table below. Further, please add expected datasets, checking them according to [this guide](/cscript/Checking a cscript dataset.md). All datasets should be readable by Stata 11, the minimal supported version.
+Contributions of new tests are welcome. When adding a test to the cscript, please add a row to the table below. Further, please add expected datasets, checking them according to [this guide](/doc/develop/cscript/Checking a cscript dataset.md). All datasets should be readable by Stata 11, the minimal supported version.
 
 Note that the `.xls` forms in `Tests` may differ from the corresponding `survey` and `choices` `.csv` files.
 

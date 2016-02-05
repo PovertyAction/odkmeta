@@ -1,7 +1,7 @@
 Checking a cscript dataset
 ==========================
 
-Follow these steps to check a Stata dataset before putting it in a cscript `Expected` directory:
+Follow these steps to check a Stata dataset before putting it in a cscript `expected` directory:
 
 - Check the data itself: inspect at least a subset of the values and make sure they are as expected. Metadata like variable labels is nice, but in the end, the most important thing is that these values are coming through right. As part of this, do a quick `browse` through the first few observations of the data, checking all variables.
 - Type `describe` or `describe, fullnames` (abbreviated `d, f`) and inspect:
