@@ -8,10 +8,6 @@
 	DatetimeMask = `""datetimemask""'
 
 [type]
-	* Deprecated
-	boolean = real scalar
-
-	* xlsform
 	AttribProps = struct odk_attrib_props
 	Attrib = struct odk_attrib
 	AttribSet = class odk_attrib_set

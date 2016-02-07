@@ -1390,7 +1390,7 @@ void write_search_set_of(`DoFileWriterS' df, `AttribSetS' attr, `SS' repeat)
 }
 
 void write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
-	`AttribSetS' attr, `boolean' finalsave)
+	`AttribSetS' attr, `BooleanS' finalsave)
 {
 	`RS' nchildren, multiple, i
 	`SS' loopname, setof
