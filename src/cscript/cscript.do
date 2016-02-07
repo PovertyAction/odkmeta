@@ -29,9 +29,7 @@ log using odkmeta, name(odkmeta) s replace
 di c(username)
 di "`:environment computername'"
 
-clear
-clear matrix
-clear mata
+clear all
 if c(maxvar) < 5450 ///
 	set maxvar 5450
 set varabbrev off
