@@ -1,8 +1,6 @@
 pr write_odkmeta_ado
 	vers 11.2
 
-	matamac
-
 	_find_project_root
 	#d ;
 	writeado
