@@ -17,5 +17,7 @@
 	Field = class odk_field
 	List = struct odk_list
 
+	ODKMetaDoWriter = class odkmeta_do_writer
+
 [enum]
 	InsheetCode = (Insheet) OK Bad Dup V
