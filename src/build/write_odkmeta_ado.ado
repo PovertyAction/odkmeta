@@ -30,6 +30,11 @@ pr write_odkmeta_ado
 			write_do_end
 			write_survey
 			write_choices
+			BaseOptions
+			SurveyOptions
+			ChoicesOptions
+			ODKMetaDoWriter
+			odkmeta
 		)
 	;
 	#d cr
