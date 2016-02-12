@@ -78,6 +78,24 @@ pr odkmeta
 
 	preserve
 
+	#d ;
+	mata: odkmeta(
+		// Main
+		"using",
+		"csv",
+		"survey",
+		"choices",
+		// Fields
+		"dropattrib",
+		"keepattrib",
+		"relax",
+		// Lists
+		"other",
+		"oneline",
+		// Non-option values
+		"0"
+	);
+	#d cr
 end
 
 
