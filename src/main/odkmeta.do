@@ -78,29 +78,6 @@ pr odkmeta
 
 	preserve
 
-	* -Parse -survey()-.
-	/* -parse_survey- completes checking that involves single rows of the survey
-	sheet; the rest is done in -write_survey()-. Unlike -write_survey()-,
-	-parse_survey- displays the problematic row, and in general, where possible
-	it is better to implement a check in -parse_survey- rather than
-	-write_survey()-. However, all complex checks that involve Mata are best put
-	in -write_survey()-. */
-	parse_survey `survey'
-	// "s" prefix for "-survey()-": "sfn" for "-survey()- filename."
-	loc sfn			"`s(fn)'"
-	loc type		"`s(type)'"
-	loc sname		"`s(name)'"
-	loc slabel		"`s(label)'"
-	loc disabled	"`s(disabled)'"
-
-	* Parse -choices()-.
-	parse_choices `choices'
-	// "c" prefix for "-choices()-": "cfn" for "-choices()- filename."
-	loc cfn			"`s(fn)'"
-	loc listname	"`s(listname)'"
-	loc cname		"`s(name)'"
-	loc clabel		"`s(label)'"
-
 end
 
 
@@ -161,6 +138,12 @@ pr check_col
 	}
 end
 
+/* -parse_survey- completes checking that involves single rows of the survey
+sheet; the rest is done in -write_survey()-. Unlike -write_survey()-,
+-parse_survey- displays the problematic row, and in general, where possible
+it is better to implement a check in -parse_survey- rather than
+-write_survey()-. However, all complex checks that involve Mata are best put
+in -write_survey()-. */
 pr parse_survey, sclass
 	cap noi syntax anything(name=fn id=filename equalok everything), ///
 		[Type(str) name(str) LAbel(str) Disabled(str)]

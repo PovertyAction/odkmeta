@@ -8,6 +8,10 @@
 	DatetimeMask = `""datetimemask""'
 
 [type]
+	BaseOptions = class odkmeta_base_options
+	SurveyOptions = class odkmeta_survey_options
+	ChoicesOptions = class odkmeta_choices_options
+
 	AttribProps = struct odk_attrib_props
 	Attrib = struct odk_attrib
 	AttribSet = class odk_attrib_set
