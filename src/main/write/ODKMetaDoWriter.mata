@@ -31,7 +31,7 @@ class `ODKMetaDoWriter' {
 		`SS' startdo, enddo, chardo, cleando1, cleando2, vallabdo, encodedo,
 			encodetab, fulldo
 
-		void define_tempfiles(), copy()
+		void define_tempfiles(), tab_file(), append_files(), copy()
 }
 
 void `ODKMetaDoWriter'::new()
@@ -87,7 +87,7 @@ void `ODKMetaDoWriter'::define_tempfiles()
 
 // Add a tab to the start of each nonblank line of _infile, saving the result to
 // _outfile.
-void tab_file(`SS' _infile, `SS' _outfile)
+void `ODKMetaDoWriter'::tab_file(`SS' _infile, `SS' _outfile)
 {
 	`RS' fhin, fhout
 	`SM' line
@@ -102,7 +102,7 @@ void tab_file(`SS' _infile, `SS' _outfile)
 }
 
 // Append the files specified to _infiles, saving the result to _outfile.
-void append_files(`SR' _infiles, `SS' _outfile)
+void `ODKMetaDoWriter'::append_files(`SR' _infiles, `SS' _outfile)
 {
 	`RS' fhout, fhin, n, i
 	`SM' line
