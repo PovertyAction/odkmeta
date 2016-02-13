@@ -1,6 +1,8 @@
 pr write_odkmeta_ado
 	vers 11.2
 
+	ste_odkmeta
+
 	_find_project_root
 	#d ;
 	writeado
@@ -26,14 +28,21 @@ pr write_odkmeta_ado
 			Attrib
 			AttribSet
 			List
-			write_do_start
-			write_do_end
-			write_survey
-			write_choices
+
 			BaseOptions
 			SurveyOptions
 			ChoicesOptions
+
+			DoStartBaseWriter
+			DoStartController
+			DoStartWriter
+
+			write_do_end
+			write_survey
+			write_choices
+
 			ODKMetaDoWriter
+
 			odkmeta
 		)
 	;

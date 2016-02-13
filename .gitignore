@@ -1,2 +1,8 @@
-/src/build/odkmeta.ado
 *.stpr
+
+# -write_ado- output
+/src/build/odkmeta.ado
+
+# -ste- output
+/src/main/write/start/DoStartBaseWriter.mata
+/src/main/write/start/DoStartWriter.mata

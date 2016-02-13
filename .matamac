@@ -21,6 +21,10 @@
 	Field = class odk_field
 	List = struct odk_list
 
+	DoStartBaseWriter = class odkmeta_do_start_base_writer
+	DoStartController = class odkmeta_do_start_controller
+	DoStartWriter = class odkmeta_do_start_writer
+
 	ODKMetaDoWriter = class odkmeta_do_writer
 
 [enum]
