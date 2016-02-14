@@ -218,7 +218,7 @@ void `ChoicesController'::write_lists(|`SS' action)
 		df.put("")
 }
 
-void write_sysmiss_labs(`DoFileWriterS' df, `ListR' lists)
+void `ChoicesController'::write_sysmiss_labs()
 {
 	`RS' nlists, nsysmiss, i
 	`SR' listnames
@@ -314,7 +314,7 @@ void `ChoicesController'::write_all()
 		}
 
 		write_lists()
-		write_sysmiss_labs(df, lists)
+		write_sysmiss_labs()
 
 		if (length(otherlists))
 			write_other_labs(df, otherlists, other)
