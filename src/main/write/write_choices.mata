@@ -6,30 +6,30 @@ matainclude DoFileWriter List
 mata:
 
 void write_choices(
-	/* output do-files */ `SS' _vallabdo, `SS' _encodedo,
-	`SS' _choices,
-	/* column headers */ `SS' _listname, `SS' _name, `SS' _label,
-	/* characteristic names */ `SS' _listnamechar, `SS' _isotherchar,
-	/* other values */ `SS' _otherlists, `SS' _other,
-	`RS' _oneline)
+	/* output do-files */ `SS' vallabdo, `SS' encodedo,
+	`SS' choices_filename,
+	/* column headers */ `SS' listname_header, `SS' name_header, `SS' label_header,
+	/* characteristic names */ `SS' listnamechar, `SS' isotherchar,
+	/* other values */ `SR' otherlists, `SS' other,
+	`RS' oneline)
 {
 	`RS' listname, name, label, rows, nvals, nstrs, i, j
 	`RR' col
 	`SS' strlists
-	`SR' listnames, otherlists
+	`SR' listnames
 	`SM' choices
 	`DoFileWriterS' df
 	`ListS' list
 	`ListR' lists
 
-	choices = read_csv(_choices)
+	choices = read_csv(choices_filename)
 	if (rows(choices) < 2)
 		return
 
 	col = 1..cols(choices)
-	listname = min(select(col, choices[1,] :== _listname))
-	name     = min(select(col, choices[1,] :== _name))
-	label    = min(select(col, choices[1,] :== _label))
+	listname = min(select(col, choices[1,] :== listname_header))
+	name     = min(select(col, choices[1,] :== name_header))
+	label    = min(select(col, choices[1,] :== label_header))
 	choices = choices[,(listname, name, label)]
 	listname = 1
 	name     = 2
@@ -37,7 +37,7 @@ void write_choices(
 	choices = choices[|2, . \ ., .|]
 	choices[,(listname, name)] = strtrim(choices[,(listname, name)])
 
-	df.open(_vallabdo)
+	df.open(vallabdo)
 	df.put("label drop _all")
 	df.put("")
 
@@ -81,23 +81,22 @@ void write_choices(
 			}
 		}
 
-		write_lists(df, lists, _oneline)
+		write_lists(df, lists, oneline)
 		write_sysmiss_labs(df, lists)
 
-		otherlists = tokens(_otherlists)
 		if (length(otherlists))
-			write_other_labs(df, otherlists, _other)
+			write_other_labs(df, otherlists, other)
 
 		write_save_label_info(df)
 	}
 
 	df.close()
 
-	df.open(_encodedo)
+	df.open(encodedo)
 
 	if (strlists != "") {
-		write_encode_start(df, strlists, _listnamechar, _isotherchar)
-		write_lists(df, lists, _oneline, "encode")
+		write_encode_start(df, strlists, listnamechar, isotherchar)
+		write_lists(df, lists, oneline, "encode")
 		write_encode_end(df)
 	}
 
@@ -279,7 +278,7 @@ void write_sysmiss_labs(`DoFileWriterS' df, `ListR' lists)
 	}
 }
 
-void write_other_labs(`DoFileWriterS' df, `SR' otherlists, `SS' _other)
+void write_other_labs(`DoFileWriterS' df, `SR' otherlists, `SS' other)
 {
 	`SS' otherval
 
@@ -287,15 +286,15 @@ void write_other_labs(`DoFileWriterS' df, `SR' otherlists, `SS' _other)
 	df.put("local otherlabs " + invtokens(otherlists))
 	df.put("foreach lab of local otherlabs {")
 	df.put(`"mata: st_vlload("\`lab'", \`values' = ., \`text' = "")"')
-	if (_other == "max" | _other == "min") {
+	if (other == "max" | other == "min") {
 		df.put(sprintf(`"mata: st_local("otherval", "' +
 			`"strofreal(%s, "%s"))"',
-			(_other == "max" ? "max(\`values') + 1" : "min(\`values') - 1"),
+			(other == "max" ? "max(\`values') + 1" : "min(\`values') - 1"),
 			`RealFormat'))
 		otherval = "\`otherval'"
 	}
 	else
-		otherval = _other
+		otherval = other
 	df.put("local othervals \`othervals' " + otherval)
 	df.put(sprintf("label define \`lab' %s other, add", otherval))
 	df.put("}")
@@ -315,17 +314,17 @@ void write_save_label_info(`DoFileWriterS' df)
 	df.put("")
 }
 
-void write_encode_start(`DoFileWriterS' df, `SS' strlists, `SS' _listnamechar,
-	`SS' _isotherchar)
+void write_encode_start(`DoFileWriterS' df, `SS' strlists, `SS' listnamechar,
+	`SS' isotherchar)
 {
 	df.put("* Encode fields whose list contains a noninteger name.")
 	df.put("local lists " + strlists)
 	df.put("tempvar temp")
-	df.put(sprintf("ds, has(char %s)", _listnamechar))
+	df.put(sprintf("ds, has(char %s)", listnamechar))
 	df.put("foreach var in \`r(varlist)' {")
-	df.put(sprintf("local list : char \`var'[%s]", _listnamechar))
+	df.put(sprintf("local list : char \`var'[%s]", listnamechar))
 	df.put(sprintf("if \`:list list in lists' & !\`:char \`var'[%s]' {",
-		_isotherchar))
+		isotherchar))
 	df.put("capture confirm numeric variable \`var'")
 	df.put("if !_rc {")
 	df.put(sprintf("tostring \`var', replace format(%s)", `RealFormat'))

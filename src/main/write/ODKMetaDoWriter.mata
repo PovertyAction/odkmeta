@@ -117,7 +117,7 @@ void `ODKMetaDoWriter'::write_choices()
 			choices->list_name(), choices->name(), choices->label(),
 		/* characteristic names */
 			st_local(LIST_NAME_CHAR), st_local(IS_OTHER_CHAR),
-		/* other values */ st_local(OTHER_LISTS), other,
+		/* other values */ tokens(st_local(OTHER_LISTS)), other,
 		oneline
 	)
 }
