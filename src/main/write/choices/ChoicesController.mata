@@ -12,6 +12,7 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 
 	private:
 		`DoFileWriterS' df
+		`ListR' lists
 }
 
 void `ChoicesController'::init(
@@ -49,7 +50,6 @@ void `ChoicesController'::write_all()
 	`SR' listnames
 	`SM' choices
 	`ListS' list
-	`ListR' lists
 
 	choices = read_csv(choices_filename)
 	if (rows(choices) < 2)
