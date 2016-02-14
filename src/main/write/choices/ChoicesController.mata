@@ -31,7 +31,7 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 		`ListR' lists
 
 		`TM' cp()
-		void write_lists()
+		void write_lists(), write_sysmiss_labs()
 }
 
 void `ChoicesController'::init(
@@ -216,6 +216,33 @@ void `ChoicesController'::write_lists(|`SS' action)
 
 	if (nlists)
 		df.put("")
+}
+
+void write_sysmiss_labs(`DoFileWriterS' df, `ListR' lists)
+{
+	`RS' nlists, nsysmiss, i
+	`SR' listnames
+
+	listnames = J(1, 0, "")
+	nlists = length(lists)
+	for (i = 1; i <= nlists; i++) {
+		if (any(lists[i].names :== adorn_quotes(".")))
+			listnames = listnames, lists[i].listname
+	}
+
+	if (nsysmiss = length(listnames)) {
+		printf("{p}{txt}note: list%s {res:%s} contain%s a name equal to " +
+			`"{res:"."}. Because of the do-file's use of {cmd:insheet}, "' +
+			`"it may not be possible to distinguish {res:"."} from "' +
+			"{res:sysmiss}. When it is unclear, the do-file will assume that " +
+			`"values equal the name {res:"."} and not {res:sysmiss}. "' +
+			"See the help file for more information.{p_end}\n",
+			(nsysmiss > 1) * "s", invtokens(listnames), (nsysmiss == 1) * "s")
+
+		df.put(`"* Lists with a name equal to ".""')
+		df.put("local sysmisslabs " + invtokens(listnames))
+		df.put("")
+	}
 }
 
 void `ChoicesController'::write_all()
