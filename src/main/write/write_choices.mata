@@ -9,9 +9,9 @@ void write_choices(
 	/* output do-files */ `SS' vallabdo, `SS' encodedo,
 	`SS' choices_filename,
 	/* column headers */ `SS' listname_header, `SS' name_header, `SS' label_header,
-	/* characteristic names */ `SS' listnamechar, `SS' isotherchar,
+	/* characteristic names */ `NameS' listnamechar, `NameS' isotherchar,
 	/* other values */ `SR' otherlists, `SS' other,
-	`RS' oneline)
+	`BooleanS' oneline)
 {
 	`RS' listname, name, label, rows, nvals, nstrs, i, j
 	`RR' col
