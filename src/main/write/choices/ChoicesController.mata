@@ -13,6 +13,9 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 	private:
 		`DoFileWriterS' df
 		`ListR' lists
+
+		`TM' cp()
+		void write_lists()
 }
 
 void `ChoicesController'::init(
@@ -44,7 +47,7 @@ void `ChoicesController'::put(|`SS' s)
 
 // See <http://www.stata.com/statalist/archive/2013-04/msg00684.html> and
 // <http://www.stata.com/statalist/archive/2006-05/msg00276.html>.
-transmorphic cp(transmorphic original)
+`TM' `ChoicesController'::cp(transmorphic original)
 {
 	transmorphic copy
 
@@ -52,7 +55,7 @@ transmorphic cp(transmorphic original)
 	return(copy)
 }
 
-void write_lists(`DoFileWriterS' df, `ListR' lists, `RS' oneline, |`SS' action)
+void `ChoicesController'::write_lists(|`SS' action)
 {
 	// "nassoc" for "number of associations"
 	`RS' labdef, nlists, mindelim, maxdelim, delim, nassoc, maxspaces, i, j
@@ -258,7 +261,7 @@ void `ChoicesController'::write_all()
 			}
 		}
 
-		write_lists(df, lists, oneline)
+		write_lists()
 		write_sysmiss_labs(df, lists)
 
 		if (length(otherlists))
@@ -273,7 +276,7 @@ void `ChoicesController'::write_all()
 
 	if (strlists != "") {
 		write_encode_start(df, strlists, listnamechar, isotherchar)
-		write_lists(df, lists, oneline, "encode")
+		write_lists("encode")
 		write_encode_end(df)
 	}
 
