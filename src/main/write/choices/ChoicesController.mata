@@ -42,6 +42,154 @@ void `ChoicesController'::write(`SS' s)
 void `ChoicesController'::put(|`SS' s)
 	df.put(s)
 
+// See <http://www.stata.com/statalist/archive/2013-04/msg00684.html> and
+// <http://www.stata.com/statalist/archive/2006-05/msg00276.html>.
+transmorphic cp(transmorphic original)
+{
+	transmorphic copy
+
+	copy = original
+	return(copy)
+}
+
+void write_lists(`DoFileWriterS' df, `ListR' lists, `RS' oneline, |`SS' action)
+{
+	// "nassoc" for "number of associations"
+	`RS' labdef, nlists, mindelim, maxdelim, delim, nassoc, maxspaces, i, j
+	`RC' diff
+	`ListS' list
+	// "ls" for "lists"
+	`ListR' ls
+
+	ls = `List'(0)
+	labdef = action != "encode"
+	nlists = length(lists)
+	for (i = 1; i <= nlists; i++) {
+		list = cp(lists[i])
+		// Defining the label
+		if (labdef) {
+			if (!list.vallab)
+				list.names = strofreal(1::rows(list.names), `RealFormat')
+			if (!list.matalab) {
+				list.labels = adorn_quotes(strip_quotes(list.labels), "label")
+			}
+			ls = ls, list
+		}
+		// Encoding
+		else if (!list.vallab) {
+			// Exclude name-label associations if the name equals the label.
+			diff = list.names :!= list.labels
+			if (any(diff)) {
+				list.names  = select(list.names,  diff)
+				list.labels = select(list.labels, diff)
+				ls = ls, list
+			}
+		}
+	}
+
+	// mindelim is the index of the list before which -#delimit ;- is required.
+	// maxdelim is the index of the list after which -#delimit cr- is required.
+	mindelim = maxdelim = 0
+	nlists = length(ls)
+	if (labdef & !oneline) {
+		/* Make mindelim the index of the first list that does not require Mata.
+		Make maxdelim the index of the last list that does not require Mata.
+		The definitions will appear as follows:
+
+		Lists that require Mata
+		#delimit ;
+		List that does not require Mata
+		Lists
+		List that does not require Mata
+		#delimit cr
+		Lists that require Mata
+
+		All the above elements are optional. If there are no lists that do not
+		require Mata, the -#delimit- commands are skipped.
+		*/
+		for (i = 1; i <= nlists; i++) {
+			if (!ls[i].matalab) {
+				mindelim = mindelim ? mindelim : i
+				maxdelim = i
+			}
+		}
+	}
+
+	for (i = 1; i <= nlists; i++) {
+		if (i == mindelim)
+			df.put("#delimit ;")
+
+		delim = i >= mindelim & i <= maxdelim
+		if (!(labdef & oneline)) {
+			df.put(sprintf("* %s%s", ls[i].listname, delim * ";"))
+		}
+
+		// Start of the label
+		if (!labdef) {
+			df.put(sprintf(`"%sif "\`list'" == "%s" {"',
+				(i > 1) * "else ", ls[i].listname))
+		}
+		else if (!ls[i].matalab) {
+			df.write("label define " + ls[i].listname)
+			if (!oneline) {
+				df.put("")
+				df.indent()
+			}
+		}
+
+		// Middle of the label: write each association.
+		nassoc = length(ls[i].labels)
+		if (!labdef)
+			maxspaces = max(strlen(ls[i].labels))
+		else if (!ls[i].matalab)
+			maxspaces = max(strlen(ls[i].names))
+		for (j = 1; j <= nassoc; j++) {
+			// -replace-
+			if (!labdef) {
+				df.put(sprintf("replace \`temp' = %s%s if \`var' == %s",
+					ls[i].labels[j],
+					" " * (maxspaces - strlen(ls[i].labels[j])),
+					ls[i].names[j]))
+			}
+			// -label define-
+			else if (!ls[i].matalab) {
+				if (oneline)
+					df.write(sprintf(" %s %s", ls[i].names[j], ls[i].labels[j]))
+				else {
+					df.put(ls[i].names[j] +
+						" " * (maxspaces - strlen(ls[i].names[j]) + 1) +
+						ls[i].labels[j])
+				}
+			}
+			// -st_vlmodify()-
+			else {
+				df.write(sprintf(`"mata: st_vlmodify("%s", %s, %s)"',
+					ls[i].listname, ls[i].names[j], ls[i].labels[j]))
+				if (delim)
+					df.write(";")
+				df.put("")
+			}
+		}
+
+		// End of the label
+		if (!labdef)
+			df.put("}")
+		else if (!ls[i].matalab) {
+			if (delim) {
+				df.indent(-1)
+				df.write(";")
+			}
+			df.put("")
+		}
+
+		if (i == maxdelim)
+			df.put("#delimit cr")
+	}
+
+	if (nlists)
+		df.put("")
+}
+
 void `ChoicesController'::write_all()
 {
 	`RS' listname, name, label, rows, nvals, nstrs, i, j
