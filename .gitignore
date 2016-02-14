@@ -8,3 +8,5 @@
 /src/main/write/start/DoStartWriter.mata
 /src/main/write/end/DoEndBaseWriter.mata
 /src/main/write/end/DoEndWriter.mata
+/src/main/write/choices/ChoicesBaseWriter.mata
+/src/main/write/choices/ChoicesWriter.mata

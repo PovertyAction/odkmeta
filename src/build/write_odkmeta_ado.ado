@@ -42,7 +42,10 @@ pr write_odkmeta_ado
 			DoEndWriter
 
 			write_survey
-			write_choices
+
+			ChoicesBaseWriter
+			ChoicesController
+			ChoicesWriter
 
 			ODKMetaDoWriter
 

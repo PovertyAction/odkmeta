@@ -1,7 +1,7 @@
 vers 11.2
 
 matamac
-matainclude DoFileWriter List
+matainclude DoFileWriter List ChoicesBaseWriter
 
 mata:
 

@@ -9,6 +9,7 @@ pr ste_odkmeta
 	loc writers
 		DoStart start
 		DoEnd   end
+		Choices choices
 	;
 	#d cr
 	while `:list sizeof writers' {

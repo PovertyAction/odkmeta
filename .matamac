@@ -29,6 +29,10 @@
 	DoEndController = class odkmeta_do_end_controller
 	DoEndWriter = class odkmeta_do_end_writer
 
+	ChoicesBaseWriter = class odkmeta_choices_base_writer
+	ChoicesController = class odkmeta_choices_controller
+	ChoicesWriter = class odkmeta_choices_writer
+
 	ODKMetaDoWriter = class odkmeta_do_writer
 
 [enum]

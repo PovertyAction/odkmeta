@@ -1,7 +1,8 @@
 vers 11.2
 
 matamac
-matainclude SurveyOptions ChoicesOptions DoStartWriter DoEndWriter
+matainclude SurveyOptions ChoicesOptions DoStartWriter DoEndWriter ///
+	ChoicesWriter
 
 mata:
 
@@ -110,16 +111,25 @@ void `ODKMetaDoWriter'::write_survey()
 
 void `ODKMetaDoWriter'::write_choices()
 {
-	::write_choices(
-		/* output do-files */ vallabdo, encodedo,
+	`ChoicesWriterS' writer
+	writer.init(
+		// Output do-files
+			vallabdo,
+			encodedo,
 		choices->filename(),
-		/* column headers */
-			choices->list_name(), choices->name(), choices->label(),
-		/* characteristic names */
-			st_local(LIST_NAME_CHAR), st_local(IS_OTHER_CHAR),
-		/* other values */ tokens(st_local(OTHER_LISTS)), other,
+		// Column headers
+		choices->list_name(),
+		choices->name(),
+		choices->label(),
+		// Characteristic names
+		st_local(LIST_NAME_CHAR),
+		st_local(IS_OTHER_CHAR),
+		// Other values
+			tokens(st_local(OTHER_LISTS)),
+			other,
 		oneline
 	)
+	writer.write_all()
 }
 
 void `ODKMetaDoWriter'::write_end()
