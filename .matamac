@@ -25,6 +25,10 @@
 	DoStartController = class odkmeta_do_start_controller
 	DoStartWriter = class odkmeta_do_start_writer
 
+	DoEndBaseWriter = class odkmeta_do_end_base_writer
+	DoEndController = class odkmeta_do_end_controller
+	DoEndWriter = class odkmeta_do_end_writer
+
 	ODKMetaDoWriter = class odkmeta_do_writer
 
 [enum]

@@ -1,7 +1,7 @@
 pr write_odkmeta_ado
 	vers 11.2
 
-	ste_odkmeta
+	qui ste_odkmeta
 
 	_find_project_root
 	#d ;
@@ -37,7 +37,10 @@ pr write_odkmeta_ado
 			DoStartController
 			DoStartWriter
 
-			write_do_end
+			DoEndBaseWriter
+			DoEndController
+			DoEndWriter
+
 			write_survey
 			write_choices
 

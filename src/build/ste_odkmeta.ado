@@ -3,13 +3,27 @@ pr ste_odkmeta
 
 	_find_project_root
 	loc write "`r(path)'/src/main/write"
-	loc start "`write'/start"
 
+	di
 	#d ;
-	ste using `"`start'/templates"',
-		base(`start'/DoStartBaseWriter.mata)
-		control(DoStartController)
-		complete(`start'/DoStartWriter.mata)
+	loc writers
+		DoStart start
+		DoEnd   end
 	;
 	#d cr
+	while `:list sizeof writers' {
+		gettoken stub   writers : writers
+		gettoken subdir writers : writers
+
+		di as txt "Templatizing {res:`subdir'}..."
+
+		loc dir "`write'/`subdir'"
+		#d ;
+		ste using `"`dir'/templates"',
+			base(`dir'/`stub'BaseWriter.mata)
+			control(`stub'Controller)
+			complete(`dir'/`stub'Writer.mata)
+		;
+		#d cr
+	}
 end

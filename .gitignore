@@ -6,3 +6,5 @@
 # -ste- output
 /src/main/write/start/DoStartBaseWriter.mata
 /src/main/write/start/DoStartWriter.mata
+/src/main/write/end/DoEndBaseWriter.mata
+/src/main/write/end/DoEndWriter.mata

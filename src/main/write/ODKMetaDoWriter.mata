@@ -1,7 +1,7 @@
 vers 11.2
 
 matamac
-matainclude SurveyOptions ChoicesOptions DoStartWriter
+matainclude SurveyOptions ChoicesOptions DoStartWriter DoEndWriter
 
 mata:
 
@@ -124,7 +124,10 @@ void `ODKMetaDoWriter'::write_choices()
 
 void `ODKMetaDoWriter'::write_end()
 {
-	write_do_end(enddo, relax)
+	`DoEndWriterS' writer
+	writer.init(enddo, relax)
+	writer.write_end()
+	writer.close()
 }
 
 // Add a tab to the start of each nonblank line of _infile, saving the result to
