@@ -317,9 +317,9 @@ void `ChoicesController'::write_all()
 		write_sysmiss_labs()
 
 		if (length(otherlists))
-			write_other_labs(df, otherlists, other)
+			write_other_labs()
 
-		write_save_label_info(df)
+		write_save_label_info()
 	}
 
 	df.close()
@@ -327,9 +327,9 @@ void `ChoicesController'::write_all()
 	df.open(encodedo)
 
 	if (strlists != "") {
-		write_encode_start(df, strlists, listnamechar, isotherchar)
+		write_encode_start(strlists)
 		write_lists("encode")
-		write_encode_end(df)
+		write_encode_end()
 	}
 
 	df.close()
