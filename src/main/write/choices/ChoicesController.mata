@@ -11,6 +11,7 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 		void init(), write_all()
 
 	private:
+		`DoFileWriterS' df
 }
 
 void `ChoicesController'::init(
@@ -34,6 +35,12 @@ void `ChoicesController'::init(
 	this.oneline = oneline
 }
 
+void `ChoicesController'::write(`SS' s)
+	df.write(s)
+
+void `ChoicesController'::put(|`SS' s)
+	df.put(s)
+
 void `ChoicesController'::write_all()
 {
 	`RS' listname, name, label, rows, nvals, nstrs, i, j
@@ -41,7 +48,6 @@ void `ChoicesController'::write_all()
 	`SS' strlists
 	`SR' listnames
 	`SM' choices
-	`DoFileWriterS' df
 	`ListS' list
 	`ListR' lists
 
