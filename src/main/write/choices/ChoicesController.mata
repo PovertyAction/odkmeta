@@ -11,6 +11,22 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 		void init(), write_all()
 
 	private:
+		`SS' choices_filename
+		`BooleanS' oneline
+		// Output do-files
+		`SS' vallabdo
+		`SS' encodedo
+		// Column headers
+		`SS' listname_header
+		`SS' name_header
+		`SS' label_header
+		// Characteristic names
+		`NameS' listnamechar
+		`NameS' isotherchar
+		// Other values
+		`SR' otherlists
+		`SS' other
+
 		`DoFileWriterS' df
 		`ListR' lists
 
@@ -19,11 +35,20 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 }
 
 void `ChoicesController'::init(
-	/* output do-files */ `SS' vallabdo, `SS' encodedo,
+	// Output do-files
+		`SS' vallabdo,
+		`SS' encodedo,
 	`SS' choices_filename,
-	/* column headers */ `SS' listname_header, `SS' name_header, `SS' label_header,
-	/* characteristic names */ `NameS' listnamechar, `NameS' isotherchar,
-	/* other values */ `SR' otherlists, `SS' other,
+	// Column headers
+	`SS' listname_header,
+	`SS' name_header,
+	`SS' label_header,
+	// Characteristic names
+	`NameS' listnamechar,
+	`NameS' isotherchar,
+	// Other values
+		`SR' otherlists,
+		`SS' other,
 	`BooleanS' oneline)
 {
 	this.vallabdo = vallabdo
