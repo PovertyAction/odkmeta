@@ -1,7 +1,7 @@
 vers 11.2
 
 matamac
-matainclude DoFileWriter List ChoicesBaseWriter
+matainclude DoFileWriter List ChoicesBaseWriter ChoicesOptions
 
 mata:
 
@@ -11,21 +11,19 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 		void init(), write_all()
 
 	private:
-		`SS' choices_filename
-		`BooleanS' oneline
 		// Output do-files
 		`SS' vallabdo
 		`SS' encodedo
-		// Column headers
-		`SS' listname_header
-		`SS' name_header
-		`SS' label_header
+		// -choices()- options
+		pointer(`ChoicesOptionsS') scalar options
 		// Characteristic names
 		`NameS' listnamechar
 		`NameS' isotherchar
-		// Other values
+		// Select/other values
 		`SR' otherlists
 		`SS' other
+		// Other options
+		`BooleanS' oneline
 
 		`DoFileWriterS' df
 		`ListR' lists
@@ -36,27 +34,22 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 
 void `ChoicesController'::init(
 	// Output do-files
-		`SS' vallabdo,
-		`SS' encodedo,
-	`SS' choices_filename,
-	// Column headers
-	`SS' listname_header,
-	`SS' name_header,
-	`SS' label_header,
+	`SS' vallabdo,
+	`SS' encodedo,
+	// -choices()- options
+	`ChoicesOptionsS' options,
 	// Characteristic names
 	`NameS' listnamechar,
 	`NameS' isotherchar,
-	// Other values
-		`SR' otherlists,
-		`SS' other,
+	// Select/other values
+	`SR' otherlists,
+	`SS' other,
+	// Other options
 	`BooleanS' oneline)
 {
 	this.vallabdo = vallabdo
 	this.encodedo = encodedo
-	this.choices_filename = choices_filename
-	this.listname_header = listname_header
-	this.name_header = name_header
-	this.label_header = label_header
+	this.options = &options
 	this.listnamechar = listnamechar
 	this.isotherchar = isotherchar
 	this.otherlists = otherlists
@@ -254,14 +247,14 @@ void `ChoicesController'::write_all()
 	`SM' choices
 	`ListS' list
 
-	choices = read_csv(choices_filename)
+	choices = read_csv(options->filename())
 	if (rows(choices) < 2)
 		return
 
 	col = 1..cols(choices)
-	listname = min(select(col, choices[1,] :== listname_header))
-	name     = min(select(col, choices[1,] :== name_header))
-	label    = min(select(col, choices[1,] :== label_header))
+	listname = min(select(col, choices[1,] :== options->list_name()))
+	name     = min(select(col, choices[1,] :== options->name()))
+	label    = min(select(col, choices[1,] :== options->label()))
 	choices = choices[,(listname, name, label)]
 	listname = 1
 	name     = 2
