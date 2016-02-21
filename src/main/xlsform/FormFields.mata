@@ -1,10 +1,39 @@
-	survey = read_csv(_survey)
+vers 11.2
+
+matamac
+matainclude AttribSet Field SurveyOptions
+
+mata:
+
+class `FormFields' {
+	public:
+		void init()
+		pointer(`GroupS') rowvector groups()
+		pointer(`RepeatS') rowvector repeats()
+		pointer(`FieldS') rowvector fields()
+		pointer(`AttribSetS') scalar attributes()
+
+	private:
+		`AttribSetS' attr
+		pointer(`GroupS') rowvector groups
+		pointer(`RepeatS') rowvector repeats
+		pointer(`FieldS') rowvector fields
+
+		void define_attr(), get_fields()
+}
+
+void `FormFields'::init(`SurveyOptionsS' options, `SS' dropattrib,
+	`SS' keepattrib, `NameS' charpre)
+{
+	`RR' col
+	`SM' survey
+
+	survey = read_csv(options.filename())
 	if (rows(survey) < 2)
 		_error("no fields in survey sheet")
 
-	charpre = "Odk_"
-	attr = get_attribs(survey, _type, _name, _label, _disabled,
-		_dropattrib, _keepattrib, charpre)
+	define_attr(survey, options.type(), options.name(), options.label(),
+		options.disabled(), dropattrib, keepattrib, charpre)
 
 	// Drop the column headers.
 	survey = survey[|2, . \ ., .|]
@@ -30,7 +59,7 @@
 
 	survey[,attr.get("type")->col] = stdtype(survey[,attr.get("type")->col])
 
-	pragma unset fields
-	pragma unset groups
-	pragma unset repeats
 	get_fields(fields, groups, repeats, survey, attr)
+}
+
+end

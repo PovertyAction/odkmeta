@@ -19,6 +19,7 @@
 	Group = class odk_group
 	Repeat = class odk_repeat_group
 	Field = class odk_field
+	FormFields = class odk_form_fields
 	List = struct odk_list
 
 	DoStartBaseWriter = class odkmeta_do_start_base_writer
