@@ -92,8 +92,7 @@ void `ODKMetaDoWriter'::write_start()
 {
 	`DoStartWriterS' writer
 	writer.init(startdo, command_line)
-	writer.write_start()
-	writer.close()
+	writer.write_all()
 }
 
 void `ODKMetaDoWriter'::write_survey()
@@ -134,8 +133,7 @@ void `ODKMetaDoWriter'::write_end()
 {
 	`DoEndWriterS' writer
 	writer.init(enddo, relax)
-	writer.write_end()
-	writer.close()
+	writer.write_all()
 }
 
 // Add a tab to the start of each nonblank line of _infile, saving the result to

@@ -8,16 +8,17 @@ mata:
 class `DoEndController' extends `DoEndBaseWriter' {
 	public:
 		virtual void write(), put()
-		void init(), close()
+		void init(), write_all()
 
 	private:
+		`SS' filename
 		`BooleanS' relax
 		`DoFileWriterS' df
 }
 
 void `DoEndController'::init(`SS' filename, `BooleanS' relax)
 {
-	df.open(filename)
+	this.filename = filename
 	this.relax = relax
 }
 
@@ -27,7 +28,11 @@ void `DoEndController'::write(`SS' s)
 void `DoEndController'::put(|`SS' s)
 	df.put(s)
 
-void `DoEndController'::close()
+void `DoEndController'::write_all()
+{
+	df.open(filename)
+	write_end()
 	df.close()
+}
 
 end
