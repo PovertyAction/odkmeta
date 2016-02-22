@@ -547,4 +547,16 @@ void `FormFields'::init(`SurveyOptionsS' options, `SS' dropattrib,
 	get_fields(fields, groups, repeats, survey, attr)
 }
 
+pointer(`GroupS') rowvector `FormFields'::groups()
+	return(groups)
+
+pointer(`RepeatS') rowvector `FormFields'::repeats()
+	return(repeats)
+
+pointer(`FieldS') rowvector `FormFields'::fields()
+	return(fields)
+
+pointer(`AttribSetS') scalar `FormFields'::attributes()
+	return(&attr)
+
 end
