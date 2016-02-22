@@ -215,7 +215,7 @@ void write_save_dta(`DoFileWriterS' df, `SS' _csv, `SS' repeat, `RS' anyrepeat,
 
 	dta = _csv + (repeat != "") * "-" + repeat +
 		(strpos(_csv, ".") ? ".dta" : "")
-	df.put("local dta `" + `"""' + adorn_quotes(dta) + `"""' + "'")
+	df.put("local dta `" + `"""' + adorn_quotes(dta) + `"""' + "'") //"
 	df.put(sprintf("save \`dta', %sreplace", anyrepeat * "orphans "))
 	df.put("local dtas : list dtas | dta")
 

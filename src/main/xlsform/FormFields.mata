@@ -163,7 +163,7 @@ void `FormFields'::init(`SurveyOptionsS' options, `SS' dropattrib,
 		attrib = attr.get(formattribs[i])
 
 		// .char
-		base = strlower(subinstr(strtoname(attrib->header), "`", "_", .))
+		base = strlower(subinstr(strtoname(attrib->header), "`", "_", .)) //"
 		while (strpos(base, "__"))
 			base = subinstr(base, "__", "_", .)
 		while (substr(base, -1, 1) == "_" & strlen(base) > 1)
