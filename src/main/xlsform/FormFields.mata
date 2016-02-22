@@ -19,10 +19,12 @@ class `FormFields' {
 		pointer(`RepeatS') rowvector repeats
 		pointer(`FieldS') rowvector fields
 
-		void define_attr(), get_fields()
+		void define_attr()
+		void check_duplicate_group_names(), check_duplicate_repeat_names()
+		void get_fields(), _get_fields(), _get_fields_base()
 }
 
-`AttribSetS' get_attribs(`SM' survey,
+void `FormFields'::define_attr(`SM' survey,
 	/* column headers */ `SS' _type, `SS' _name, `SS' _label, `SS' _disabled,
 	`SS' _dropattrib, `SS' _keepattrib, `SS' charpre)
 {
@@ -31,7 +33,6 @@ class `FormFields' {
 	`SS' char, base
 	`SR' dropattrib, keepattrib, headers, opts, notfound, newattribs,
 		formattribs, chars
-	`AttribSetS' attr
 	pointer(`SR') p
 	pointer(`AttribPropsS') scalar attrib
 
@@ -150,14 +151,12 @@ class `FormFields' {
 		else
 			attrib->keep = 1
 	}
-
-	return(attr)
 }
 
 // See the comments for -_get_fields()-.
 // Process rows of survey that do not contain groups or repeat groups other than
 // SET-OF fields.
-void _get_fields_base(pointer(`FieldS') rowvector fields, `RS' fpos,
+void `FormFields'::_get_fields_base(pointer(`FieldS') rowvector fields, `RS' fpos,
 	`SM' survey, `AttribSetS' attr,
 	pointer(`GroupS') scalar parentgroup,
 	pointer(`RepeatS') scalar parentrepeat, `SR' odknames, `SR' stnames)
@@ -282,7 +281,7 @@ nested.
 odknames and stnames (for "Stata names") are parallel lists that contain,
 respectively, the ODK and Stata long names of the fields of parentrepeat. A
 field whose Stata name is already in stnames has a duplicate Stata name. */
-void _get_fields(pointer(`FieldS') rowvector fields,
+void `FormFields'::_get_fields(pointer(`FieldS') rowvector fields,
 	pointer(`GroupS') rowvector groups, pointer(`RepeatS') rowvector repeats,
 	`RS' fpos, `RS' gpos, `RS' rpos, `SM' survey, `AttribSetS' attr,
 	pointer(`GroupS') scalar parentgroup,
@@ -419,7 +418,7 @@ void _get_fields(pointer(`FieldS') rowvector fields,
 	}
 }
 
-void check_duplicate_group_names(pointer(`GroupS') rowvector groups)
+void `FormFields'::check_duplicate_group_names(pointer(`GroupS') rowvector groups)
 {
 	`RS' n, i, j
 	`SS' name
@@ -440,7 +439,7 @@ void check_duplicate_group_names(pointer(`GroupS') rowvector groups)
 	}
 }
 
-void check_duplicate_repeat_names(pointer(`RepeatS') rowvector repeats)
+void `FormFields'::check_duplicate_repeat_names(pointer(`RepeatS') rowvector repeats)
 {
 	`RS' n, i, j
 
@@ -461,7 +460,7 @@ void check_duplicate_repeat_names(pointer(`RepeatS') rowvector repeats)
 // See the comments for -_get_fields()-.
 // -get_fields()- and not -write_survey()- should do all the validation of
 // fields, groups, and repeats.
-void get_fields(pointer(`FieldS') rowvector fields,
+void `FormFields'::get_fields(pointer(`FieldS') rowvector fields,
 	pointer(`GroupS') rowvector groups, pointer(`RepeatS') rowvector repeats,
 	`SM' survey, `AttribSetS' attr)
 {
