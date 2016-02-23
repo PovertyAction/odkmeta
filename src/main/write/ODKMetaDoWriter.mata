@@ -32,7 +32,7 @@ class `ODKMetaDoWriter' {
 
 		// tempfiles
 		`SS' startdo, enddo, chardo, cleando1, cleando2, vallabdo, encodedo,
-			encodetab, fulldo
+			fulldo
 
 		void define_fields(), define_tempfiles()
 		void write_start(), write_survey(), write_choices(), write_end()
@@ -75,15 +75,14 @@ void `ODKMetaDoWriter'::init(
 
 void `ODKMetaDoWriter'::define_tempfiles()
 {
-	startdo   = st_tempfilename()
-	enddo     = st_tempfilename()
-	chardo    = st_tempfilename()
-	cleando1  = st_tempfilename()
-	cleando2  = st_tempfilename()
-	vallabdo  = st_tempfilename()
-	encodedo  = st_tempfilename()
-	encodetab = st_tempfilename()
-	fulldo    = st_tempfilename()
+	startdo  = st_tempfilename()
+	enddo    = st_tempfilename()
+	chardo   = st_tempfilename()
+	cleando1 = st_tempfilename()
+	cleando2 = st_tempfilename()
+	vallabdo = st_tempfilename()
+	encodedo = st_tempfilename()
+	fulldo   = st_tempfilename()
 }
 
 void `ODKMetaDoWriter'::define_fields()
@@ -177,12 +176,14 @@ void `ODKMetaDoWriter'::append_files(`SR' _infiles, `SS' _outfile)
 void `ODKMetaDoWriter'::copy(`SS' from, `SS' to)
 	stata(sprintf(`"qui copy `"%s"' `"%s"', replace"', from, to))
 
+// Append the do-file sections and export.
 void `ODKMetaDoWriter'::append_and_save()
 {
-	// Append the do-file sections and export.
+	`SS' indented
 	if (fields.has_repeat() && fileexists(encodedo)) {
-		tab_file(encodedo, encodetab)
-		copy(encodetab, encodedo)
+		indented = st_tempfilename()
+		tab_file(encodedo, indented)
+		copy(indented, encodedo)
 	}
 	append_files((startdo, vallabdo, chardo, cleando1, encodedo, cleando2,
 		enddo), fulldo)
