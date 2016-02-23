@@ -15,23 +15,30 @@ pr write_odkmeta_ado
 			Field
 		)
 		mata(
+			// Classes with declaration dependencies
 			Collection
 			Group
 			Repeat
 			Field
-			string
-			csv
-			stata
-			error
+
+			// External dependencies
 			DoFileWriter
-			AttribProps
-			Attrib
-			AttribSet
-			List
+
+			// Functions
+			csv
+			error
+			stata
+			string
 
 			BaseOptions
 			SurveyOptions
 			ChoicesOptions
+
+			AttribProps
+			Attrib
+			AttribSet
+			FormFields
+			List
 
 			DoStartBaseWriter
 			DoStartController
