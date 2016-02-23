@@ -1,7 +1,7 @@
 vers 11.2
 
 matamac
-matainclude DoFileWriter List ChoicesBaseWriter ChoicesOptions
+matainclude DoFileWriter List ChoicesBaseWriter ChoicesOptions FormFields
 
 mata:
 
@@ -14,21 +14,18 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 		// Output do-files
 		`SS' vallabdo
 		`SS' encodedo
-		// -choices()- options
+		// Options
 		pointer(`ChoicesOptionsS') scalar options
-		// Characteristic names
-		`NameS' listnamechar
-		`NameS' isotherchar
-		// Select/other values
-		`SR' otherlists
 		`SS' other
-		// Other options
 		`BooleanS' oneline
+		// Fields
+		pointer(`FormFieldsS') scalar fields
 
 		`DoFileWriterS' df
 		`ListR' lists
 
 		`TM' cp()
+		`NameS' char_name()
 		void write_lists(), write_sysmiss_labs()
 }
 
@@ -36,25 +33,19 @@ void `ChoicesController'::init(
 	// Output do-files
 	`SS' vallabdo,
 	`SS' encodedo,
-	// -choices()- options
+	// Options
 	`ChoicesOptionsS' options,
-	// Characteristic names
-	`NameS' listnamechar,
-	`NameS' isotherchar,
-	// Select/other values
-	`SR' otherlists,
 	`SS' other,
-	// Other options
-	`BooleanS' oneline)
+	`BooleanS' oneline,
+	// Fields
+	`FormFieldsS' fields)
 {
 	this.vallabdo = vallabdo
 	this.encodedo = encodedo
 	this.options = &options
-	this.listnamechar = listnamechar
-	this.isotherchar = isotherchar
-	this.otherlists = otherlists
 	this.other = other
 	this.oneline = oneline
+	this.fields = &fields
 }
 
 void `ChoicesController'::write(`SS' s)
@@ -62,6 +53,9 @@ void `ChoicesController'::write(`SS' s)
 
 void `ChoicesController'::put(|`SS' s)
 	df.put(s)
+
+`NameS' `ChoicesController'::char_name(`SS' attribute)
+	return(fields->attributes()->get(attribute)->char)
 
 // See <http://www.stata.com/statalist/archive/2013-04/msg00684.html> and
 // <http://www.stata.com/statalist/archive/2006-05/msg00276.html>.
@@ -309,7 +303,7 @@ void `ChoicesController'::write_all()
 		write_lists()
 		write_sysmiss_labs()
 
-		if (length(otherlists))
+		if (length(fields->other_lists()))
 			write_other_labs()
 
 		write_save_label_info()

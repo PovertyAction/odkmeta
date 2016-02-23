@@ -2,7 +2,7 @@ vers 11.2
 
 matamac
 matainclude SurveyOptions ChoicesOptions DoStartWriter DoEndWriter ///
-	ChoicesWriter
+	ChoicesWriter FormFields
 
 mata:
 
@@ -11,7 +11,7 @@ class `ODKMetaDoWriter' {
 		void new(), init(), write()
 
 	private:
-		static `LclNameS' ANY_REPEAT, OTHER_LISTS, LIST_NAME_CHAR, IS_OTHER_CHAR
+		static `NameS' CHAR_PREFIX
 
 		// Main
 		`SS' filename
@@ -28,23 +28,21 @@ class `ODKMetaDoWriter' {
 		// Non-option values
 		`SS' command_line
 
+		`FormFieldsS' fields
+
 		// tempfiles
 		`SS' startdo, enddo, chardo, cleando1, cleando2, vallabdo, encodedo,
 			encodetab, fulldo
 
-		void define_tempfiles()
+		void define_fields(), define_tempfiles()
 		void write_start(), write_survey(), write_choices(), write_end()
 		void tab_file(), append_files(), copy(), append_and_save()
 }
 
 void `ODKMetaDoWriter'::new()
 {
-	if (ANY_REPEAT == "") {
-		ANY_REPEAT = "anyrepeat"
-		OTHER_LISTS = "otherlists"
-		LIST_NAME_CHAR = "listnamechar"
-		IS_OTHER_CHAR = "isotherchar"
-	}
+	if (CHAR_PREFIX == "")
+		CHAR_PREFIX = "Odk_"
 }
 
 void `ODKMetaDoWriter'::init(
@@ -88,6 +86,12 @@ void `ODKMetaDoWriter'::define_tempfiles()
 	fulldo    = st_tempfilename()
 }
 
+void `ODKMetaDoWriter'::define_fields()
+{
+	fields = `FormFields'()
+	fields.init(*survey, dropattrib, keepattrib, CHAR_PREFIX)
+}
+
 void `ODKMetaDoWriter'::write_start()
 {
 	`DoStartWriterS' writer
@@ -115,16 +119,12 @@ void `ODKMetaDoWriter'::write_choices()
 		// Output do-files
 		vallabdo,
 		encodedo,
-		// -choices()- options
+		// Options
 		*choices,
-		// Characteristic names
-		st_local(LIST_NAME_CHAR),
-		st_local(IS_OTHER_CHAR),
-		// Select/other values
-		tokens(st_local(OTHER_LISTS)),
 		other,
-		// Other options
-		oneline
+		oneline,
+		// Fields
+		fields
 	)
 	writer.write_all()
 }
@@ -180,7 +180,7 @@ void `ODKMetaDoWriter'::copy(`SS' from, `SS' to)
 void `ODKMetaDoWriter'::append_and_save()
 {
 	// Append the do-file sections and export.
-	if (strtoreal(st_local(ANY_REPEAT)) && fileexists(encodedo)) {
+	if (fields.has_repeat() && fileexists(encodedo)) {
 		tab_file(encodedo, encodetab)
 		copy(encodetab, encodedo)
 	}
@@ -191,6 +191,7 @@ void `ODKMetaDoWriter'::append_and_save()
 
 void `ODKMetaDoWriter'::write()
 {
+	define_fields()
 	define_tempfiles()
 	write_start()
 	write_survey()
