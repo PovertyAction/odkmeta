@@ -8,10 +8,14 @@ mata:
 class `FormFields' {
 	public:
 		void init()
+
 		pointer(`GroupS') rowvector groups()
 		pointer(`RepeatS') rowvector repeats()
 		pointer(`FieldS') rowvector fields()
 		pointer(`AttribSetS') scalar attributes()
+
+		`BooleanS' has_repeat(), has_field_of_type()
+		`NameR' other_lists()
 
 	private:
 		`AttribSetS' attr
@@ -558,5 +562,37 @@ pointer(`FieldS') rowvector `FormFields'::fields()
 
 pointer(`AttribSetS') scalar `FormFields'::attributes()
 	return(&attr)
+
+`BooleanS' `FormFields'::has_repeat()
+	return(length(repeats) > 1)
+
+`BooleanS' `FormFields'::has_field_of_type(`SS' type)
+{
+	`RS' i
+	if (strpos(type, " "))
+		_error("invalid type")
+	for (i = 1; i <= length(fields); i++)
+		if (regexm(fields[i]->type(), sprintf("^%s( |$)", type)))
+			return(`True')
+	return(`False')
+}
+
+`NameR' `FormFields'::other_lists()
+{
+	`RS' i
+	`NameS' list
+	`NameR' lists
+
+	lists = J(1, 0, "")
+	for (i = 1; i <= length(fields); i++) {
+		if (regexm(fields[i]->type(), "^select_(one|multiple) (.+) or_other$")) {
+			list = regexs(2)
+			if (!anyof(lists, list))
+				lists = lists, list
+		}
+	}
+
+	return(lists)
+}
 
 end
