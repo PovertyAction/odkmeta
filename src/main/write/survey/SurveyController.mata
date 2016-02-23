@@ -1,14 +1,36 @@
 vers 11.2
 
 matamac
-matainclude DoFileWriter AttribSet FormFields
+matainclude DoFileWriter AttribSet FormFields SurveyBaseWriter
 
 mata:
 
 // Using `:char evarname[charname]' instead of `evarname[charname]':
 // <http://www.stata.com/statalist/archive/2013-08/msg00186.html>.
 
-void write_survey(
+class `SurveyController' extends `SurveyBaseWriter' {
+	public:
+		virtual void write(), put()
+		void init(), write_all()
+
+	private:
+		// Output do-files
+		`SS' chardo
+		`SS' cleando1
+		`SS' cleando2
+		// Options
+		`SS' csv
+		`BooleanS' relax
+		// Other
+		pointer(`FormFieldsS') scalar fields
+		`NameS' charpre
+
+		`DoFileWriterS' df
+
+		`SS' char_name()
+}
+
+void `SurveyController'::init(
 	// Output do-files
 	`SS' chardo,
 	`SS' cleando1,
@@ -20,29 +42,48 @@ void write_survey(
 	`FormFieldsS' fields,
 	`NameS' charpre)
 {
-	`AttribSetS' attr
-	`DoFileWriterS' df
+	this.chardo = chardo
+	this.cleando1 = cleando1
+	this.cleando2 = cleando2
+	this.csv = csv
+	this.relax = relax
+	this.fields = &fields
+	this.charpre = charpre
+}
 
-	attr = *fields.attributes()
+void `SurveyController'::write(`SS' s)
+	df.write(s)
+
+void `SurveyController'::put(|`SS' s)
+	df.put(s)
+
+`NameS' `SurveyController'::char_name(`SS' attribute)
+	return(fields->attributes()->get(attribute)->char)
+
+void `SurveyController'::write_all()
+{
+	`AttribSetS' attr
+
+	attr = *fields->attributes()
 
 	// Write the characteristics do-file, a section of the final do-file that
 	// -insheet-s the .csv files and imports the characteristics.
 	df.open(chardo)
 	write_survey_start(df, attr, charpre)
-	write_fields(df, fields.fields(), attr, csv, relax)
+	write_fields(df, fields->fields(), attr, csv, relax)
 	df.close()
 
 	// Write the first cleaning do-file, a section of the final do-file that
 	// completes all cleaning before the -encode-ing of string lists.
 	// (See `ChoicesController'.)
 	df.open(cleando1)
-	if (fields.has_repeat())
+	if (fields->has_repeat())
 		write_dta_loop_start(df, attr)
-	if (fields.has_field_of_type("select_multiple")) {
-		write_rename_for_split(df, fields.repeats())
+	if (fields->has_field_of_type("select_multiple")) {
+		write_rename_for_split(df, fields->repeats())
 		write_split_select_multiple(df, attr)
 	}
-	if (fields.has_field_of_type("note"))
+	if (fields->has_field_of_type("note"))
 		write_drop_note_vars(df, attr)
 	write_dates_times(df, attr)
 	df.close()
@@ -52,23 +93,23 @@ void write_survey(
 
 	df.open(cleando2, "w", `False')
 
-	if (fields.has_field_of_type("select_one") ||
-		fields.has_field_of_type("select_multiple"))
+	if (fields->has_field_of_type("select_one") ||
+		fields->has_field_of_type("select_multiple"))
 		write_attach_vallabs(df, attr)
-	if (length(fields.other_lists()))
+	if (length(fields->other_lists()))
 		write_recode_or_other(df)
 
 	write_field_labels(df, attr)
-	write_repeat_locals(df, attr, (fields.has_repeat() ? "\`repeat'" : ""),
-		fields.has_repeat())
+	write_repeat_locals(df, attr, (fields->has_repeat() ? "\`repeat'" : ""),
+		fields->has_repeat())
 
-	if (!fields.has_repeat()) {
+	if (!fields->has_repeat()) {
 		write_clean_before_final_save(df, attr)
-		write_save_dta(df, csv, "", fields.has_repeat(), relax)
+		write_save_dta(df, csv, "", fields->has_repeat(), relax)
 	}
 	else {
 		write_dta_loop_end(df)
-		write_merge_repeats(df, fields.repeats(), attr, csv)
+		write_merge_repeats(df, fields->repeats(), attr, csv)
 	}
 
 	df.close()

@@ -2,7 +2,7 @@ vers 11.2
 
 matamac
 matainclude SurveyOptions ChoicesOptions DoStartWriter DoEndWriter ///
-	ChoicesWriter FormFields
+	ChoicesWriter FormFields SurveyWriter
 
 mata:
 
@@ -100,7 +100,8 @@ void `ODKMetaDoWriter'::write_start()
 
 void `ODKMetaDoWriter'::write_survey()
 {
-	::write_survey(
+	`SurveyWriterS' writer
+	writer.init(
 		// Output do-files
 		chardo,
 		cleando1,
@@ -112,6 +113,7 @@ void `ODKMetaDoWriter'::write_survey()
 		fields,
 		CHAR_PREFIX
 	)
+	writer.write_all()
 }
 
 void `ODKMetaDoWriter'::write_choices()

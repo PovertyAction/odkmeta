@@ -9,6 +9,7 @@ pr ste_odkmeta
 	loc writers
 		DoStart start
 		DoEnd   end
+		Survey  survey
 		Choices choices
 	;
 	#d cr

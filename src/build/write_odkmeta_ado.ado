@@ -48,7 +48,9 @@ pr write_odkmeta_ado
 			DoEndController
 			DoEndWriter
 
-			write_survey
+			SurveyBaseWriter
+			SurveyController
+			SurveyWriter
 
 			ChoicesBaseWriter
 			ChoicesController

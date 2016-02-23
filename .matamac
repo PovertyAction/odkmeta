@@ -30,6 +30,10 @@
 	DoEndController = class odkmeta_do_end_controller
 	DoEndWriter = class odkmeta_do_end_writer
 
+	SurveyBaseWriter = class odkmeta_survey_base_writer
+	SurveyController = class odkmeta_survey_controller
+	SurveyWriter = class odkmeta_survey_writer
+
 	ChoicesBaseWriter = class odkmeta_choices_base_writer
 	ChoicesController = class odkmeta_choices_controller
 	ChoicesWriter = class odkmeta_choices_writer
