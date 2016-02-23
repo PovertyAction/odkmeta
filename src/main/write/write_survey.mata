@@ -1,7 +1,7 @@
 vers 11.2
 
 matamac
-matainclude DoFileWriter AttribSet Field
+matainclude DoFileWriter AttribSet FormFields
 
 mata:
 
@@ -9,103 +9,69 @@ mata:
 // <http://www.stata.com/statalist/archive/2013-08/msg00186.html>.
 
 void write_survey(
-	/* output do-files */ `SS' _chardo, `SS' _cleando1, `SS' _cleando2,
-	/* output locals */ `SS' _anyrepeat, `SS' _otherlists, `SS' _listnamechar,
-		`SS' _isotherchar,
-	`SS' _survey, `SS' _csv,
-	/* column headers */ `SS' _type, `SS' _name, `SS' _label, `SS' _disabled,
-	`SS' _dropattrib, `SS' _keepattrib, `RS' _relax)
+	// Output do-files
+	`SS' chardo,
+	`SS' cleando1,
+	`SS' cleando2,
+	// Options
+	`SS' csv,
+	`BooleanS' relax,
+	// Other
+	`FormFieldsS' fields,
+	`NameS' charpre)
 {
-	`RS' anyselect, anymultiple, anynote, nfields, isselect, anyrepeat, i
-	`RR' col
-	`SS' charpre, list
-	`SR' otherlists
-	`SM' survey
-	`DoFileWriterS' df
 	`AttribSetS' attr
-	pointer(`GroupS') rowvector groups
-	pointer(`RepeatS') rowvector repeats
-	pointer(`FieldS') rowvector fields
+	`DoFileWriterS' df
 
-	// Get aggregate information about the fields.
-	otherlists = J(1, 0, "")
-	anyselect = anymultiple = anynote = 0
-	nfields = length(fields)
-	for (i = 1; i <= nfields; i++) {
-		isselect = 0
-		if (prematch(fields[i]->type(), "select_one "))
-			isselect = anyselect = 1
-		else if (prematch(fields[i]->type(), "select_multiple "))
-			isselect = anyselect = anymultiple = 1
-		else if (fields[i]->type() == "note")
-			anynote = 1
-
-		if (isselect) {
-			list = substr(fields[i]->type(),
-				strpos(fields[i]->type(), " ") + 1, .)
-			if (postmatch(list, " or_other")) {
-				list = substr(list, 1, strpos(list, " ") - 1)
-				if (!anyof(otherlists, list))
-					otherlists = otherlists, list
-			}
-		}
-	}
+	attr = *fields.attributes()
 
 	// Write the characteristics do-file, a section of the final do-file that
 	// -insheet-s the .csv files and imports the characteristics.
-	df.open(_chardo)
-
+	df.open(chardo)
 	write_survey_start(df, attr, charpre)
-	write_fields(df, fields, attr, _csv, _relax)
-
+	write_fields(df, fields.fields(), attr, csv, relax)
 	df.close()
 
 	// Write the first cleaning do-file, a section of the final do-file that
-	// completes all cleaning before the -encode-ing of string lists. (See
-	// -write_choices()-.)
-	df.open(_cleando1)
-
-	anyrepeat = length(repeats) > 1
-	if (anyrepeat)
+	// completes all cleaning before the -encode-ing of string lists.
+	// (See `ChoicesController'.)
+	df.open(cleando1)
+	if (fields.has_repeat())
 		write_dta_loop_start(df, attr)
-	if (anymultiple) {
-		write_rename_for_split(df, repeats)
+	if (fields.has_field_of_type("select_multiple")) {
+		write_rename_for_split(df, fields.repeats())
 		write_split_select_multiple(df, attr)
 	}
-	if (anynote)
+	if (fields.has_field_of_type("note"))
 		write_drop_note_vars(df, attr)
 	write_dates_times(df, attr)
-
 	df.close()
 
 	// Write the second cleaning do-file, a section of the final do-file that
 	// completes all cleaning after the -encode-ing of string lists.
-	df.open(_cleando2, "w", 0)
 
-	if (anyselect)
+	df.open(cleando2, "w", `False')
+
+	if (fields.has_field_of_type("select_one") ||
+		fields.has_field_of_type("select_multiple"))
 		write_attach_vallabs(df, attr)
-	if (length(otherlists))
+	if (length(fields.other_lists()))
 		write_recode_or_other(df)
 
 	write_field_labels(df, attr)
-	write_repeat_locals(df, attr, (anyrepeat ? "\`repeat'" : ""), anyrepeat)
+	write_repeat_locals(df, attr, (fields.has_repeat() ? "\`repeat'" : ""),
+		fields.has_repeat())
 
-	if (!anyrepeat) {
+	if (!fields.has_repeat()) {
 		write_clean_before_final_save(df, attr)
-		write_save_dta(df, _csv, "", anyrepeat, _relax)
+		write_save_dta(df, csv, "", fields.has_repeat(), relax)
 	}
 	else {
 		write_dta_loop_end(df)
-		write_merge_repeats(df, repeats, attr, _csv)
+		write_merge_repeats(df, fields.repeats(), attr, csv)
 	}
 
 	df.close()
-
-	// Store values in the output locals.
-	st_local(_anyrepeat,    strofreal(anyrepeat))
-	st_local(_otherlists,   invtokens(otherlists))
-	st_local(_listnamechar, attr.get("list_name")->char)
-	st_local(_isotherchar,  attr.get("is_other")->char)
 }
 
 void write_survey_start(`DoFileWriterS' df, `AttribSetS' attr, `SS' charpre)

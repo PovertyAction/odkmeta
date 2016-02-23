@@ -101,13 +101,16 @@ void `ODKMetaDoWriter'::write_start()
 void `ODKMetaDoWriter'::write_survey()
 {
 	::write_survey(
-		/* output do-files */ chardo, cleando1, cleando2,
-		/* output locals */
-			ANY_REPEAT, OTHER_LISTS, LIST_NAME_CHAR, IS_OTHER_CHAR,
-		survey->filename(), csv,
-		/* column headers */
-			survey->type(), survey->name(), survey->label(), survey->disabled(),
-		dropattrib, keepattrib, relax
+		// Output do-files
+		chardo,
+		cleando1,
+		cleando2,
+		// Options
+		csv,
+		relax,
+		// Other
+		fields,
+		CHAR_PREFIX
 	)
 }
 
