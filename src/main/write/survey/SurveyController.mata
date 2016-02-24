@@ -71,15 +71,11 @@ void `SurveyController'::put(|`SS' s)
 
 void `SurveyController'::write_all()
 {
-	`AttribSetS' attr
-
-	attr = *fields->attributes()
-
 	// Write the characteristics do-file, a section of the final do-file that
 	// -insheet-s the .csv files and imports the characteristics.
 	df.open(chardo)
-	write_survey_start(df, attr, charpre)
-	write_fields(df, fields->fields(), attr, csv, relax)
+	write_survey_start()
+	write_fields()
 	df.close()
 
 	// Write the first cleaning do-file, a section of the final do-file that
@@ -89,7 +85,7 @@ void `SurveyController'::write_all()
 	if (fields->has_repeat())
 		write_dta_loop_start()
 	if (fields->has_field_of_type("select_multiple")) {
-		write_rename_for_split(df, fields->repeats())
+		write_rename_for_split()
 		write_split_select_multiple()
 	}
 	if (fields->has_field_of_type("note"))
@@ -112,27 +108,27 @@ void `SurveyController'::write_all()
 	write_repeat_locals()
 
 	if (!fields->has_repeat()) {
-		write_clean_before_final_save(df, attr)
+		write_clean_before_final_save()
 		write_save_dta("")
 	}
 	else {
 		write_dta_loop_end()
-		write_merge_repeats(df, fields->repeats(), attr, csv)
+		write_merge_repeats()
 	}
 
 	df.close()
 }
 
-void `SurveyController'::write_survey_start(`DoFileWriterS' df, `AttribSetS' attr, `SS' charpre)
+void `SurveyController'::write_survey_start()
 {
 	`RS' ndiffs, i
 	`RR' form
 	`RC' diff
 	`SR' headers, chars
 
-	form = attr.vals("form")
-	headers = select(attr.vals("header"), form)
-	chars   = select(attr.vals("char"),   form)
+	form = fields->attributes()->vals("form")
+	headers = select(fields->attributes()->vals("header"), form)
+	chars   = select(fields->attributes()->vals("char"),   form)
 
 	diff = headers :!= subinstr(chars, charpre, "", 1)
 	ndiffs = sum(diff)
@@ -161,11 +157,14 @@ void `SurveyController'::write_survey_start(`DoFileWriterS' df, `AttribSetS' att
 	return(`True')
 }
 
-void `SurveyController'::write_char(`DoFileWriterS' df, `SS' var, `SS' char, `SS' text, `SS' suffix,
+void `SurveyController'::write_char(`SS' var, `SS' attribute, `SS' text, `SS' suffix,
 	`RS' loop)
 {
 	`RS' autotab, nstrs
 	`SS' exp
+	`NameS' char
+
+	char = char_name(attribute)
 
 	if (text != "" | suffix != "") {
 		pragma unset nstrs
@@ -186,19 +185,19 @@ void `SurveyController'::write_char(`DoFileWriterS' df, `SS' var, `SS' char, `SS
 	}
 }
 
-void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowvector fields,
-	`AttribSetS' attr, `SS' _csv, `RS' _relax)
+void `SurveyController'::write_fields()
 {
-	`RS' relax, nfields, firstrepeat, insheetmain, nattribs, ngroups, other,
+	`RS' nfields, firstrepeat, insheetmain, nattribs, ngroups, other,
 		geopoint, loop, pctr, i, j
 	`RC' p
 	`RM' order
 	`SS' var, badname, list, space
 	`SR' attribchars, suffix
 	`InsheetCodeS' insheet
+	pointer(`FieldS') rowvector fields
 	pointer(`GroupS') rowvector groups
 
-	relax = _relax != 0
+	fields = this.fields->fields()
 
 	// Write fields according to repeat()->order() .order().
 	if (nfields = length(fields)) {
@@ -212,7 +211,8 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 
 	firstrepeat = 1
 	insheetmain = 0
-	attribchars = select(attr.vals("char"), !attr.vals("special"))
+	attribchars = select(this.fields->attributes()->vals("name"),
+		!this.fields->attributes()->vals("special"))
 	nattribs = length(attribchars)
 	for (pctr = 1; pctr <= nfields; pctr++) {
 		i = p[pctr]
@@ -227,20 +227,20 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 
 			df.put("* begin repeat " + fields[i]->repeat()->name())
 			df.put("")
-			write_insheet(_csv + "-" + fields[i]->repeat()->long_name() + ".csv",
+			write_insheet(csv + "-" + fields[i]->repeat()->long_name() + ".csv",
 				insheetable_names(fields, fields[i]->repeat()->long_name()))
 
-			if (_relax) {
+			if (relax) {
 				df.put("local formnotdata")
 				df.put("")
 			}
 		}
 		// Start of the main .csv file
 		else if (fields[i]->repeat()->main() & !insheetmain) {
-			write_insheet(_csv + ".csv", insheetable_names(fields, ""))
+			write_insheet(csv + ".csv", insheetable_names(fields, ""))
 			insheetmain = 1
 
-			if (_relax) {
+			if (relax) {
 				df.put("local formnotdata")
 				df.put("")
 			}
@@ -249,9 +249,8 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 		// begin group
 		groups = fields[i]->begin_groups()
 		if (ngroups = length(groups)) {
-			for (j = 1; j <= ngroups; j++) {
+			for (j = 1; j <= ngroups; j++)
 				df.put("* begin group " + groups[j]->name())
-			}
 			df.put("")
 		}
 
@@ -271,9 +270,8 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 			suffix = ""
 		if (loop = geopoint | other) {
 			df.write("foreach suffix in ")
-			for (j = 1; j <= length(suffix); j++) {
+			for (j = 1; j <= length(suffix); j++)
 				df.write(adorn_quotes(suffix[j], "list") + " ")
-			}
 			df.put("{")
 		}
 
@@ -332,9 +330,8 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 
 				badname = "\`isbadname'"
 			}
-			else {
+			else
 				badname = "1"
-			}
 
 			var = "\`var'"
 		}
@@ -348,47 +345,34 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 		}
 
 		// Field name
-		write_char(df, var, attr.get("name")->char,
-			fields[i]->name(), "", loop)
-		write_char(df, var, attr.get("bad_name")->char,
-			"", badname, loop)
+		write_char(var, "name", fields[i]->name(), "", loop)
+		write_char(var, "bad_name", "", badname, loop)
 
 		// Group
-		if (fields[i]->group()->inside()) {
-			write_char(df, var, attr.get("group")->char,
-				fields[i]->group()->st_list(), "", loop)
-		}
-		write_char(df, var, attr.get("long_name")->char,
-			fields[i]->long_name(), "", loop)
+		if (fields[i]->group()->inside())
+			write_char(var, "group", fields[i]->group()->st_list(), "", loop)
+		write_char(var, "long_name", fields[i]->long_name(), "", loop)
 
 		// Repeat
-		if (fields[i]->repeat()->inside()) {
-			write_char(df, var, attr.get("repeat")->char,
-				fields[i]->repeat()->long_name(), "", loop)
-		}
+		if (fields[i]->repeat()->inside())
+			write_char(var, "repeat", fields[i]->repeat()->long_name(), "", loop)
 
 		// Type
-		write_char(df, var, attr.get("type")->char,
-			fields[i]->type(), "", loop)
+		write_char(var, "type", fields[i]->type(), "", loop)
 		if (prematch(fields[i]->type(), "select_one ") |
 			prematch(fields[i]->type(), "select_multiple ")) {
 			list = substr(fields[i]->type(),
 				strpos(fields[i]->type(), " ") + 1, .)
 			if (postmatch(list, " or_other"))
 				list = substr(list, 1, strpos(list, " ") - 1)
-			write_char(df, var, attr.get("list_name")->char,
-				list, "", loop)
+			write_char(var, "list_name", list, "", loop)
 		}
-		else if (geopoint) {
-			write_char(df, var, attr.get("geopoint")->char,
-				"", "\`suffix'", loop)
-		}
-		write_char(df, var, attr.get("or_other")->char,
-			(other ? "1" : "0"), "", loop)
+		else if (geopoint)
+			write_char(var, "geopoint", "", "\`suffix'", loop)
+		write_char(var, "or_other", (other ? "1" : "0"), "", loop)
 		if (other)
 			df.put(`"local isother = "\`suffix'" != """')
-		write_char(df, var, attr.get("is_other")->char,
-			(other ? "" : "0"), other * "\`isother'", loop)
+		write_char(var, "is_other", (other ? "" : "0"), other * "\`isother'", loop)
 
 		// Label
 		if (fields[i]->label() != "") {
@@ -397,16 +381,13 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 				df.put(sprintf("local labend " +
 					`""\`=cond("\`suffix'" == "", "", "%s(Other)")'""', space))
 			}
-			write_char(df, var, attr.get("label")->char,
-				fields[i]->label(),
+			write_char(var, "label", fields[i]->label(),
 				loop * (geopoint ? space + "(\`suffix')" : "\`labend'"), loop)
 		}
 
 		// Other attributes
-		for (j = 1; j <= nattribs; j++) {
-			write_char(df, var, attribchars[j],
-				fields[i]->attrib(j), "", loop)
-		}
+		for (j = 1; j <= nattribs; j++)
+			write_char(var, attribchars[j], fields[i]->attrib(j), "", loop)
 
 		if (relax)
 			df.put("}")
@@ -420,9 +401,8 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 		// end group
 		groups = fields[i]->end_groups()
 		if (ngroups = length(groups)) {
-			for (j = 1; j <= ngroups; j++) {
+			for (j = 1; j <= ngroups; j++)
 				df.put("* end group " + groups[j]->name())
-			}
 			df.put("")
 		}
 		// end repeat
@@ -434,20 +414,21 @@ void `SurveyController'::write_fields(`DoFileWriterS' df, pointer(`FieldS') rowv
 	}
 }
 
-void `SurveyController'::write_rename_for_split(`DoFileWriterS' df,
-	pointer(`RepeatS') rowvector repeats)
+void `SurveyController'::write_rename_for_split()
 {
 	`RS' n, i
+	pointer(`RepeatS') scalar repeat
 
 	df.put("* Rename any variable names that are difficult for -split-.")
-	n = length(repeats)
+	n = length(fields->repeats())
 	if (n == 1)
 		df.put("// rename ...")
 	else {
 		for (i = 1; i <= n; i++) {
+			repeat = fields->repeats()[i]
 			df.put(sprintf(`"%sif "\`repeat'" == %s%s {"',
-				(i > 1) * "else ", adorn_quotes(repeats[i]->long_name()),
-				repeats[i]->main() * " /* main fields (not a repeat group) */"))
+				(i > 1) * "else ", adorn_quotes(repeat->long_name()),
+				repeat->main() * " /* main fields (not a repeat group) */"))
 			df.put("// rename ...")
 			df.put("}")
 		}
@@ -459,15 +440,14 @@ void `SurveyController'::write_rename_for_split(`DoFileWriterS' df,
 // an end-user dataset immediately before it is saved.
 // It is destructive, dropping characteristics for instance, so
 // it is usually best to limit any code between this clean and -save-.
-void `SurveyController'::write_clean_before_final_save(`DoFileWriterS' df, `AttribSetS' attr)
+void `SurveyController'::write_clean_before_final_save()
 {
-	// Implement -dropattrib()- and -keepattrib()-.
 	write_drop_attrib()
 	write_compress()
 }
 
-void `SurveyController'::write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS') scalar repeat,
-	`AttribSetS' attr, `BooleanS' finalsave)
+void `SurveyController'::write_merge_repeat(pointer(`RepeatS') scalar repeat,
+	`BooleanS' finalsave)
 {
 	`RS' nchildren, multiple, i
 	`SS' loopname, setof
@@ -505,19 +485,21 @@ void `SurveyController'::write_merge_repeat(`DoFileWriterS' df, pointer(`RepeatS
 	df.put("")
 
 	if (finalsave)
-		write_clean_before_final_save(df, attr)
+		write_clean_before_final_save()
 
 	df.put("save, replace")
 	df.put("")
 }
 
-void `SurveyController'::write_merge_repeats(`DoFileWriterS' df,
-	pointer(`RepeatS') rowvector repeats, `AttribSetS' attr, `SS' _csv)
+void `SurveyController'::write_merge_repeats()
 {
 	`RS' nrepeats, pctr, i
 	`RC' order, p
 	// "dtaq" for ".dta (with) quotes"
 	`SS' repeatcsv, dtaq
+	pointer(`RepeatS') rowvector repeats
+
+	repeats = fields->repeats()
 
 	// Write repeats according to .order().
 	if (nrepeats = length(repeats)) {
@@ -538,7 +520,7 @@ void `SurveyController'::write_merge_repeats(`DoFileWriterS' df,
 			"Main fields (not a repeat group)"))
 		df.put("")
 
-		repeatcsv = _csv + repeats[i]->inside() * "-" + repeats[i]->long_name()
+		repeatcsv = csv + repeats[i]->inside() * "-" + repeats[i]->long_name()
 		dtaq = adorn_quotes(repeatcsv + (strpos(repeatcsv, ".") ? ".dta" : ""),
 			"list")
 		df.put(sprintf("use %s, clear", dtaq))
@@ -550,13 +532,13 @@ void `SurveyController'::write_merge_repeats(`DoFileWriterS' df,
 		df.put("")
 
 		if (length(repeats[i]->children()))
-			write_merge_repeat(df, repeats[i], attr, repeats[i]->main())
+			write_merge_repeat(repeats[i], repeats[i]->main())
 		if (repeats[i]->inside()) {
 			write_reshape_repeat(repeats[i])
 
 			df.put(sprintf("use %s, clear", dtaq))
 			df.put("")
-			write_clean_before_final_save(df, attr)
+			write_clean_before_final_save()
 			df.put("save, replace")
 			df.put("")
 		}
