@@ -2,7 +2,7 @@ vers 11.2
 
 matamac
 matainclude SurveyOptions ChoicesOptions DoStartWriter DoEndWriter ///
-	ChoicesWriter FormFields SurveyWriter
+	ChoicesWriter FormFields SurveyWriter FormLists
 
 mata:
 
@@ -16,11 +16,7 @@ class `ODKMetaDoWriter' {
 		// Main
 		`SS' filename
 		`SS' csv
-		pointer(`SurveyOptionsS') scalar survey
-		pointer(`ChoicesOptionsS') scalar choices
 		// Fields
-		`SS' dropattrib
-		`SS' keepattrib
 		`BooleanS' relax
 		// Lists
 		`SS' other
@@ -28,13 +24,15 @@ class `ODKMetaDoWriter' {
 		// Non-option values
 		`SS' command_line
 
+		// Form
 		`FormFieldsS' fields
+		`FormListsS' lists
 
 		// tempfiles
 		`SS' startdo, enddo, chardo, cleando1, cleando2, vallabdo, encodedo,
 			fulldo
 
-		void define_fields(), define_tempfiles()
+		void parse_form(), define_tempfiles()
 		void write_start(), write_survey(), write_choices(), write_end()
 		void tab_file(), append_files(), copy(), append_and_save()
 }
@@ -59,18 +57,17 @@ void `ODKMetaDoWriter'::init(
 	`SS' other,
 	`BooleanS' oneline,
 	// Non-option values
-	`SS' command_line
-) {
+	`SS' command_line)
+{
 	this.filename = filename
 	this.csv = csv
-	this.survey = &survey
-	this.choices = &choices
-	this.dropattrib = dropattrib
-	this.keepattrib = keepattrib
 	this.relax = relax
 	this.other = other
 	this.oneline = oneline
 	this.command_line = command_line
+
+	fields.init(survey, dropattrib, keepattrib, CHAR_PREFIX)
+	lists.init(choices)
 }
 
 void `ODKMetaDoWriter'::define_tempfiles()
@@ -83,12 +80,6 @@ void `ODKMetaDoWriter'::define_tempfiles()
 	vallabdo = st_tempfilename()
 	encodedo = st_tempfilename()
 	fulldo   = st_tempfilename()
-}
-
-void `ODKMetaDoWriter'::define_fields()
-{
-	fields = `FormFields'()
-	fields.init(*survey, dropattrib, keepattrib, CHAR_PREFIX)
 }
 
 void `ODKMetaDoWriter'::write_start()
@@ -123,12 +114,12 @@ void `ODKMetaDoWriter'::write_choices()
 		// Output do-files
 		vallabdo,
 		encodedo,
+		// Form
+		fields,
+		lists,
 		// Options
-		*choices,
 		other,
-		oneline,
-		// Fields
-		fields
+		oneline
 	)
 	writer.write_all()
 }
@@ -197,7 +188,6 @@ void `ODKMetaDoWriter'::append_and_save()
 
 void `ODKMetaDoWriter'::write()
 {
-	define_fields()
 	define_tempfiles()
 	write_start()
 	write_survey()

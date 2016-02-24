@@ -38,7 +38,9 @@ pr write_odkmeta_ado
 			Attrib
 			AttribSet
 			FormFields
+
 			List
+			FormLists
 
 			DoStartBaseWriter
 			DoStartController

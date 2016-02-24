@@ -1,7 +1,7 @@
 vers 11.2
 
 matamac
-matainclude DoFileWriter List ChoicesBaseWriter ChoicesOptions FormFields
+matainclude DoFileWriter List ChoicesBaseWriter FormFields FormLists
 
 mata:
 
@@ -14,16 +14,16 @@ class `ChoicesController' extends `ChoicesBaseWriter' {
 		// Output do-files
 		`SS' vallabdo
 		`SS' encodedo
+		// Form
+		pointer(`FormFieldsS') scalar fields
+		pointer(`FormListsS') scalar lists
 		// Options
-		pointer(`ChoicesOptionsS') scalar options
 		`SS' other
 		`BooleanS' oneline
-		// Fields
-		pointer(`FormFieldsS') scalar fields
 
 		`DoFileWriterS' df
-		`ListR' lists
 
+		`SS' string_lists()
 		`TM' cp()
 		`NameS' char_name()
 		void write_lists(), write_sysmiss_labs()
@@ -33,19 +33,19 @@ void `ChoicesController'::init(
 	// Output do-files
 	`SS' vallabdo,
 	`SS' encodedo,
+	// Form
+	`FormFieldsS' fields,
+	`FormListsS' lists,
 	// Options
-	`ChoicesOptionsS' options,
 	`SS' other,
-	`BooleanS' oneline,
-	// Fields
-	`FormFieldsS' fields)
+	`BooleanS' oneline)
 {
 	this.vallabdo = vallabdo
 	this.encodedo = encodedo
-	this.options = &options
+	this.fields = &fields
+	this.lists = &lists
 	this.other = other
 	this.oneline = oneline
-	this.fields = &fields
 }
 
 void `ChoicesController'::write(`SS' s)
@@ -78,9 +78,9 @@ void `ChoicesController'::write_lists(|`SS' action)
 
 	ls = `List'(0)
 	labdef = action != "encode"
-	nlists = length(lists)
+	nlists = lists->length()
 	for (i = 1; i <= nlists; i++) {
-		list = cp(lists[i])
+		list = cp(*lists->get(i))
 		// Defining the label
 		if (labdef) {
 			if (!list.vallab)
@@ -211,10 +211,10 @@ void `ChoicesController'::write_sysmiss_labs()
 	`SR' listnames
 
 	listnames = J(1, 0, "")
-	nlists = length(lists)
+	nlists = lists->length()
 	for (i = 1; i <= nlists; i++) {
-		if (any(lists[i].names :== adorn_quotes(".")))
-			listnames = listnames, lists[i].listname
+		if (any(lists->get(i)->names :== adorn_quotes(".")))
+			listnames = listnames, lists->get(i)->listname
 	}
 
 	if (nsysmiss = length(listnames)) {
@@ -232,74 +232,32 @@ void `ChoicesController'::write_sysmiss_labs()
 	}
 }
 
+`SS' `ChoicesController'::string_lists()
+{
+	`RS' i
+	`SS' strlists
+	pointer(`ListS') scalar list
+
+	pragma unset strlists
+	for (i = 1; i <= lists->length(); i++) {
+		list = lists->get(i)
+		if (!list->vallab)
+			strlists = strlists + (strlists != "") * " " + list->listname
+	}
+
+	return(strlists)
+}
+
 void `ChoicesController'::write_all()
 {
-	`RS' listname, name, label, rows, nvals, nstrs, i, j
-	`RR' col
 	`SS' strlists
-	`SR' listnames
-	`SM' choices
-	`ListS' list
-
-	choices = read_csv(options->filename())
-	if (rows(choices) < 2)
-		return
-
-	col = 1..cols(choices)
-	listname = min(select(col, choices[1,] :== options->list_name()))
-	name     = min(select(col, choices[1,] :== options->name()))
-	label    = min(select(col, choices[1,] :== options->label()))
-	choices = choices[,(listname, name, label)]
-	listname = 1
-	name     = 2
-	label    = 3
-	choices = choices[|2, . \ ., .|]
-	choices[,(listname, name)] = strtrim(choices[,(listname, name)])
 
 	df.open(vallabdo)
+
 	df.put("label drop _all")
 	df.put("")
 
-	if (rows = rows(choices)) {
-		lists = `List'(0)
-		strlists = ""
-		listnames = J(1, 0, "")
-		for (i = 1; i <= rows; i++) {
-			if (!anyof(listnames, choices[i, listname])) {
-				list.listname = choices[i, listname]
-				listnames = listnames, list.listname
-				list.names  = select(choices[,name],
-					choices[,listname] :== list.listname)
-				list.labels = select(choices[,label],
-					choices[,listname] :== list.listname)
-				// .vallab is 1 if list looks like an ordinary Stata value
-				// label, and all its names are integers; it is 0 otherwise.
-				list.vallab = !hasmissing(strtoreal(list.names)) &
-					strtoreal(list.names) == floor(strtoreal(list.names)) &
-					/* Distinct names can be converted to the same number, e.g.,
-					1 and 01; guard against this. */
-					length(uniqrows(list.names)) ==
-					length(uniqrows(strtoreal(list.names)))
-				if (!list.vallab)
-					strlists = strlists + (strlists != "") * " " + list.listname
-
-				// .matalab is 1 if the value label must be created in Mata; it
-				// is 0 if not.
-				list.matalab = 0
-				nvals = length(list.names)
-				for (j = 1; j <= nvals; j++) {
-					if (!list.vallab)
-						list.names[j] = specialexp(list.names[j])
-					pragma unset nstrs
-					list.labels[j] = specialexp(list.labels[j], nstrs)
-					if (nstrs > 1)
-						list.matalab = 1
-				}
-
-				lists = lists, list
-			}
-		}
-
+	if (lists->length() > 0) {
 		write_lists()
 		write_sysmiss_labs()
 
@@ -313,6 +271,7 @@ void `ChoicesController'::write_all()
 
 	df.open(encodedo)
 
+	strlists = string_lists()
 	if (strlists != "") {
 		write_encode_start(strlists)
 		write_lists("encode")
