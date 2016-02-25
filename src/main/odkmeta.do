@@ -157,11 +157,11 @@ pr check_col
 end
 
 /* -parse_survey- completes checking that involves single rows of the survey
-sheet; the rest is done in -write_survey()-. Unlike -write_survey()-,
+sheet; the rest is done in `FormFields'. Unlike `FormFields',
 -parse_survey- displays the problematic row, and in general, where possible
 it is better to implement a check in -parse_survey- rather than
--write_survey()-. However, all complex checks that involve Mata are best put
-in -write_survey()-. */
+`FormFields'. However, all complex checks that involve Mata are best put
+in `FormFields'. */
 pr parse_survey, sclass
 	cap noi syntax anything(name=fn id=filename equalok everything), ///
 		[Type(str) name(str) LAbel(str) Disabled(str)]

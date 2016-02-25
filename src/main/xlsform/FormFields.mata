@@ -462,8 +462,6 @@ void `FormFields'::check_duplicate_repeat_names(pointer(`RepeatS') rowvector rep
 }
 
 // See the comments for -_get_fields()-.
-// -get_fields()- and not -write_survey()- should do all the validation of
-// fields, groups, and repeats.
 void `FormFields'::get_fields(pointer(`FieldS') rowvector fields,
 	pointer(`GroupS') rowvector groups, pointer(`RepeatS') rowvector repeats,
 	`SM' survey, `AttribSetS' attr)

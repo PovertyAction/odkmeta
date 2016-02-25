@@ -24,23 +24,9 @@
 	List = struct odk_list
 	FormLists = class odk_form_lists
 
-	DoStartBaseWriter = class odkmeta_do_start_base_writer
-	DoStartController = class odkmeta_do_start_controller
-	DoStartWriter = class odkmeta_do_start_writer
-
-	DoEndBaseWriter = class odkmeta_do_end_base_writer
-	DoEndController = class odkmeta_do_end_controller
-	DoEndWriter = class odkmeta_do_end_writer
-
-	SurveyBaseWriter = class odkmeta_survey_base_writer
-	SurveyController = class odkmeta_survey_controller
-	SurveyWriter = class odkmeta_survey_writer
-
-	ChoicesBaseWriter = class odkmeta_choices_base_writer
-	ChoicesController = class odkmeta_choices_controller
-	ChoicesWriter = class odkmeta_choices_writer
-
-	ODKMetaDoWriter = class odkmeta_do_writer
+	ODKMetaBaseWriter = class odkmeta_base_writer
+	ODKMetaController = class odkmeta_controller
+	ODKMetaWriter = class odkmeta_writer
 
 [enum]
 	InsheetCode = (Insheet) OK Bad Dup V

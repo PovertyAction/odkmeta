@@ -39,3 +39,5 @@ foreach var in values text {
 	}
 }
 
+label drop _all
+

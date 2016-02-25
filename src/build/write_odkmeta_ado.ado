@@ -42,23 +42,9 @@ pr write_odkmeta_ado
 			List
 			FormLists
 
-			DoStartBaseWriter
-			DoStartController
-			DoStartWriter
-
-			DoEndBaseWriter
-			DoEndController
-			DoEndWriter
-
-			SurveyBaseWriter
-			SurveyController
-			SurveyWriter
-
-			ChoicesBaseWriter
-			ChoicesController
-			ChoicesWriter
-
-			ODKMetaDoWriter
+			ODKMetaBaseWriter
+			ODKMetaController
+			ODKMetaWriter
 
 			odkmeta
 		)

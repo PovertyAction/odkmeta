@@ -1,35 +1,48 @@
 vers 11.2
 
 matamac
-matainclude DoFileWriter AttribSet FormFields SurveyBaseWriter
+matainclude ODKMetaBaseWriter SurveyOptions ChoicesOptions FormFields ///
+	FormLists DoFileWriter
 
 mata:
 
-// Using `:char evarname[charname]' instead of `evarname[charname]':
-// <http://www.stata.com/statalist/archive/2013-08/msg00186.html>.
-
-class `SurveyController' extends `SurveyBaseWriter' {
+class `ODKMetaController' extends `ODKMetaBaseWriter' {
 	public:
 		virtual void write(), put()
-		void init(), write_all()
+		void new(), init(), write_all()
 
-	private:
-		// Output do-files
-		`SS' chardo
-		`SS' cleando1
-		`SS' cleando2
-		// Options
+	protected:
+		static `NameS' CHAR_PREFIX
+
+		// Main
+		`SS' filename
 		`SS' csv
+		// Fields
 		`BooleanS' relax
-		// Other
-		pointer(`FormFieldsS') scalar fields
-		`NameS' charpre
+		// Lists
+		`SS' other
+		`BooleanS' oneline
+		// Non-option values
+		`SS' command_line
+
+		// Form
+		`FormFieldsS' fields
+		`FormListsS' lists
 
 		`DoFileWriterS' df
 
-		`SS' char_name()
+		// Helpers
+		`SS' current_date()
+		`SS' string_lists()
+		`TM' cp()
 		`BooleanS' insheetable_names()
+		`NameS' char_name()
+		void copy()
 
+	private:
+		// Control logic
+		void write_lists()
+		void write_sysmiss_labs()
 		void write_survey_start()
 		void write_char()
 		void write_fields()
@@ -39,75 +52,115 @@ class `SurveyController' extends `SurveyBaseWriter' {
 		void write_merge_repeats()
 }
 
-void `SurveyController'::init(
-	// Output do-files
-	`SS' chardo,
-	`SS' cleando1,
-	`SS' cleando2,
-	// Options
-	`SS' csv,
-	`BooleanS' relax,
-	// Other
-	`FormFieldsS' fields,
-	`NameS' charpre)
+/* -------------------------------------------------------------------------- */
+					/* initialize */
+
+void `ODKMetaController'::new()
 {
-	this.chardo = chardo
-	this.cleando1 = cleando1
-	this.cleando2 = cleando2
-	this.csv = csv
-	this.relax = relax
-	this.fields = &fields
-	this.charpre = charpre
+	if (CHAR_PREFIX == "")
+		CHAR_PREFIX = "Odk_"
 }
 
-void `SurveyController'::write(`SS' s)
+void `ODKMetaController'::init(
+	// Main
+	`SS' filename,
+	`SS' csv,
+	`SurveyOptionsS' survey,
+	`ChoicesOptionsS' choices,
+	// Fields
+	`SS' dropattrib,
+	`SS' keepattrib,
+	`BooleanS' relax,
+	// Lists
+	`SS' other,
+	`BooleanS' oneline,
+	// Non-option values
+	`SS' command_line)
+{
+	this.filename = filename
+	this.csv = csv
+	this.relax = relax
+	this.other = other
+	this.oneline = oneline
+	this.command_line = command_line
+
+	fields.init(survey, dropattrib, keepattrib, CHAR_PREFIX)
+	lists.init(choices)
+}
+
+					/* initialize */
+/* -------------------------------------------------------------------------- */
+
+
+/* -------------------------------------------------------------------------- */
+					/* override write() and put() */
+
+void `ODKMetaController'::write(`SS' s)
 	df.write(s)
 
-void `SurveyController'::put(|`SS' s)
+void `ODKMetaController'::put(|`SS' s)
 	df.put(s)
 
-`NameS' `SurveyController'::char_name(`SS' attribute)
-	return(fields->attributes()->get(attribute)->char)
+					/* override write() and put() */
+/* -------------------------------------------------------------------------- */
 
-void `SurveyController'::write_all()
+
+/* -------------------------------------------------------------------------- */
+					/* core logic */
+
+void `ODKMetaController'::write_all()
 {
-	// Write the characteristics do-file, a section of the final do-file that
-	// -insheet-s the .csv files and imports the characteristics.
-	df.open(chardo)
+	`SS' in_progress, strlists
+
+	in_progress = st_tempfilename()
+	df.open(in_progress)
+
+	write_do_start()
+
+	if (lists.length() > 0) {
+		write_lists()
+		write_sysmiss_labs()
+
+		if (length(fields.other_lists()))
+			write_other_labs()
+
+		write_save_label_info()
+	}
+
 	write_survey_start()
 	write_fields()
-	df.close()
 
-	// Write the first cleaning do-file, a section of the final do-file that
-	// completes all cleaning before the -encode-ing of string lists.
-	// (See `ChoicesController'.)
-	df.open(cleando1)
-	if (fields->has_repeat())
+	if (fields.has_repeat())
 		write_dta_loop_start()
-	if (fields->has_field_of_type("select_multiple")) {
+
+	if (fields.has_field_of_type("select_multiple")) {
 		write_rename_for_split()
 		write_split_select_multiple()
 	}
-	if (fields->has_field_of_type("note"))
+
+	if (fields.has_field_of_type("note"))
 		write_drop_note_vars()
+
 	write_dates_times()
-	df.close()
 
-	// Write the second cleaning do-file, a section of the final do-file that
-	// completes all cleaning after the -encode-ing of string lists.
+	strlists = string_lists()
+	if (strlists != "") {
+		write_encode_start(strlists)
+		write_lists("encode")
+		write_encode_end()
+	}
 
-	df.open(cleando2, "w", `False')
-
-	if (fields->has_field_of_type("select_one") ||
-		fields->has_field_of_type("select_multiple"))
+	if (fields.has_field_of_type("select_one") ||
+		fields.has_field_of_type("select_multiple"))
 		write_attach_vallabs()
-	if (length(fields->other_lists()))
+
+	if (length(fields.other_lists()))
 		write_recode_or_other()
 
 	write_field_labels()
 	write_repeat_locals()
 
-	if (!fields->has_repeat()) {
+	if (!fields.has_repeat()) {
 		write_clean_before_final_save()
 		write_save_dta("")
 	}
@@ -116,21 +169,249 @@ void `SurveyController'::write_all()
 		write_merge_repeats()
 	}
 
+	write_do_end()
+
 	df.close()
+	copy(in_progress, filename)
 }
 
-void `SurveyController'::write_survey_start()
+					/* core logic */
+/* -------------------------------------------------------------------------- */
+
+
+/* -------------------------------------------------------------------------- */
+					/* helpers */
+
+`SS' `ODKMetaController'::current_date()
+	return(strofreal(date(c("current_date"), "DMY"), "%tdMonth_dd,_CCYY"))
+
+`SS' `ODKMetaController'::string_lists()
+{
+	`RS' i
+	`SS' strlists
+	pointer(`ListS') scalar list
+
+	pragma unset strlists
+	for (i = 1; i <= lists.length(); i++) {
+		list = lists.get(i)
+		if (!list->vallab)
+			strlists = strlists + (strlists != "") * " " + list->listname
+	}
+
+	return(strlists)
+}
+
+// See <http://www.stata.com/statalist/archive/2013-04/msg00684.html> and
+// <http://www.stata.com/statalist/archive/2006-05/msg00276.html>.
+`TM' `ODKMetaController'::cp(transmorphic original)
+{
+	transmorphic copy
+
+	copy = original
+	return(copy)
+}
+
+`BooleanS' `ODKMetaController'::insheetable_names(pointer(`FieldS') rowvector fields,
+	`SS' repeatname)
+{
+	`RS' i
+	for (i = 1; i <= length(fields); i++)
+		if (fields[i]->repeat()->long_name() == repeatname &
+			fields[i]->insheet() != `InsheetOK')
+			return(`False')
+	return(`True')
+}
+
+`NameS' `ODKMetaController'::char_name(`SS' attribute)
+	return(fields.attributes()->get(attribute)->char)
+
+void `ODKMetaController'::copy(`SS' from, `SS' to)
+	stata(sprintf(`"qui copy `"%s"' `"%s"', replace"', from, to))
+
+					/* helpers */
+/* -------------------------------------------------------------------------- */
+
+
+/* -------------------------------------------------------------------------- */
+					/* control logic */
+
+void `ODKMetaController'::write_lists(|`SS' action)
+{
+	// "nassoc" for "number of associations"
+	`RS' labdef, nlists, mindelim, maxdelim, delim, nassoc, maxspaces, i, j
+	`RC' diff
+	`ListS' list
+	// "ls" for "lists"
+	`ListR' ls
+
+	ls = `List'(0)
+	labdef = action != "encode"
+	nlists = lists.length()
+	for (i = 1; i <= nlists; i++) {
+		list = cp(*lists.get(i))
+		// Defining the label
+		if (labdef) {
+			if (!list.vallab)
+				list.names = strofreal(1::rows(list.names), `RealFormat')
+			if (!list.matalab) {
+				list.labels = adorn_quotes(strip_quotes(list.labels), "label")
+			}
+			ls = ls, list
+		}
+		// Encoding
+		else if (!list.vallab) {
+			// Exclude name-label associations if the name equals the label.
+			diff = list.names :!= list.labels
+			if (any(diff)) {
+				list.names  = select(list.names,  diff)
+				list.labels = select(list.labels, diff)
+				ls = ls, list
+			}
+		}
+	}
+
+	// mindelim is the index of the list before which -#delimit ;- is required.
+	// maxdelim is the index of the list after which -#delimit cr- is required.
+	mindelim = maxdelim = 0
+	nlists = length(ls)
+	if (labdef & !oneline) {
+		/* Make mindelim the index of the first list that does not require Mata.
+		Make maxdelim the index of the last list that does not require Mata.
+		The definitions will appear as follows:
+
+		Lists that require Mata
+		#delimit ;
+		List that does not require Mata
+		Lists
+		List that does not require Mata
+		#delimit cr
+		Lists that require Mata
+
+		All the above elements are optional. If there are no lists that do not
+		require Mata, the -#delimit- commands are skipped.
+		*/
+		for (i = 1; i <= nlists; i++) {
+			if (!ls[i].matalab) {
+				mindelim = mindelim ? mindelim : i
+				maxdelim = i
+			}
+		}
+	}
+
+	for (i = 1; i <= nlists; i++) {
+		if (i == mindelim)
+			df.put("#delimit ;")
+
+		delim = i >= mindelim & i <= maxdelim
+		if (!(labdef & oneline)) {
+			df.put(sprintf("* %s%s", ls[i].listname, delim * ";"))
+		}
+
+		// Start of the label
+		if (!labdef) {
+			df.put(sprintf(`"%sif "\`list'" == "%s" {"',
+				(i > 1) * "else ", ls[i].listname))
+		}
+		else if (!ls[i].matalab) {
+			df.write("label define " + ls[i].listname)
+			if (!oneline) {
+				df.put("")
+				df.indent()
+			}
+		}
+
+		// Middle of the label: write each association.
+		nassoc = length(ls[i].labels)
+		if (!labdef)
+			maxspaces = max(strlen(ls[i].labels))
+		else if (!ls[i].matalab)
+			maxspaces = max(strlen(ls[i].names))
+		for (j = 1; j <= nassoc; j++) {
+			// -replace-
+			if (!labdef) {
+				df.put(sprintf("replace \`temp' = %s%s if \`var' == %s",
+					ls[i].labels[j],
+					" " * (maxspaces - strlen(ls[i].labels[j])),
+					ls[i].names[j]))
+			}
+			// -label define-
+			else if (!ls[i].matalab) {
+				if (oneline)
+					df.write(sprintf(" %s %s", ls[i].names[j], ls[i].labels[j]))
+				else {
+					df.put(ls[i].names[j] +
+						" " * (maxspaces - strlen(ls[i].names[j]) + 1) +
+						ls[i].labels[j])
+				}
+			}
+			// -st_vlmodify()-
+			else {
+				df.write(sprintf(`"mata: st_vlmodify("%s", %s, %s)"',
+					ls[i].listname, ls[i].names[j], ls[i].labels[j]))
+				if (delim)
+					df.write(";")
+				df.put("")
+			}
+		}
+
+		// End of the label
+		if (!labdef)
+			df.put("}")
+		else if (!ls[i].matalab) {
+			if (delim) {
+				df.indent(-1)
+				df.write(";")
+			}
+			df.put("")
+		}
+
+		if (i == maxdelim)
+			df.put("#delimit cr")
+	}
+
+	if (nlists)
+		df.put("")
+}
+
+void `ODKMetaController'::write_sysmiss_labs()
+{
+	`RS' nlists, nsysmiss, i
+	`SR' listnames
+
+	listnames = J(1, 0, "")
+	nlists = lists.length()
+	for (i = 1; i <= nlists; i++) {
+		if (any(lists.get(i)->names :== adorn_quotes(".")))
+			listnames = listnames, lists.get(i)->listname
+	}
+
+	if (nsysmiss = length(listnames)) {
+		printf("{p}{txt}note: list%s {res:%s} contain%s a name equal to " +
+			`"{res:"."}. Because of the do-file's use of {cmd:insheet}, "' +
+			`"it may not be possible to distinguish {res:"."} from "' +
+			"{res:sysmiss}. When it is unclear, the do-file will assume that " +
+			`"values equal the name {res:"."} and not {res:sysmiss}. "' +
+			"See the help file for more information.{p_end}\n",
+			(nsysmiss > 1) * "s", invtokens(listnames), (nsysmiss == 1) * "s")
+
+		df.put(`"* Lists with a name equal to ".""')
+		df.put("local sysmisslabs " + invtokens(listnames))
+		df.put("")
+	}
+}
+
+void `ODKMetaController'::write_survey_start()
 {
 	`RS' ndiffs, i
 	`RR' form
 	`RC' diff
 	`SR' headers, chars
 
-	form = fields->attributes()->vals("form")
-	headers = select(fields->attributes()->vals("header"), form)
-	chars   = select(fields->attributes()->vals("char"),   form)
+	form = fields.attributes()->vals("form")
+	headers = select(fields.attributes()->vals("header"), form)
+	chars   = select(fields.attributes()->vals("char"),   form)
 
-	diff = headers :!= subinstr(chars, charpre, "", 1)
+	diff = headers :!= subinstr(chars, CHAR_PREFIX, "", 1)
 	ndiffs = sum(diff)
 	headers = select(headers, diff)
 	chars   = select(chars,   diff)
@@ -146,18 +427,7 @@ void `SurveyController'::write_survey_start()
 	df.put("")
 }
 
-`BooleanS' `SurveyController'::insheetable_names(pointer(`FieldS') rowvector fields,
-	`SS' repeatname)
-{
-	`RS' i
-	for (i = 1; i <= length(fields); i++)
-		if (fields[i]->repeat()->long_name() == repeatname &
-			fields[i]->insheet() != `InsheetOK')
-			return(`False')
-	return(`True')
-}
-
-void `SurveyController'::write_char(`SS' var, `SS' attribute, `SS' text, `SS' suffix,
+void `ODKMetaController'::write_char(`SS' var, `SS' attribute, `SS' text, `SS' suffix,
 	`RS' loop)
 {
 	`RS' autotab, nstrs
@@ -185,7 +455,7 @@ void `SurveyController'::write_char(`SS' var, `SS' attribute, `SS' text, `SS' su
 	}
 }
 
-void `SurveyController'::write_fields()
+void `ODKMetaController'::write_fields()
 {
 	`RS' nfields, firstrepeat, insheetmain, nattribs, ngroups, other,
 		geopoint, loop, pctr, i, j
@@ -197,7 +467,7 @@ void `SurveyController'::write_fields()
 	pointer(`FieldS') rowvector fields
 	pointer(`GroupS') rowvector groups
 
-	fields = this.fields->fields()
+	fields = this.fields.fields()
 
 	// Write fields according to repeat()->order() .order().
 	if (nfields = length(fields)) {
@@ -211,8 +481,8 @@ void `SurveyController'::write_fields()
 
 	firstrepeat = 1
 	insheetmain = 0
-	attribchars = select(this.fields->attributes()->vals("name"),
-		!this.fields->attributes()->vals("special"))
+	attribchars = select(this.fields.attributes()->vals("name"),
+		!this.fields.attributes()->vals("special"))
 	nattribs = length(attribchars)
 	for (pctr = 1; pctr <= nfields; pctr++) {
 		i = p[pctr]
@@ -414,18 +684,18 @@ void `SurveyController'::write_fields()
 	}
 }
 
-void `SurveyController'::write_rename_for_split()
+void `ODKMetaController'::write_rename_for_split()
 {
 	`RS' n, i
 	pointer(`RepeatS') scalar repeat
 
 	df.put("* Rename any variable names that are difficult for -split-.")
-	n = length(fields->repeats())
+	n = length(fields.repeats())
 	if (n == 1)
 		df.put("// rename ...")
 	else {
 		for (i = 1; i <= n; i++) {
-			repeat = fields->repeats()[i]
+			repeat = fields.repeats()[i]
 			df.put(sprintf(`"%sif "\`repeat'" == %s%s {"',
 				(i > 1) * "else ", adorn_quotes(repeat->long_name()),
 				repeat->main() * " /* main fields (not a repeat group) */"))
@@ -440,13 +710,13 @@ void `SurveyController'::write_rename_for_split()
 // an end-user dataset immediately before it is saved.
 // It is destructive, dropping characteristics for instance, so
 // it is usually best to limit any code between this clean and -save-.
-void `SurveyController'::write_clean_before_final_save()
+void `ODKMetaController'::write_clean_before_final_save()
 {
 	write_drop_attrib()
 	write_compress()
 }
 
-void `SurveyController'::write_merge_repeat(pointer(`RepeatS') scalar repeat,
+void `ODKMetaController'::write_merge_repeat(pointer(`RepeatS') scalar repeat,
 	`BooleanS' finalsave)
 {
 	`RS' nchildren, multiple, i
@@ -491,7 +761,7 @@ void `SurveyController'::write_merge_repeat(pointer(`RepeatS') scalar repeat,
 	df.put("")
 }
 
-void `SurveyController'::write_merge_repeats()
+void `ODKMetaController'::write_merge_repeats()
 {
 	`RS' nrepeats, pctr, i
 	`RC' order, p
@@ -499,7 +769,7 @@ void `SurveyController'::write_merge_repeats()
 	`SS' repeatcsv, dtaq
 	pointer(`RepeatS') rowvector repeats
 
-	repeats = fields->repeats()
+	repeats = fields.repeats()
 
 	// Write repeats according to .order().
 	if (nrepeats = length(repeats)) {
@@ -544,5 +814,8 @@ void `SurveyController'::write_merge_repeats()
 		}
 	}
 }
+
+					/* control logic */
+/* -------------------------------------------------------------------------- */
 
 end

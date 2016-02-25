@@ -1,11 +1,11 @@
 vers 11.2
 
 matamac
-matainclude ChoicesOptions ODKMetaDoWriter SurveyOptions
+matainclude ChoicesOptions ODKMetaWriter SurveyOptions
 
 mata:
 
-// Functional layer between -odkmeta- and `ODKMetaDoWriter'
+// Functional layer between -odkmeta- and `ODKMetaWriter'
 void odkmeta(
 	// Main
 	`LclNameS' filename,
@@ -23,7 +23,7 @@ void odkmeta(
 	`LclNameS' command_line
 ) {
 	`ChoicesOptionsS' choices
-	`ODKMetaDoWriterS' writer
+	`ODKMetaWriterS' writer
 	`SurveyOptionsS' survey
 
 	survey.init(st_local(survey_command_line))
@@ -44,7 +44,7 @@ void odkmeta(
 		// Non-option values
 		st_local(command_line)
 	)
-	writer.write()
+	writer.write_all()
 }
 
 end

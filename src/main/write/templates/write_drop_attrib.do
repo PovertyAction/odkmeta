@@ -1,8 +1,8 @@
 <% `RS' i
 `SR' drop
 
-drop = select(fields->attributes()->vals("char"),
-	!fields->attributes()->vals("keep"))
+drop = select(fields.attributes()->vals("char"),
+	!fields.attributes()->vals("keep"))
 if (length(drop) == 0)
 	return
 drop = sort(drop', 1)' %>

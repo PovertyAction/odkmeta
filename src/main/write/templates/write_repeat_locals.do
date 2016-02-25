@@ -1,7 +1,7 @@
 <% `SS' repeat
-repeat = fields->has_repeat() ? "\`repeat'" : "" %>
+repeat = fields.has_repeat() ? "\`repeat'" : "" %>
 local repeats <%= adorn_quotes("\`repeats' " + adorn_quotes(repeat)) %>
-<% if (fields->has_repeat()) { %>
+<% if (fields.has_repeat()) { %>
 	tempfile child
 	local childfiles : list childfiles | child
 <% } %>

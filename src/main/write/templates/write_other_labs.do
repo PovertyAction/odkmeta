@@ -1,6 +1,6 @@
 <% `SS' expression, otherval %>
 * Add "other" values to value labels that need them.
-local otherlabs <%= invtokens(fields->other_lists()) %>
+local otherlabs <%= invtokens(fields.other_lists()) %>
 foreach lab of local otherlabs {
 	mata: st_vlload("`lab'", `values' = ., `text' = "")
 	<% if (other == "max" | other == "min") { %>
