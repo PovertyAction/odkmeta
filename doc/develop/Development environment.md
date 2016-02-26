@@ -1,7 +1,7 @@
 Stata environment for odkmeta development
 =========================================
 
-Follow these steps to set up your Stata environment for `odkmeta` development. At the end, individual source code files should be able to run on their own: there is no need to run `write_ado.do` when working on a single source code file.
+Follow these steps to set up your Stata environment for `odkmeta` development. At the end, individual source code files should be able to run on their own: there is no need to run `write_odkmeta_ado` when working on a single source code file.
 
 Type the following in Stata to install SSC packages used in `odkmeta` itself, the cscript, or other files:
 
@@ -26,18 +26,8 @@ After this, the command `c odkmeta` will change the working directory to `GitHub
 
 Next, install [`matawarn`](https://github.com/matthew-white/matawarn) and [`compdta`](https://github.com/matthew-white/compdta), adding them to a [system directory](http://www.stata.com/help.cgi?sysdir) or your [ado-path](http://www.stata.com/help.cgi?adopath).
 
-Finally, add `odkmeta` to your ado-path:
+`odkmeta` uses [Project Mata](https://github.com/PovertyAction/project-mata). Add `src/build` to your ado-path. Build `odkmeta.ado` by running `write_odkmeta_ado.ado`.
 
-```
-c odkmeta
-adopath ++ `"`c(pwd)'"'
-```
+`odkmeta` uses the [Stata Template Engine](https://github.com/PovertyAction/stata-template-engine). Compile the templates by running `ste_odkmeta.ado`.
 
-You may wish to place these lines in your [`profile.do`](http://www.stata.com/support/faqs/programming/profile-do-file/) as follows:
-
-```
-local curdir "`c(pwd)'"
-c odkmeta
-adopath ++ `"`c(pwd)'"'
-cd `"`curdir'"'
-```
+You may wish to add some of the above setup to your [`profile.do`](http://www.stata.com/support/faqs/programming/profile-do-file/).

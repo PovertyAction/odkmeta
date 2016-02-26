@@ -13,7 +13,7 @@ odkmeta
 - Attach field labels as [variable labels](http://www.stata.com/help.cgi?label) and [notes](http://www.stata.com/help.cgi?notes)
 - [Merge](http://www.stata.com/help.cgi?merge) repeat groups
 
-The latest stable version is available through [SSC](http://www.stata.com/support/ssc-installation/): type `ssc install odkmeta` in Stata to install. Run [`write_ado.do`](/write_ado.do) to append all working source code files into a single `odkmeta.ado` containing the latest changes.
+The latest stable version is available through [SSC](http://www.stata.com/support/ssc-installation/): type `ssc install odkmeta` in Stata to install.
 
 Certification script
 --------------------
@@ -25,9 +25,11 @@ Contributing
 
 Help keep `odkmeta` up-to-date by contributing code. See the [issues](https://github.com/PovertyAction/odkmeta/issues?state=open) for current to-dos. If you have experience with an ODK flavor not yet supported, please contribute your knowledge through pull requests or issues.
 
-Most contributors will wish to modify one of `write_*.mata`, e.g., [`write_choices.mata`](/write_choices.mata). The `odkmeta` Stata program itself is stored in [`odkmeta.do`](/src/main/odkmeta.do); review it for an overview of the program flow. When contributing code, adding associated [cscript tests](/doc/develop/cscript/Tests.md) is much appreciated.
+The Mata class [`` `ODKMetaController'``](/src/main/write/ODKMetaController.mata) writes the `odkmeta` do-file, and `odkmeta` is largely just a wrapper of `` `ODKMetaController'``. `odkmeta` uses the [Stata Template Engine](https://github.com/PovertyAction/stata-template-engine), which means that `` `ODKMetaController'`` writes from the do-file section templates in [`templates/`](/src/main/write/templates). Most contributors will wish to modify one of the templates or add a new one.
 
-Follow [these steps](/doc/develop/Development environment.md) to set up your Stata environment for `odkmeta` development. At the end, individual source code files should be able to run on their own: there is no need to run `write_ado.do` when working on a single source code file.
+When contributing code, adding associated [cscript tests](/doc/develop/cscript/Tests.md) is much appreciated.
+
+Follow [these steps](/doc/develop/Development environment.md) to set up your Stata environment for `odkmeta` development.
 
 License
 -------
