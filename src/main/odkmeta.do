@@ -78,73 +78,24 @@ pr odkmeta
 
 	preserve
 
-	* -Parse -survey()-.
-	/* -parse_survey- completes checking that involves single rows of the survey
-	sheet; the rest is done in -write_survey()-. Unlike -write_survey()-,
-	-parse_survey- displays the problematic row, and in general, where possible
-	it is better to implement a check in -parse_survey- rather than
-	-write_survey()-. However, all complex checks that involve Mata are best put
-	in -write_survey()-. */
-	parse_survey `survey'
-	// "s" prefix for "-survey()-": "sfn" for "-survey()- filename."
-	loc sfn			"`s(fn)'"
-	loc type		"`s(type)'"
-	loc sname		"`s(name)'"
-	loc slabel		"`s(label)'"
-	loc disabled	"`s(disabled)'"
-
-	* Parse -choices()-.
-	parse_choices `choices'
-	// "c" prefix for "-choices()-": "cfn" for "-choices()- filename."
-	loc cfn			"`s(fn)'"
-	loc listname	"`s(listname)'"
-	loc cname		"`s(name)'"
-	loc clabel		"`s(label)'"
-
-	tempfile startdo enddo chardo cleando1 cleando2 vallabdo encodedo ///
-		encodetab fulldo
-
-	* Do-file start and end
-	mata: write_do_start("`startdo'", st_local("0"))
-	mata: write_do_end("`enddo'", "`relax'" != "")
-
-	* -survey()-
 	#d ;
-	mata: write_survey(
-		/* output do-files */ "`chardo'", "`cleando1'", "`cleando2'",
-		/* output locals */ "anyrepeat", "otherlists", "listnamechar",
-			"isotherchar",
-		`"`sfn'"', st_local("csv"),
-		/* column headers */ st_local("type"), st_local("sname"),
-			st_local("slabel"), st_local("disabled"),
-		st_local("dropattrib"), st_local("keepattrib"), "`relax'" != "")
-	;
+	mata: odkmeta(
+		// Main
+		"using",
+		"csv",
+		"survey",
+		"choices",
+		// Fields
+		"dropattrib",
+		"keepattrib",
+		"relax",
+		// Lists
+		"other",
+		"oneline",
+		// Non-option values
+		"0"
+	);
 	#d cr
-
-	* -choices()-
-	#d ;
-	mata: write_choices(
-		/* output do-files */ "`vallabdo'", "`encodedo'",
-		`"`cfn'"',
-		/* column headers */ st_local("listname"), st_local("cname"),
-			st_local("clabel"),
-		/* characteristic names */ "`listnamechar'", "`isotherchar'",
-		/* other values */ "`otherlists'", "`other'",
-		"`oneline'" != "")
-	;
-	#d cr
-
-	* Append the do-file sections and export.
-	if `anyrepeat' {
-		cap conf f `encodedo'
-		if !_rc {
-			mata: tab_file("`encodedo'", "`encodetab'")
-			copy `encodetab' `encodedo', replace
-		}
-	}
-	mata: append_files(("`startdo'", "`vallabdo'", "`chardo'", "`cleando1'", ///
-		"`encodedo'", "`cleando2'", "`enddo'"), "`fulldo'")
-	qui copy `fulldo' `"`using'"', `replace'
 end
 
 
@@ -205,6 +156,12 @@ pr check_col
 	}
 end
 
+/* -parse_survey- completes checking that involves single rows of the survey
+sheet; the rest is done in `FormFields'. Unlike `FormFields',
+-parse_survey- displays the problematic row, and in general, where possible
+it is better to implement a check in -parse_survey- rather than
+`FormFields'. However, all complex checks that involve Mata are best put
+in `FormFields'. */
 pr parse_survey, sclass
 	cap noi syntax anything(name=fn id=filename equalok everything), ///
 		[Type(str) name(str) LAbel(str) Disabled(str)]

@@ -158,42 +158,4 @@ void load_csv(`SS' _optvars, `SS' _fn, `SR' _opts, `SS' _opt)
 	st_local(_optvars, invtokens(vars[optindex]))
 }
 
-// Add a tab to the start of each nonblank line of _infile, saving the result to
-// _outfile.
-void tab_file(`SS' _infile, `SS' _outfile)
-{
-	`RS' fhin, fhout
-	`SM' line
-
-	fhin = fopen(_infile, "r")
-	fhout = fopen(_outfile, "w")
-	while ((line = fget(fhin)) != J(0, 0, "")) {
-		fput(fhout, tab(line != "") + line)
-	}
-	fclose(fhin)
-	fclose(fhout)
-}
-
-// Append the files specified to _infiles, saving the result to _outfile.
-void append_files(`SR' _infiles, `SS' _outfile)
-{
-	`RS' fhout, fhin, n, i
-	`SM' line
-
-	fhout = fopen(_outfile, "w")
-
-	n = length(_infiles)
-	for (i = 1; i <= n; i++) {
-		if (fileexists(_infiles[i])) {
-			fhin = fopen(_infiles[i], "r")
-			while ((line = fget(fhin)) != J(0, 0, "")) {
-				fput(fhout, line)
-			}
-			fclose(fhin)
-		}
-	}
-
-	fclose(fhout)
-}
-
 end
