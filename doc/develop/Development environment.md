@@ -8,7 +8,7 @@ Type the following in Stata to install SSC packages used in `odkmeta` itself, th
 ```
 ssc install specialexp
 ssc install fastcd
-ssc install renvars
+net install dm88_1.pkg, all replace from("http://www.stata-journal.com/software/sj5-4/")
 ```
 
 Now set up `fastcd` to run on your computer as follows:
