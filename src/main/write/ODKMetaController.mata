@@ -19,6 +19,7 @@ class `ODKMetaController' extends `ODKMetaBaseWriter' {
 		`SS' csv
 		// Fields
 		`BooleanS' relax
+		`BooleanS' shortnames
 		// Lists
 		`SS' other
 		`BooleanS' oneline
@@ -71,6 +72,7 @@ void `ODKMetaController'::init(
 	`SS' dropattrib,
 	`SS' keepattrib,
 	`BooleanS' relax,
+	`BooleanS' shortnames,
 	// Lists
 	`SS' other,
 	`BooleanS' oneline,
@@ -80,6 +82,7 @@ void `ODKMetaController'::init(
 	this.filename = filename
 	this.csv = csv
 	this.relax = relax
+	this.shortnames = shortnames
 	this.other = other
 	this.oneline = oneline
 	this.command_line = command_line
@@ -132,6 +135,10 @@ void `ODKMetaController'::write_all()
 
 	if (fields.has_repeat())
 		write_dta_loop_start()
+
+	if (shortnames) {
+		write_shortnames()
+	}
 
 	if (fields.has_field_of_type("select_multiple")) {
 		write_rename_for_split()
