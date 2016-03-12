@@ -16,6 +16,7 @@ void odkmeta(
 	`LclNameS' dropattrib,
 	`LclNameS' keepattrib,
 	`LclNameS' relax,
+	`LclNameS' shortnames,
 	// Lists
 	`LclNameS' other,
 	`LclNameS' oneline,
@@ -38,6 +39,7 @@ void odkmeta(
 		st_local(dropattrib),
 		st_local(keepattrib),
 		st_local(relax) != "",
+		st_local(shortnames) != "",
 		// Lists
 		st_local(other),
 		st_local(oneline) != "",
