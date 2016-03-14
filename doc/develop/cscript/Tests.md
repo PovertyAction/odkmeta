@@ -1082,4 +1082,13 @@ Note that the `.xls` forms in `Tests` may differ from the corresponding `survey`
 	<td>Groups and repeats</td>
 	<td>A form that looks like this:<br>type name<br>integer SETOFmygroupmyrepeat<br>begin group mygroup<br>begin repeat myrepeat<br>integer SETOFmyrepeat<br>end repeat myrepeat<br>end group mygroup</td>
 </tr>
+<<<<<<< HEAD
+=======
+<tr>
+    <td>210</td>
+	<td><a href="https://github.com/boyercb">boyercb</a></td>
+	<td><code>shortnames</code></td>
+	<td>Test of -shortnames-. Same as [ID 115]</td>
+</tr>
+>>>>>>> 70a2e5a... Update documentation
 </table>
