@@ -1353,6 +1353,19 @@ cd ..
 
 
 /* -------------------------------------------------------------------------- */
+					/* shortnames		*/
+
+* Test 210
+cd 210
+odkmeta using import, ///
+	csv(odkmetatest210) survey(survey) choices(choices) replace ///
+	shortnames
+run import
+compall expected
+cd ..
+
+
+/* -------------------------------------------------------------------------- */
 					/* live-project testing		*/
 
 if `project' {

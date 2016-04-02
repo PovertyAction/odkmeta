@@ -14,7 +14,7 @@ pr odkmeta
 	#d ;
 	syntax using/, csv(str)
 		/* survey options */
-		Survey(str asis) [DROPattrib(str asis) KEEPattrib(str asis) RELax]
+		Survey(str asis) [DROPattrib(str asis) KEEPattrib(str asis) RELax SHORTnames]
 		/* choices options */
 		CHOices(str asis) [OTHer(str) ONEline]
 		/* other options */
@@ -30,6 +30,7 @@ pr odkmeta
 	-DROPattrib()- from -drop-.
 	-KEEPattrib()- from -keep- and -cluster subcommand, KEEPcenters-.
 	-RELax- from -sem, RELiability()-; multiple -REL*- options.
+	-SHORTnames- from -separate, SHORTlabel-
 	-CHOices()- from -nlogittree, CHOice()-.
 	-choices(, LIstname())- would be -Listname()- (from -list-) except for
 		-choices(, label)-; instead from -return LIst-.
@@ -89,6 +90,7 @@ pr odkmeta
 		"dropattrib",
 		"keepattrib",
 		"relax",
+		"shortnames",
 		// Lists
 		"other",
 		"oneline",

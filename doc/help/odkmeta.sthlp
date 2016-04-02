@@ -37,6 +37,8 @@ metadata from the {it:survey} worksheet {it:surveyfile}{p_end}
 metadata from the {it:choices} worksheet {it:choicesfile}{p_end}
 
 {syntab:Fields}
+{synopt:{opt short:names}}do not append group names to fields when 
+importing as Stata variables.{p_end}
 {synopt:{opt drop:attrib(headers)}}do not import field attributes with
 the column headers {it:headers}{p_end}
 {synopt:{opt keep:attrib(headers)}}import only field attributes with
@@ -219,21 +221,8 @@ such renaming should go in the designated areas.
 However, some forms,
 usually because of many nested groups or groups with long names,
 have many long field names that become duplicate Stata names (problem 2 above).
-In this case, it may work best to use fields' short names where possible.
-The following code attempts to rename variables to their field short names.
-Place it as-is before the renaming for {cmd:split}:
-
-{cmd}{...}
-{phang}foreach var of varlist _all {{p_end}
-{phang2}if "`:char `var'[Odk_group]'" != "" {{p_end}
-{phang3}local name = "`:char `var'[Odk_name]'" + ///{p_end}
-{p 16 20 2}cond(`:char `var'[Odk_is_other]', "_other", "") + ///{p_end}
-{p 16 20 2}"`:char `var'[Odk_geopoint]'"{p_end}
-{phang3}local newvar = strtoname("`name'"){p_end}
-{phang3}capture rename `var' `newvar'{p_end}
-{phang2}}{p_end}
-{phang}}{p_end}
-{txt}{...}
+In this case, it may be best to specify the {opt shortnames} option, which will
+not append group names to the beginning of a field's Stata variable name.
 
 
 {marker remarks_lists}{...}
@@ -525,6 +514,14 @@ If the {it:choices} worksheet has duplicate column headers,
 only the first column for each column header is used.
 
 {dlgtab:Fields}
+
+{phang}
+{opt shortnames} specifies that field names in the {it:surveyfile} should
+be imported as Stata variables with out appending group names to the beginning 
+(the default). This option is useful for forms with many nested groups or 
+groups with long names, which may result in duplicate field names despite
+{cmd odkmeta}'s best attempts to abbreviate field names to Stata's 32 character
+limit.
 
 {phang}
 {opt dropattrib(headers)} specifies the column headers of field attributes that
